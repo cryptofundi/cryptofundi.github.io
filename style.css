@@ -1,0 +1,65 @@
+/* style.css */
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f7f7;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #111;
+  color: white;
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+.logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 10px;
+}
+nav {
+  background: #333;
+  text-align: center;
+  padding: 0.5rem;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 1rem;
+}
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+}
+.topic-img {
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+.btn {
+  display: inline-block;
+  background: #f7931a;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-top: 1rem;
+}
+.nav-buttons {
+  text-align: center;
+  margin: 2rem 0;
+}
+.nav-buttons a {
+  margin: 0 1rem;
+  text-decoration: none;
+  color: #f7931a;
+  font-weight: bold;
+}
+footer {
+  background: #eee;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
