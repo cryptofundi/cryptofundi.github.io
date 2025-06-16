@@ -10,18 +10,55 @@
       background-color: #0e0e0e;
       color: white;
       font-family: Arial, sans-serif;
-      padding: 20px;
+      padding: 0;
+      margin: 0;
     }
+
+    header {
+      background-color: #1a1a1a;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      color: #00ffe5;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 8px 12px;
+    }
+
+    nav a.active,
+    nav a:hover {
+      background-color: #333;
+      border-radius: 5px;
+    }
+
     h1 {
       text-align: center;
       color: #00ffe5;
+      margin: 30px 0 20px 0;
     }
+
     .category {
-      margin-bottom: 20px;
+      margin: 0 auto 20px auto;
+      max-width: 800px;
       border: 1px solid #444;
       border-radius: 8px;
       overflow: hidden;
     }
+
     .category summary {
       background-color: #1e1e1e;
       padding: 12px;
@@ -30,19 +67,23 @@
       font-weight: bold;
       color: #00ffe5;
     }
+
     .category ul {
       list-style-type: none;
       padding: 10px 20px;
       margin: 0;
     }
+
     .category li {
       margin-bottom: 12px;
     }
+
     .category a {
       color: #ffcc00;
       text-decoration: none;
       font-weight: bold;
     }
+
     .category p {
       margin: 2px 0 10px 0;
       font-size: 14px;
@@ -51,6 +92,17 @@
   </style>
 </head>
 <body>
+
+  <!-- Header with Logo and Navigation -->
+  <header>
+    <img src="assets/logo-placeholder.png" alt="Crypto Fundi Logo" class="logo" />
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="resources.html">Learn</a>
+      <a href="tools.html" class="active">Tools</a>
+      <a href="support.html">Support</a>
+    </nav>
+  </header>
 
   <h1>🧰 Crypto Tools by Category</h1>
 
