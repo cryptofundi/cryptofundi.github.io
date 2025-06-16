@@ -1,74 +1,149 @@
-<section class="tools-section">
-  <h2>Crypto Tools by Category</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Fundi - Tools</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00ffe5;
+    }
+    .category {
+      margin-bottom: 20px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .category summary {
+      background-color: #1e1e1e;
+      padding: 12px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00ffe5;
+    }
+    .category ul {
+      list-style-type: none;
+      padding: 10px 20px;
+      margin: 0;
+    }
+    .category li {
+      margin-bottom: 12px;
+    }
+    .category a {
+      color: #ffcc00;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .category p {
+      margin: 2px 0 10px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧰 Crypto Tools by Category</h1>
 
   <!-- 🔄 DEX Platforms -->
-  <h3>🔄 Decentralized Exchanges (DEXs)</h3>
-  <div class="tool">
-    <h4><a href="https://uniswap.org/" target="_blank">Uniswap</a></h4>
-    <p>A leading DEX on Ethereum for swapping ERC-20 tokens.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://pump.fun/" target="_blank">Pump.fun</a></h4>
-    <p>A Solana-based meme coin launchpad and trading platform.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://hyperliquid.xyz/" target="_blank">Hyperliquid</a></h4>
-    <p>Decentralized trading for perpetuals and spot with high performance.</p>
-  </div>
+  <details class="category" open>
+    <summary>🔄 Decentralized Exchanges (DEXs)</summary>
+    <ul>
+      <li>
+        <a href="https://uniswap.org/" target="_blank">Uniswap</a>
+        <p>A leading DEX on Ethereum for swapping ERC-20 tokens.</p>
+      </li>
+      <li>
+        <a href="https://pump.fun/" target="_blank">Pump.fun</a>
+        <p>Solana-based meme coin launchpad and marketplace.</p>
+      </li>
+      <li>
+        <a href="https://hyperliquid.xyz/" target="_blank">Hyperliquid</a>
+        <p>Decentralized platform for perpetual and spot trading.</p>
+      </li>
+    </ul>
+  </details>
 
-  <!-- 📊 Market Data & Price Tracking -->
-  <h3>📊 Market Data & Analysis</h3>
-  <div class="tool">
-    <h4><a href="https://www.coingecko.com/" target="_blank">CoinGecko</a></h4>
-    <p>Track crypto prices, market cap, and coin rankings in real time.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://coinmarketcap.com/" target="_blank">CoinMarketCap</a></h4>
-    <p>One of the most used platforms to view crypto prices and historical data.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://geckoterminal.com/" target="_blank">GeckoTerminal</a></h4>
-    <p>Live on-chain DEX data powered by CoinGecko. Great for trading insights.</p>
-  </div>
+  <!-- 📊 Market Data -->
+  <details class="category">
+    <summary>📊 Market Data & Price Tracking</summary>
+    <ul>
+      <li>
+        <a href="https://www.coingecko.com/" target="_blank">CoinGecko</a>
+        <p>Real-time market prices, rankings, and community data.</p>
+      </li>
+      <li>
+        <a href="https://coinmarketcap.com/" target="_blank">CoinMarketCap</a>
+        <p>Popular platform for tracking crypto asset prices and news.</p>
+      </li>
+      <li>
+        <a href="https://geckoterminal.com/" target="_blank">GeckoTerminal</a>
+        <p>Live on-chain DEX data dashboard powered by CoinGecko.</p>
+      </li>
+    </ul>
+  </details>
 
   <!-- 🔍 Blockchain Explorers -->
-  <h3>🔍 Blockchain Explorers</h3>
-  <div class="tool">
-    <h4><a href="https://etherscan.io/" target="_blank">Etherscan</a></h4>
-    <p>Ethereum blockchain explorer to track transactions, wallets, and contracts.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://solscan.io/" target="_blank">SolanaScan</a></h4>
-    <p>Solana network explorer to view wallet balances and transaction history.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://mempool.space/" target="_blank">Mempool.space</a></h4>
-    <p>Real-time Bitcoin mempool visualizer and block explorer.</p>
-  </div>
+  <details class="category">
+    <summary>🔍 Blockchain Explorers</summary>
+    <ul>
+      <li>
+        <a href="https://etherscan.io/" target="_blank">Etherscan</a>
+        <p>Ethereum explorer for wallet history, tokens, and contracts.</p>
+      </li>
+      <li>
+        <a href="https://solscan.io/" target="_blank">SolanaScan</a>
+        <p>Explore Solana transactions and accounts.</p>
+      </li>
+      <li>
+        <a href="https://mempool.space/" target="_blank">Mempool.space</a>
+        <p>Visualize Bitcoin mempool, blocks, and transaction fees.</p>
+      </li>
+    </ul>
+  </details>
 
-  <!-- 🧰 DeFi Dashboards & Utilities -->
-  <h3>🧰 DeFi Dashboards & Utilities</h3>
-  <div class="tool">
-    <h4><a href="https://dextools.io/" target="_blank">DexTools</a></h4>
-    <p>Live analytics and tracking for Ethereum and other DEX markets.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://dexscreener.com/" target="_blank">DexScreener</a></h4>
-    <p>Real-time charts for tokens across many decentralized exchanges.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://defillama.com/" target="_blank">DeFiLlama</a></h4>
-    <p>Track Total Value Locked (TVL) across multiple DeFi protocols.</p>
-  </div>
+  <!-- 🧰 DeFi Utilities -->
+  <details class="category">
+    <summary>🧰 DeFi Dashboards & Utilities</summary>
+    <ul>
+      <li>
+        <a href="https://dextools.io/" target="_blank">DexTools</a>
+        <p>Analytics and trading tools for DEX platforms.</p>
+      </li>
+      <li>
+        <a href="https://dexscreener.com/" target="_blank">DexScreener</a>
+        <p>Charts and token data for multiple DEXs and chains.</p>
+      </li>
+      <li>
+        <a href="https://defillama.com/" target="_blank">DeFiLlama</a>
+        <p>Track TVL across DeFi protocols and blockchains.</p>
+      </li>
+    </ul>
+  </details>
 
-  <!-- 🕵️‍♂️ Intelligence & On-chain Analytics -->
-  <h3>🕵️‍♂️ Intelligence & On-chain Analytics</h3>
-  <div class="tool">
-    <h4><a href="https://arkhamintelligence.com/" target="_blank">Arkham Intelligence</a></h4>
-    <p>Powerful on-chain intelligence tool to track wallets, entities, and flows.</p>
-  </div>
-  <div class="tool">
-    <h4><a href="https://tokensniffer.com/" target="_blank">TokenSniffer</a></h4>
-    <p>Tool to analyze token contracts for potential scams and risks.</p>
-  </div>
-</section>
+  <!-- 🕵️‍♂️ Intelligence -->
+  <details class="category">
+    <summary>🕵️‍♂️ Intelligence & On-Chain Analytics</summary>
+    <ul>
+      <li>
+        <a href="https://arkhamintelligence.com/" target="_blank">Arkham Intelligence</a>
+        <p>Monitor wallets, identities, and transaction behavior.</p>
+      </li>
+      <li>
+        <a href="https://tokensniffer.com/" target="_blank">TokenSniffer</a>
+        <p>Audit token contracts and detect scams.</p>
+      </li>
+    </ul>
+  </details>
+
+</body>
+</html>
