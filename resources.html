@@ -32,6 +32,54 @@
     .resource-list a:hover {
       text-decoration: underline;
     }
+    .accordion-container {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.accordion-btn {
+  background-color: #111;
+  color: #00bfff;
+  font-weight: bold;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  margin-top: 1rem;
+  border-radius: 5px;
+}
+
+.accordion-btn::before {
+  content: "▶ ";
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.accordion-btn.active::before {
+  transform: rotate(90deg);
+}
+
+.accordion-content {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 0.75rem 1rem;
+  display: none;
+  border-radius: 0 0 5px 5px;
+}
+
+.accordion-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.accordion-content li {
+  border-bottom: 1px solid #222;
+  padding: 0.5rem 0;
+}
+
   </style>
 </head>
 <body>
@@ -45,37 +93,52 @@
     </nav>
   </header>
 
-  <main>
-    <h1>Crypto Learning Resources</h1>
-    <p>Explore our collection of beginner to advanced crypto education topics.</p>
+ <main>
+  <h1>Crypto Learning Resources</h1>
+  <p>Explore our collection of beginner to advanced crypto education topics.</p>
 
-    <div class="resource-list">
+  <div class="accordion-container">
 
-      <details open>
-        <summary><h2>Basics</h2></summary>
+    <div class="accordion-item">
+      <button class="accordion-btn">📘 Basics</button>
+      <div class="accordion-content">
         <ul>
           <li><a href="topic-1.html">1. What is Blockchain?</a></li>
           <li><a href="topic-2.html">2. How Blockchain is used to create Crypto</a></li>
           <li><a href="topic-3.html">3. The Fastest Blockchains in the World</a></li>
-          <!-- Add more links as you create topics -->
         </ul>
-      </details>
+      </div>
+    </div>
 
-      <details>
-        <summary><h2>Coming Soon</h2></summary>
+    <div class="accordion-item">
+      <button class="accordion-btn">📚 Coming Soon</button>
+      <div class="accordion-content">
         <ul>
           <li>4. How Crypto Wallets Work</li>
           <li>5. What is DeFi?</li>
           <li>6. What is an NFT?</li>
-          <!-- Placeholder topics -->
         </ul>
-      </details>
-
+      </div>
     </div>
-  </main>
+
+  </div>
+</main>
+
 
   <footer>
     <p>&copy; 2025 Crypto Fundi • <a href="https://x.com/CryptoFundi_">Contact</a></p>
   </footer>
+  <script>
+  const accBtns = document.querySelectorAll(".accordion-btn");
+
+  accBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const content = btn.nextElementSibling;
+      btn.classList.toggle("active");
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    });
+  });
+</script>
+
 </body>
 </html>
