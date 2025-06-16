@@ -73,13 +73,14 @@ footer {
 
 .wallet-row code {
   background-color: #f5f5f5; /* Light background */
-  color: #111;               /* Dark text */
-  padding: 0.5rem;
+  color: #111;               /* Dark text for contrast */
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
   font-size: 1rem;
-  border-radius: 4px;
+  display: inline-block;
+  min-width: 300px;
   word-break: break-word;
 }
-
 
 .wallet-row button {
   background: #f7931a;
