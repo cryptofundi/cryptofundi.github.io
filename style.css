@@ -72,9 +72,10 @@ footer {
 }
 
 .wallet-row code {
-  background-color: #222;
+  background-color: transparent; /* Remove black background */
+  color: #ffffff; /* Ensure white font */
   padding: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
   border-radius: 4px;
   word-break: break-all;
 }
