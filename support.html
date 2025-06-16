@@ -51,17 +51,39 @@
       <p><a href="https://magiceden.io/marketplace/your-nft-name" target="_blank">View on Magic Eden</a></p>
     </div>
 
-    <div class="wallets">
-      <h2>💸 Donate in Crypto</h2>
-      <p><strong>Bitcoin (BTC)</strong></p>
-      <code>your_btc_wallet_address_here</code>
+   <div class="wallets">
+  <h2>💸 Donate in Crypto</h2>
 
-      <p><strong>Ethereum (ETH)</strong></p>
-      <code>your_eth_wallet_address_here</code>
+  <p><strong>Bitcoin (BTC)</strong></p>
+  <div class="wallet-row">
+    <code id="btc-address">your_btc_wallet_address_here</code>
+    <button onclick="copyToClipboard('btc-address')">📋</button>
+  </div>
 
-      <p><strong>Solana (SOL)</strong></p>
-      <code>your_sol_wallet_address_here</code>
-    </div>
+  <p><strong>Ethereum (ETH)</strong></p>
+  <div class="wallet-row">
+    <code id="eth-address">your_eth_wallet_address_here</code>
+    <button onclick="copyToClipboard('eth-address')">📋</button>
+  </div>
+
+  <p><strong>Solana (SOL)</strong></p>
+  <div class="wallet-row">
+    <code id="sol-address">your_sol_wallet_address_here</code>
+    <button onclick="copyToClipboard('sol-address')">📋</button>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied!');
+    }).catch(err => {
+      alert('Failed to copy. Please try manually.');
+    });
+  }
+</script>
+
   </main>
 
   <footer>
