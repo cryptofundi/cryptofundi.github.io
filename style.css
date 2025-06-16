@@ -93,11 +93,4 @@ footer {
   background: #e68217;
 }
 
-.wallet-row code {
-  background-color: #222;
-  color: #fff; /* Make the wallet address text white */
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  border-radius: 4px;
-  word-break: break-all;
-}
+
