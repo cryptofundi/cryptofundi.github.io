@@ -32,54 +32,54 @@
     .resource-list a:hover {
       text-decoration: underline;
     }
+
     .accordion-container {
-  max-width: 800px;
-  margin: 2rem auto;
-}
+      max-width: 800px;
+      margin: 2rem auto;
+    }
 
-.accordion-btn {
-  background-color: #111;
-  color: #00bfff;
-  font-weight: bold;
-  padding: 0.75rem 1rem;
-  width: 100%;
-  text-align: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  margin-top: 1rem;
-  border-radius: 5px;
-}
+    .accordion-btn {
+      background-color: #111;
+      color: #00bfff;
+      font-weight: bold;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      margin-top: 1rem;
+      border-radius: 5px;
+    }
 
-.accordion-btn::before {
-  content: "▶ ";
-  display: inline-block;
-  transition: transform 0.3s ease;
-}
+    .accordion-btn::before {
+      content: "▶ ";
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
 
-.accordion-btn.active::before {
-  transform: rotate(90deg);
-}
+    .accordion-btn.active::before {
+      transform: rotate(90deg);
+    }
 
-.accordion-content {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 0.75rem 1rem;
-  display: none;
-  border-radius: 0 0 5px 5px;
-}
+    .accordion-content {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 0.75rem 1rem;
+      display: none;
+      border-radius: 0 0 5px 5px;
+    }
 
-.accordion-content ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
+    .accordion-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
 
-.accordion-content li {
-  border-bottom: 1px solid #222;
-  padding: 0.5rem 0;
-}
-
+    .accordion-content li {
+      border-bottom: 1px solid #222;
+      padding: 0.5rem 0;
+    }
   </style>
 </head>
 <body>
@@ -93,53 +93,157 @@
     </nav>
   </header>
 
- <main>
-  <h1>Crypto Learning Resources</h1>
-  <p>Explore our collection of beginner to advanced crypto education topics.</p>
+  <main>
+    <h1>Crypto Learning Resources</h1>
+    <p>Explore our collection of beginner to advanced crypto education topics.</p>
 
-  <div class="accordion-container">
+    <div class="accordion-container">
 
-    <div class="accordion-item">
-  <button class="accordion-btn active">📘 Basics</button>
-  <div class="accordion-content" style="display: block;">
-    <ul>
-      <li><a href="topic-1.html">1. What is Blockchain?</a></li>
-      <li><a href="topic-2.html">2. How Blockchain is used to create Crypto</a></li>
-      <li><a href="topic-3.html">3. The Fastest Blockchains in the World</a></li>
-    </ul>
-  </div>
-</div>
+      <!-- Crypto Basics -->
+      <div class="accordion-item">
+        <button class="accordion-btn active">📘 Crypto Basics</button>
+        <div class="accordion-content" style="display: block;">
+          <ul>
+            <li><a href="#">What is Cryptocurrency?</a></li>
+            <li><a href="#">What is Blockchain?</a></li>
+            <li><a href="#">What is Bitcoin?</a></li>
+            <li><a href="#">What are Altcoins?</a></li>
+            <li><a href="#">Token vs Coin</a></li>
+            <li><a href="#">Types of Blockchains</a></li>
+            <li><a href="#">How to Buy Your First Crypto</a></li>
+          </ul>
+        </div>
+      </div>
 
-<div class="accordion-item">
-  <button class="accordion-btn active">📚 Coming Soon</button>
-  <div class="accordion-content" style="display: block;">
-    <ul>
-      <li>4. How Crypto Wallets Work</li>
-      <li>5. What is DeFi?</li>
-      <li>6. What is an NFT?</li>
-    </ul>
-  </div>
-</div>
+      <!-- Wallets -->
+      <div class="accordion-item">
+        <button class="accordion-btn">💼 Crypto Wallets & Storage</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">What is a Wallet?</a></li>
+            <li><a href="#">Hot Wallet vs Cold Wallet</a></li>
+            <li><a href="#">How to Store Crypto Safely</a></li>
+            <li><a href="#">Choosing the Right Wallet</a></li>
+            <li><a href="#">Multi-signature Wallets</a></li>
+          </ul>
+        </div>
+      </div>
 
+      <!-- Mechanics -->
+      <div class="accordion-item">
+        <button class="accordion-btn">⚙️ Crypto Mechanics</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">How Blockchain Creates Crypto</a></li>
+            <li><a href="#">How Bitcoin Mining Works</a></li>
+            <li><a href="#">Proof of Work vs Proof of Stake</a></li>
+            <li><a href="#">Gas Fees Explained</a></li>
+            <li><a href="#">Fastest Blockchains in the World</a></li>
+          </ul>
+        </div>
+      </div>
 
-  </div>
-</main>
+      <!-- Security -->
+      <div class="accordion-item">
+        <button class="accordion-btn">🛡️ Security & Safety</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">Common Crypto Scams to Avoid</a></li>
+            <li><a href="#">Safety Tips for Trading & Storing</a></li>
+            <li><a href="#">How to Spot a Rug Pull</a></li>
+            <li><a href="#">Avoiding Fake Airdrops & Phishing</a></li>
+          </ul>
+        </div>
+      </div>
 
+      <!-- Exchanges -->
+      <div class="accordion-item">
+        <button class="accordion-btn">🏦 Exchanges & Trading</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">What is a Crypto Exchange?</a></li>
+            <li><a href="#">CEX vs DEX</a></li>
+            <li><a href="#">How to Use a DEX</a></li>
+            <li><a href="#">Limit vs Market Orders</a></li>
+            <li><a href="#">Trading vs Investing</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- DeFi -->
+      <div class="accordion-item">
+        <button class="accordion-btn">🌍 DeFi & Web3</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">What is DeFi?</a></li>
+            <li><a href="#">Yield Farming & Liquidity Pools</a></li>
+            <li><a href="#">What are DAOs?</a></li>
+            <li><a href="#">Staking Explained</a></li>
+            <li><a href="#">Borrowing & Lending in DeFi</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- NFTs -->
+      <div class="accordion-item">
+        <button class="accordion-btn">🎨 NFTs & Digital Assets</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">What is an NFT?</a></li>
+            <li><a href="#">How to Buy an NFT</a></li>
+            <li><a href="#">Top NFT Marketplaces</a></li>
+            <li><a href="#">NFT Use Cases Beyond Art</a></li>
+            <li><a href="#">NFT Risks & Scams</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Advanced -->
+      <div class="accordion-item">
+        <button class="accordion-btn">🚀 Advanced Topics</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">Layer 1 vs Layer 2</a></li>
+            <li><a href="#">Cross-Chain Interoperability</a></li>
+            <li><a href="#">On-Chain vs Off-Chain</a></li>
+            <li><a href="#">Tokenomics Basics</a></li>
+            <li><a href="#">Intro to Smart Contracts</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div class="accordion-item">
+        <button class="accordion-btn">🔧 Crypto Tools & Utilities</button>
+        <div class="accordion-content">
+          <ul>
+            <li><a href="#">Top Tools for Price Tracking</a></li>
+            <li><a href="#">How to Use a Block Explorer</a></li>
+            <li><a href="#">Wallet Portfolio Managers</a></li>
+            <li><a href="#">Gas Fee Calculators</a></li>
+            <li><a href="#">DEX Aggregators</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
 
   <footer>
     <p>&copy; 2025 Crypto Fundi • <a href="https://x.com/CryptoFundi_">Contact</a></p>
   </footer>
-  <script>
-  const accBtns = document.querySelectorAll(".accordion-btn");
 
-  accBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const content = btn.nextElementSibling;
-      btn.classList.toggle("active");
-      content.style.display = content.style.display === "block" ? "none" : "block";
+  <script>
+    const accBtns = document.querySelectorAll(".accordion-btn");
+
+    accBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const content = btn.nextElementSibling;
+        btn.classList.toggle("active");
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
     });
-  });
-</script>
+  </script>
 
 </body>
 </html>
