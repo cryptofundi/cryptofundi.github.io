@@ -3,97 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crypto Fundi - Tools</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Crypto Fundi Tools</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      background-color: #0e0e0e;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 0;
-      margin: 0;
-    }
-
-    header {
-      background-color: #1a1a1a;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      height: 40px;
-    }
-
-    nav {
-      display: flex;
-      gap: 15px;
-    }
-
-    nav a {
-      color: #00ffe5;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 8px 12px;
-    }
-
-    nav a.active,
-    nav a:hover {
-      background-color: #333;
-      border-radius: 5px;
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
 
     h1 {
       text-align: center;
       color: #00ffe5;
-      margin: 30px 0 20px 0;
+      margin-bottom: 1rem;
     }
 
-    .category {
-      margin: 0 auto 20px auto;
-      max-width: 800px;
-      border: 1px solid #444;
-      border-radius: 8px;
+    .tool-category {
+      margin-bottom: 2rem;
+      border: 1px solid #333;
+      border-radius: 6px;
       overflow: hidden;
     }
 
-    .category summary {
-      background-color: #1e1e1e;
-      padding: 12px;
-      cursor: pointer;
+    .tool-category summary {
+      background-color: #1a1a1a;
+      padding: 10px 15px;
       font-size: 18px;
       font-weight: bold;
       color: #00ffe5;
+      cursor: pointer;
     }
 
-    .category ul {
-      list-style-type: none;
+    .tool-category ul {
+      list-style: none;
       padding: 10px 20px;
       margin: 0;
     }
 
-    .category li {
-      margin-bottom: 12px;
+    .tool-category li {
+      margin-bottom: 10px;
     }
 
-    .category a {
+    .tool-category a {
       color: #ffcc00;
       text-decoration: none;
       font-weight: bold;
     }
 
-    .category p {
-      margin: 2px 0 10px 0;
+    .tool-category a:hover {
+      text-decoration: underline;
+    }
+
+    .tool-category p {
+      margin: 3px 0 12px 0;
       font-size: 14px;
       color: #ccc;
     }
   </style>
 </head>
 <body>
-
-  <!-- Header with Logo and Navigation -->
   <header>
     <img src="assets/logo-placeholder.png" alt="Crypto Fundi Logo" class="logo" />
     <nav>
@@ -104,98 +72,98 @@
     </nav>
   </header>
 
-  <h1>🧰 Crypto Tools by Category</h1>
+  <main>
+    <h1>🧰 Crypto Tools by Category</h1>
 
-  <!-- 🔄 DEX Platforms -->
-  <details class="category" open>
-    <summary>🔄 Decentralized Exchanges (DEXs)</summary>
-    <ul>
-      <li>
-        <a href="https://uniswap.org/" target="_blank">Uniswap</a>
-        <p>A leading DEX on Ethereum for swapping ERC-20 tokens.</p>
-      </li>
-      <li>
-        <a href="https://pump.fun/" target="_blank">Pump.fun</a>
-        <p>Solana-based meme coin launchpad and marketplace.</p>
-      </li>
-      <li>
-        <a href="https://hyperliquid.xyz/" target="_blank">Hyperliquid</a>
-        <p>Decentralized platform for perpetual and spot trading.</p>
-      </li>
-    </ul>
-  </details>
+    <details class="tool-category" open>
+      <summary>🔄 Decentralized Exchanges (DEXs)</summary>
+      <ul>
+        <li>
+          <a href="https://uniswap.org/" target="_blank">Uniswap</a>
+          <p>A top Ethereum DEX for swapping ERC-20 tokens.</p>
+        </li>
+        <li>
+          <a href="https://pump.fun/" target="_blank">Pump.fun</a>
+          <p>Solana meme coin launchpad and token marketplace.</p>
+        </li>
+        <li>
+          <a href="https://hyperliquid.xyz/" target="_blank">Hyperliquid</a>
+          <p>Decentralized perpetual and spot trading platform.</p>
+        </li>
+      </ul>
+    </details>
 
-  <!-- 📊 Market Data -->
-  <details class="category">
-    <summary>📊 Market Data & Price Tracking</summary>
-    <ul>
-      <li>
-        <a href="https://www.coingecko.com/" target="_blank">CoinGecko</a>
-        <p>Real-time market prices, rankings, and community data.</p>
-      </li>
-      <li>
-        <a href="https://coinmarketcap.com/" target="_blank">CoinMarketCap</a>
-        <p>Popular platform for tracking crypto asset prices and news.</p>
-      </li>
-      <li>
-        <a href="https://geckoterminal.com/" target="_blank">GeckoTerminal</a>
-        <p>Live on-chain DEX data dashboard powered by CoinGecko.</p>
-      </li>
-    </ul>
-  </details>
+    <details class="tool-category">
+      <summary>📊 Market Data & Price Tracking</summary>
+      <ul>
+        <li>
+          <a href="https://www.coingecko.com/" target="_blank">CoinGecko</a>
+          <p>Real-time prices, rankings, charts, and token data.</p>
+        </li>
+        <li>
+          <a href="https://coinmarketcap.com/" target="_blank">CoinMarketCap</a>
+          <p>Market cap, price charts, and exchange data.</p>
+        </li>
+        <li>
+          <a href="https://geckoterminal.com/" target="_blank">GeckoTerminal</a>
+          <p>Live on-chain charts for tokens and pairs.</p>
+        </li>
+      </ul>
+    </details>
 
-  <!-- 🔍 Blockchain Explorers -->
-  <details class="category">
-    <summary>🔍 Blockchain Explorers</summary>
-    <ul>
-      <li>
-        <a href="https://etherscan.io/" target="_blank">Etherscan</a>
-        <p>Ethereum explorer for wallet history, tokens, and contracts.</p>
-      </li>
-      <li>
-        <a href="https://solscan.io/" target="_blank">SolanaScan</a>
-        <p>Explore Solana transactions and accounts.</p>
-      </li>
-      <li>
-        <a href="https://mempool.space/" target="_blank">Mempool.space</a>
-        <p>Visualize Bitcoin mempool, blocks, and transaction fees.</p>
-      </li>
-    </ul>
-  </details>
+    <details class="tool-category">
+      <summary>🔍 Blockchain Explorers</summary>
+      <ul>
+        <li>
+          <a href="https://etherscan.io/" target="_blank">Etherscan</a>
+          <p>Ethereum explorer for transactions, tokens, and contracts.</p>
+        </li>
+        <li>
+          <a href="https://solscan.io/" target="_blank">SolanaScan</a>
+          <p>Track Solana wallet activity and on-chain data.</p>
+        </li>
+        <li>
+          <a href="https://mempool.space/" target="_blank">Mempool.space</a>
+          <p>Bitcoin mempool visualizer and transaction tracker.</p>
+        </li>
+      </ul>
+    </details>
 
-  <!-- 🧰 DeFi Utilities -->
-  <details class="category">
-    <summary>🧰 DeFi Dashboards & Utilities</summary>
-    <ul>
-      <li>
-        <a href="https://dextools.io/" target="_blank">DexTools</a>
-        <p>Analytics and trading tools for DEX platforms.</p>
-      </li>
-      <li>
-        <a href="https://dexscreener.com/" target="_blank">DexScreener</a>
-        <p>Charts and token data for multiple DEXs and chains.</p>
-      </li>
-      <li>
-        <a href="https://defillama.com/" target="_blank">DeFiLlama</a>
-        <p>Track TVL across DeFi protocols and blockchains.</p>
-      </li>
-    </ul>
-  </details>
+    <details class="tool-category">
+      <summary>🧰 DeFi Dashboards & Utilities</summary>
+      <ul>
+        <li>
+          <a href="https://dextools.io/" target="_blank">DexTools</a>
+          <p>Real-time charts, analytics, and trading tools for DEXs.</p>
+        </li>
+        <li>
+          <a href="https://dexscreener.com/" target="_blank">DexScreener</a>
+          <p>Charts and live token data across many DEX platforms.</p>
+        </li>
+        <li>
+          <a href="https://defillama.com/" target="_blank">DeFiLlama</a>
+          <p>View total value locked (TVL) and DeFi protocol stats.</p>
+        </li>
+      </ul>
+    </details>
 
-  <!-- 🕵️‍♂️ Intelligence -->
-  <details class="category">
-    <summary>🕵️‍♂️ Intelligence & On-Chain Analytics</summary>
-    <ul>
-      <li>
-        <a href="https://arkhamintelligence.com/" target="_blank">Arkham Intelligence</a>
-        <p>Monitor wallets, identities, and transaction behavior.</p>
-      </li>
-      <li>
-        <a href="https://tokensniffer.com/" target="_blank">TokenSniffer</a>
-        <p>Audit token contracts and detect scams.</p>
-      </li>
-    </ul>
-  </details>
+    <details class="tool-category">
+      <summary>🕵️‍♂️ Intelligence & Token Safety</summary>
+      <ul>
+        <li>
+          <a href="https://arkhamintelligence.com/" target="_blank">Arkham Intelligence</a>
+          <p>Track wallets, identities, and wallet labeling on-chain.</p>
+        </li>
+        <li>
+          <a href="https://tokensniffer.com/" target="_blank">TokenSniffer</a>
+          <p>Check token contracts for safety and scam potential.</p>
+        </li>
+      </ul>
+    </details>
+  </main>
 
+  <footer>
+    <p>&copy; 2025 Crypto Fundi • <a href="mailto:theaiworldnet@gmail.com">Contact</a></p>
+  </footer>
 </body>
 </html>
