@@ -1,0 +1,63 @@
+<!-- merkle-tree-explained.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Merkle Tree Explained - Crypto Fundi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <img src="assets/logo-placeholder.png" alt="Crypto Fundi Logo" class="logo" />
+    <h1>Crypto Fundi</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="resources.html">Learn</a>
+    <a href="tools.html">Tools</a>
+    <a href="support.html">Support</a>
+  </nav>
+
+  <main>
+    <h2>Merkle Tree Explained</h2>
+
+    <p>
+      A <strong>Merkle Tree</strong> is a special type of data structure used in blockchain to efficiently and securely verify the integrity of data. It organizes data in a tree structure where each leaf node is a hash of a transaction, and every non-leaf node is a hash of its child nodes.
+    </p>
+
+    <h3>Why Merkle Trees Matter in Blockchain</h3>
+    <ul>
+      <li><strong>Efficient Verification:</strong> You can verify the inclusion of a transaction without downloading the entire block.</li>
+      <li><strong>Data Integrity:</strong> Any change in transaction data changes the Merkle Root.</li>
+      <li><strong>Scalability:</strong> Enables lightweight clients (like mobile wallets) to verify transactions with minimal data.</li>
+    </ul>
+
+    <h3>Structure of a Merkle Tree</h3>
+    <p>Suppose we have 4 transactions: TX1, TX2, TX3, TX4</p>
+    <ul>
+      <li>Hash each transaction: H1, H2, H3, H4</li>
+      <li>Pair and hash again: H12 = Hash(H1 + H2), H34 = Hash(H3 + H4)</li>
+      <li>Final Merkle Root = Hash(H12 + H34)</li>
+    </ul>
+    <p>
+      This Merkle Root is stored in the block header. If a single transaction is changed, the root hash changes, ensuring tamper detection.
+    </p>
+
+    <h3>Real-World Analogy</h3>
+    <p>
+      Imagine you're verifying that a page exists in a 500-page book. Instead of reading the whole book, you check a few key page summaries that lead to the final index. If the index matches, the book hasn’t changed. That’s how Merkle Trees allow fast and secure verification.
+    </p>
+  </main>
+
+  <div class="nav-buttons">
+    <a href="hashing-in-blockchain.html">← Previous</a>
+    <a href="bitcoin-history.html">Next →</a>
+  </div>
+
+  <footer>
+    <p>Follow us on <a href="https://x.com/CryptoFundi_" target="_blank">X (Twitter)</a></p>
+      </footer>
+</body>
+</html>
