@@ -1,0 +1,72 @@
+<!-- digital-signature.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Digital Signature - Crypto Fundi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <img src="assets/logo-placeholder.png" alt="Crypto Fundi Logo" class="logo" />
+    <h1>Crypto Fundi</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="resources.html">Learn</a>
+    <a href="tools.html">Tools</a>
+    <a href="support.html">Support</a>
+  </nav>
+
+  <main>
+    <h2>Digital Signature</h2>
+
+    <p>
+      A <strong>digital signature</strong> is a cryptographic technique used to verify the authenticity and integrity of digital messages or transactions.
+      It's like a virtual fingerprint or seal that confirms a message truly comes from the claimed sender and hasn't been altered.
+    </p>
+
+    <h3>How It Works</h3>
+    <ol>
+      <li>The sender creates a message (e.g., a transaction).</li>
+      <li>The sender’s private key is used to generate a digital signature from the message data.</li>
+      <li>Anyone with the sender’s public key can verify the signature and ensure:
+        <ul>
+          <li>The message came from the sender (authentication).</li>
+          <li>The message wasn’t altered (integrity).</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>Real-World Analogy</h3>
+    <p>
+      Imagine signing a document with a unique wax seal that only you possess. Anyone who sees that seal knows it was you who signed it,
+      and if the seal is broken or replaced, it’s obvious something went wrong.
+    </p>
+
+    <h3>Use in Cryptocurrencies</h3>
+    <ul>
+      <li><strong>Bitcoin:</strong> Every transaction includes a digital signature proving ownership of the coins being spent.</li>
+      <li><strong>Ethereum and others:</strong> Use digital signatures to sign transactions and smart contract interactions.</li>
+    </ul>
+
+    <h3>Benefits</h3>
+    <ul>
+      <li>Security: Only the holder of the private key can create a valid signature.</li>
+      <li>Trust: Verifiers can confirm messages came from legitimate sources.</li>
+      <li>Non-repudiation: A sender cannot deny sending the message.</li>
+    </ul>
+  </main>
+
+  <div class="nav-buttons">
+    <a href="bitcoin-history.html">← Previous</a>
+    <a href="cryptography.html">Next →</a>
+  </div>
+
+  <footer>
+    <p>Follow us on <a href="https://x.com/CryptoFundi_" target="_blank">X (Twitter)</a></p>
+     </footer>
+</body>
+</html>
