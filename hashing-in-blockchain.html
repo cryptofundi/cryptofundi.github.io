@@ -1,0 +1,66 @@
+<!-- hashing-in-blockchain.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hashing in Blockchain - Crypto Fundi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="assets/logo-placeholder.png" alt="Crypto Fundi Logo" class="logo">
+    <h1>Crypto Fundi</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="resources.html">Learn</a>
+    <a href="tools.html">Tools</a>
+    <a href="support.html">Support</a>
+  </nav>
+
+  <main>
+    <h2>Hashing in Blockchain</h2>
+    <p>Hashing is a fundamental concept in blockchain technology. It involves converting any input (like a transaction or block) into a fixed-length string of characters using a mathematical function called a <strong>hash function</strong>.</p>
+
+    <h3>What is a Hash Function?</h3>
+    <p>A hash function takes data of any size and produces a unique output of fixed length. In blockchain, this is usually done using SHA-256 (Secure Hash Algorithm).</p>
+
+    <h3>Key Features of Hashing</h3>
+    <ul>
+      <li><strong>Deterministic:</strong> Same input always gives the same output.</li>
+      <li><strong>Fast computation:</strong> Hashes are calculated quickly.</li>
+      <li><strong>Irreversible:</strong> You cannot reverse-engineer the original data from a hash.</li>
+      <li><strong>Unique:</strong> Small changes in input produce vastly different hashes (avalanche effect).</li>
+      <li><strong>Collision-resistant:</strong> It’s nearly impossible for two inputs to produce the same hash.</li>
+    </ul>
+
+    <h3>Why is Hashing Important in Blockchain?</h3>
+    <ul>
+      <li><strong>Data Integrity:</strong> Any tampering changes the hash and breaks the chain.</li>
+      <li><strong>Block Linking:</strong> Each block contains the hash of the previous block, linking them securely.</li>
+      <li><strong>Mining:</strong> In Proof of Work, miners try to find a hash that meets specific criteria.</li>
+    </ul>
+
+    <h3>Analogy</h3>
+    <p>Think of hashing like a fingerprint for data. Just as your fingerprint is unique and helps verify your identity, a hash verifies the integrity of data in the blockchain.</p>
+
+    <h3>Example</h3>
+    <p>If you input “Crypto is cool” into SHA-256, it gives:</p>
+    <code>427abf62d5b0cfb94944b1dbf79f0efc9f32c42c7387a8816b6ef25e0e4c9f2b</code>
+    <p>Change it to “Crypto is cool!” and the hash becomes completely different:</p>
+    <code>c8673a4ec1ea0934629b6f2c9e56740496e74111cb6c5eac7719b45d23457a7f</code>
+
+  </main>
+
+  <div class="nav-buttons">
+    <a href="nodes-in-blockchain.html">← Previous</a>
+    <a href="merkle-tree-explained.html">Next →</a>
+  </div>
+
+  <footer>
+    <p>Follow us on <a href="https://x.com/CryptoFundi_" target="_blank">X (Twitter)</a></p>
+     </footer>
+</body>
+</html>
