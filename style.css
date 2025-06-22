@@ -106,3 +106,28 @@ footer {
   margin: 0.5rem 0;
 }
 
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.project-row {
+  background-color: #f9f9f9;
+  border-left: 5px solid #ff9900;
+  padding: 15px 20px;
+  font-size: 1.05em;
+  transition: background-color 0.3s ease;
+}
+
+.project-row a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.project-row:hover {
+  background-color: #fff3e0;
+}
+
