@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y456KMDP8N"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y456KMDP8N');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is X402? - Crypto Fundi</title>
+  <meta name="description" content="Learn about X402 — the open protocol for internet-native payments using HTTP 402, enabling seamless crypto micropayments for APIs, digital products, and AI agents.">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <img src="assets/logo-placeholder.png" alt="Crypto Fundi Logo" class="logo">
+    <h1>Crypto Fundi</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="resources.html">Learn</a>
+    <a href="tools.html">Tools</a>
+    <a href="support.html">Support</a>
+  </nav>
+
+  <main>
+    <h2>What is X402?</h2>
+
+    <p><strong>X402</strong> is an open internet-native payment protocol introduced by <strong>Coinbase</strong> and collaborators. It leverages the existing HTTP <code>402 Payment Required</code> status code to enable <strong>direct crypto payments</strong> — typically in <strong>USDC</strong> or other stablecoins — for web resources, APIs, and autonomous services.</p>
+
+    <div style="text-align:center; margin: 20px 0;">
+      <img src="assets/x402-diagram.png" alt="X402 Payment Flow Diagram" style="max-width:80%; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+      <p style="font-size: 0.9em; color: #555;">Illustration: How X402 enables frictionless on-chain payments via HTTP 402</p>
+    </div>
+
+    <h3>🧠 In Simple Terms:</h3>
+    <p>Think of X402 as a way to make <strong>pay-per-use web services</strong> possible — where your browser, app, or even AI agent can directly pay for an online resource using crypto, no middleman required.</p>
+
+    <h3>⚙️ How X402 Works:</h3>
+    <ol>
+      <li>A client (user, app, or AI agent) requests a resource or API.</li>
+      <li>The server replies with an HTTP <strong>402 Payment Required</strong> response, detailing how much to pay, what token, and where.</li>
+      <li>The client sends the payment on-chain and retries the request, including a <strong>X-PAYMENT</strong> header with proof of payment.</li>
+      <li>The server verifies payment and returns <strong>HTTP 200 OK</strong> with the requested resource.</li>
+    </ol>
+
+    <p>In short: <strong>Code + Payment + Access</strong> — all handled automatically through the web’s native communication layer.</p>
+
+    <h3>🚀 Why X402 Matters:</h3>
+    <ul>
+      <li>✅ <strong>Micropayments</strong> — Enable tiny, on-demand payments (e.g., $0.001 per API call).</li>
+      <li>✅ <strong>Frictionless Access</strong> — No KYC, subscriptions, or payment gateways.</li>
+      <li>✅ <strong>Agent-Friendly</strong> — Built for autonomous AI agents that can transact directly.</li>
+      <li>✅ <strong>Chain-Agnostic</strong> — Works across multiple blockchains and tokens, not just one network.</li>
+    </ul>
+
+    <h3>💡 Why It’s Relevant to You:</h3>
+    <p>If you're building AI tools, digital product marketplaces, or microservice apps like <strong>Prompt Goldmine</strong>, X402 can power <strong>pay-per-use access</strong> — perfect for creators and solopreneurs.</p>
+
+    <ul>
+      <li>🪙 Sell prompts or API access without subscriptions</li>
+      <li>🤖 Let AI agents pay autonomously for usage</li>
+      <li>💳 Offer wallet-based one-click access to digital content</li>
+    </ul>
+
+    <h3>🌍 The Bigger Picture:</h3>
+    <p>X402 represents a major step toward a <strong>machine-payable web</strong> — where apps, users, and agents can exchange value natively, safely, and instantly.</p>
+
+    <blockquote style="font-style: italic; color: #555; border-left: 4px solid #008080; padding-left: 12px;">
+      “Just as HTTP made information free to access, X402 could make value transfer frictionless across the internet.”
+    </blockquote>
+  </main>
+
+  <div class="nav-buttons">
+    <a href="what-is-smart-contract.html">← Previous</a> |
+    <a href="cross-chain-bridges.html">Next →</a> |
+    <a href="resources.html">↑ Back to Learn</a>
+  </div>
+
+  <footer>
+    <p>Follow us on <a href="https://x.com/CryptoFundi_" target="_blank">X (Twitter)</a></p>
+    <p><a href="disclaimer.html">Disclaimer</a></p>
+  </footer>
+</body>
+</html>
