@@ -950,11 +950,25 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   z-index: 700;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   transform: translateY(100%);
   transition: transform .35s cubic-bezier(.34,1.1,.64,1);
   padding: 0 0 32px;
 }
 .mobile-sheet.open { transform: translateY(0); }
+
+/* Wrapper that scales wide cards (e.g. Twitter 16:9) to fit the sheet */
+.sheet-card-scaler {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.sheet-card-scaler .card {
+  transform-origin: top center;
+  flex-shrink: 0;
+}
 
 .sheet-handle {
   display: flex; justify-content: center;
@@ -2073,6 +2087,10 @@ function update() {
   renderCard();
   updateMetaJson();
   setQrStatus('idle', getQrData() ? 'Click "Test QR Link" to verify' : 'Enter a URL to validate QR link');
+  // Auto-refresh mobile sheet if it's currently open
+  if (typeof mobileSheetOpen !== 'undefined' && mobileSheetOpen) {
+    requestAnimationFrame(_renderMobileSheet);
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -3110,34 +3128,68 @@ function toggleInfoCard(card) {
 // ═══════════════════════════════════════════════
 // MOBILE — PREVIEW BOTTOM SHEET
 // ═══════════════════════════════════════════════
+let mobileSheetOpen = false;
+
 function openMobilePreview() {
   if (window.innerWidth > 700) return;
+  mobileSheetOpen = true;
+  _renderMobileSheet();
   const overlay = document.getElementById('sheet-overlay');
   const sheet   = document.getElementById('mobile-sheet');
-  const body    = document.getElementById('sheet-body');
-  // Clone the current NFT card into the sheet
-  const original = document.getElementById('nft-card');
-  const clone = original.cloneNode(true);
-  clone.id = 'nft-card-sheet-clone';
-  clone.style.maxWidth = '100%';
-  clone.style.width = '100%';
-  clone.style.boxSizing = 'border-box';
-  // Remove any existing clone
-  const old = document.getElementById('nft-card-sheet-clone');
-  if (old) old.remove();
-  // Insert clone before .sheet-actions
-  const actions = body.querySelector('.sheet-actions');
-  body.insertBefore(clone, actions);
   overlay.classList.add('open');
   sheet.classList.add('open');
   document.body.style.overflow = 'hidden';
-  // Also sync QR status
+}
+
+function _renderMobileSheet() {
+  const body    = document.getElementById('sheet-body');
+  if (!body) return;
+  const original = document.getElementById('nft-card');
+  if (!original) return;
+
+  // Remove any existing card clone + status clone
+  const old = document.getElementById('nft-card-sheet-clone');
+  if (old) old.remove();
+  const oldStatus = body.querySelector('.qr-test-wrap-clone');
+  if (oldStatus) oldStatus.remove();
+  const oldScaler = body.querySelector('.sheet-card-scaler');
+  if (oldScaler) oldScaler.remove();
+
+  const actions = body.querySelector('.sheet-actions');
+
+  // Clone the card
+  const clone = original.cloneNode(true);
+  clone.id = 'nft-card-sheet-clone';
+  clone.style.transform = '';
+  clone.style.transition = 'none';
+
+  // Wrap in scaler
+  const scaler = document.createElement('div');
+  scaler.className = 'sheet-card-scaler';
+  scaler.appendChild(clone);
+  body.insertBefore(scaler, actions);
+
+  // Scale wide cards (Twitter 16:9 = 630px) to fit sheet
+  requestAnimationFrame(() => {
+    const sheetWidth = body.offsetWidth || (window.innerWidth - 40);
+    const cardNatural = clone.offsetWidth || 360;
+    if (cardNatural > sheetWidth) {
+      const scale = sheetWidth / cardNatural;
+      clone.style.transformOrigin = 'top center';
+      clone.style.transform = `scale(${scale})`;
+      // Correct the layout height since transform doesn't affect flow
+      scaler.style.height = Math.round(clone.offsetHeight * scale) + 'px';
+    } else {
+      clone.style.maxWidth = '100%';
+      clone.style.width = '100%';
+    }
+  });
+
+  // QR test status
   const srcStatus = document.getElementById('qr-test-status');
   if (srcStatus) {
-    const existClone = body.querySelector('.qr-test-wrap-clone');
-    if (existClone) existClone.remove();
     const statusClone = srcStatus.cloneNode(true);
-    statusClone.classList.add('qr-test-wrap-clone');
+    statusClone.className += ' qr-test-wrap-clone';
     statusClone.style.maxWidth = '100%';
     statusClone.style.width = '100%';
     body.insertBefore(statusClone, actions);
@@ -3145,6 +3197,7 @@ function openMobilePreview() {
 }
 
 function closeMobilePreview() {
+  mobileSheetOpen = false;
   const overlay = document.getElementById('sheet-overlay');
   const sheet   = document.getElementById('mobile-sheet');
   overlay.classList.remove('open');
