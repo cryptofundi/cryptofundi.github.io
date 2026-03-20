@@ -604,11 +604,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   display: flex; justify-content: space-between; align-items: flex-start;
   position: relative; z-index: 2;
 }
-.card-id {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 2px; color: var(--ca);
-  opacity: .65; font-family: monospace;
-}
+.card-id { display: none; }
 .card-tier-badge { display: none; }
 .tb-basic  { background: rgba(100,116,139,.15); color: #475569; border: 1px solid #cbd5e1; }
 .tb-pro    { background: rgba(26,86,219,.15);   color: #1e40af; border: 1px solid #93c5fd; }
@@ -1269,8 +1265,8 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
         <button class="btn btn-primary btn-full" onclick="mintToCollection()">⬡ Add to Collection</button>
       </div>
       <div style="text-align:center;font-size:10px;color:var(--gray-400);margin-top:7px;line-height:1.6;padding:0 4px">
-        Saves locally — not minted on blockchain.<br/>
-        Export PNG + JSON → mint on <strong style="color:var(--blue)">OpenSea</strong> or <strong style="color:var(--blue)">Magic Eden</strong>.
+        🔒 Privacy-first: your data stays on your device.<br/>
+        Export your collection JSON to back it up safely.
       </div>
       <div style="height:6px"></div>
       <div class="btn-row">
@@ -2279,9 +2275,26 @@ function mintToCollection() {
   const snap = snapshotCurrent();
   snap.idNum = collection.length + 1;
   collection.push(snap);
+  saveCollection();
   updateStats();
   toast(`✓ Added to collection: ${name} #${pad(collection.length)}`);
   updateMetaJson();
+}
+
+function saveCollection() {
+  try {
+    localStorage.setItem('uqnft_collection', JSON.stringify(collection));
+  } catch(e) { console.warn('localStorage save failed', e); }
+}
+
+function loadCollection() {
+  try {
+    const saved = localStorage.getItem('uqnft_collection');
+    if (saved) {
+      collection = JSON.parse(saved);
+      toast(`✓ Restored ${collection.length} item${collection.length!==1?'s':''} from your last session`);
+    }
+  } catch(e) { console.warn('localStorage load failed', e); }
 }
 
 function updateStats() {
@@ -2306,7 +2319,7 @@ function renderCollectionGallery() {
       <button class="ci-del" onclick="event.stopPropagation();deleteItem(${i})" title="Remove">×</button>
       <div class="ci-id">#${pad(s.idNum||i+1)}</div>
       <div class="ci-name">${esc(s.title)}</div>
-      <div class="ci-type">${s.identityType==='human'?'👤 Human':s.identityType==='agent'?'🤖 Agent':s.identityType==='asset'?'📊 Asset':'🔑 Utility'} · ${s.tier}</div>
+      <div class="ci-type">${s.identityType==='human'?'👤 Human':s.identityType==='agent'?'🤖 Agent':s.identityType==='asset'?'📊 Asset':'🔑 Utility'}</div>
     </div>`
   ).join('');
 }
@@ -2323,7 +2336,7 @@ function renderCollectionSidebar() {
       <div>
         <span style="font-size:10px;font-weight:700;color:var(--blue)">#${pad(s.idNum||i+1)}</span>
         <span style="font-size:12px;margin-left:8px;font-weight:500">${esc(s.title)}</span>
-        <span style="font-size:10px;color:var(--gray-400);margin-left:6px">${s.tier}</span>
+        <span style="font-size:10px;color:var(--gray-400);margin-left:6px">${s.identityType==='human'?'Human':s.identityType==='agent'?'Agent':s.identityType==='asset'?'Asset':'Utility'}</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center">
         <span class="redir-type-badge rt-${s.identityType==='asset'?'utility':s.identityType}">${s.identityType==='human'?'Human':s.identityType==='agent'?'Agent':s.identityType==='asset'?'Asset':'Utility'}</span>
@@ -2418,6 +2431,7 @@ function deleteItem(i) {
   if (!confirm('Remove this NFT from the collection?')) return;
   collection.splice(i, 1);
   if (selectedMeta && i <= collection.length) selectedMeta = null;
+  saveCollection();
   updateStats();
   renderCollectionGallery();
   toast('Removed from collection');
@@ -2426,6 +2440,7 @@ function deleteItem(i) {
 function clearCollection() {
   if (!collection.length || !confirm('Clear entire collection? This cannot be undone.')) return;
   collection = []; selectedMeta = null;
+  saveCollection();
   updateStats(); renderCollectionGallery();
   toast('Collection cleared');
 }
@@ -2645,6 +2660,7 @@ function toast(msg) {
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
+loadCollection();   // restore saved collection from previous session
 update();
 </script>
 </body>
