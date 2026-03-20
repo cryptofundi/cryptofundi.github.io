@@ -2937,8 +2937,9 @@ const THEME_BASE_COLORS = {
 
 function downloadCard() {
   const isMobile = window.innerWidth <= 700;
-  // On mobile use the sheet clone if available (it's the visible card),
-  // otherwise fall back to the hidden original
+  const isIOS    = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  // On mobile use the visible sheet clone; fall back to hidden original
   const card = (isMobile && document.getElementById('nft-card-sheet-clone'))
     ? document.getElementById('nft-card-sheet-clone')
     : document.getElementById('nft-card');
@@ -2946,7 +2947,7 @@ function downloadCard() {
   const name      = getTitle() || 'nft-card';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
 
-  toast('Rendering PNG...');
+  toast('Rendering image...');
   const prevTransform  = card.style.transform;
   const prevTransition = card.style.transition;
   card.style.transform  = 'none';
@@ -2958,7 +2959,7 @@ function downloadCard() {
     useCORS: true,
     allowTaint: true,
     logging: false,
-    windowWidth: card.scrollWidth,
+    windowWidth:  card.scrollWidth,
     windowHeight: card.scrollHeight,
   }).then(captured => {
     const S = isMobile ? 2 : 3;
@@ -2973,7 +2974,6 @@ function downloadCard() {
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, W, H);
-
     ctx.beginPath();
     ctx.moveTo(R, 0);
     ctx.lineTo(W-R, 0); ctx.arcTo(W, 0,  W,  R,   R);
@@ -2984,44 +2984,60 @@ function downloadCard() {
     ctx.clip();
     ctx.drawImage(captured, 0, 0, W, H);
 
-    const dataUrl = out.toDataURL('image/png');
+    const filename = name.replace(/\s+/g, '-') + '-NFT.png';
 
-    if (isMobile) {
-      // iOS Safari blocks programmatic anchor clicks — open image in new tab
-      // User can then long-press → Save Image
+    if (isIOS) {
+      // ── iOS Safari / Chrome / Firefox ──────────────────────────────
+      // Programmatic anchor clicks are blocked after async — open a
+      // dedicated image page instead; user long-presses → Save to Photos
+      const dataUrl = out.toDataURL('image/png');
       const win = window.open('', '_blank');
       if (win) {
-        win.document.write(`
-          <!DOCTYPE html><html><head>
+        win.document.write(`<!DOCTYPE html><html><head>
+          <meta charset="UTF-8"/>
           <meta name="viewport" content="width=device-width,initial-scale=1"/>
-          <title>${name} NFT</title>
+          <title>${esc(name)} NFT</title>
           <style>
-            body{margin:0;background:#0f172a;display:flex;flex-direction:column;
-                 align-items:center;justify-content:flex-start;min-height:100vh;padding:20px;box-sizing:border-box;}
-            img{max-width:100%;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
-            p{color:#94a3b8;font-family:system-ui,sans-serif;font-size:13px;margin-top:16px;text-align:center;line-height:1.6;}
-            strong{color:#60a5fa;}
+            *{box-sizing:border-box;margin:0;padding:0}
+            body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;
+                 align-items:center;padding:24px 16px 40px;font-family:system-ui,sans-serif}
+            img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
+            .tip{margin-top:20px;background:rgba(255,255,255,.07);border-radius:12px;
+                 padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;width:100%;max-width:340px}
+            .tip strong{color:#60a5fa;display:block;margin-bottom:4px;font-size:14px}
           </style></head><body>
-          <img src="${dataUrl}" alt="${name} NFT"/>
-          <p>Long-press the image above and tap<br/><strong>Save to Photos</strong> or <strong>Add to Photos</strong></p>
-          </body></html>`);
+          <img src="${dataUrl}" alt="${esc(name)} NFT"/>
+          <div class="tip">
+            <strong>Save this image</strong>
+            Long-press the image above, then tap<br/>
+            <em>Save to Photos</em> or <em>Add to Photos</em>
+          </div>
+        </body></html>`);
         win.document.close();
-        toast('Image opened — long-press to Save to Photos ✓');
+        toast('Image ready — long-press to save ✓');
       } else {
-        // Pop-up blocked fallback — create a temporary link the user can tap
-        toast('Tap-and-hold the image in Preview to save it');
+        toast('Allow pop-ups to save the image');
       }
+
     } else {
-      // Desktop: normal anchor download
-      const a   = document.createElement('a');
-      a.download = name.replace(/\s+/g, '-') + '-NFT.png';
-      a.href     = dataUrl;
-      a.click();
-      toast('Downloaded — clean edges, 3× resolution ✓');
+      // ── Android Chrome / Desktop ────────────────────────────────────
+      // Blob URL + anchor click works reliably here
+      out.toBlob(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href     = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        toast(isMobile ? 'Saved to Downloads ✓' : 'Downloaded — 3× resolution ✓');
+      }, 'image/png');
     }
+
   }).catch(err => {
     console.error('Export error:', err);
-    toast('Download failed — please try again');
+    toast('Export failed — please try again');
   }).finally(() => {
     card.style.transform  = prevTransform;
     card.style.transition = prevTransition;
