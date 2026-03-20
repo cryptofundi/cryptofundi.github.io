@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Universal QR NFT Identity & Access Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   DIVINE BLUE DESIGN SYSTEM
+   ═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Divine Blue Palette */
+  --blue:       #1a56db;   /* primary divine blue */
+  --blue-dark:  #1e40af;   /* deeper blue */
+  --blue-mid:   #3b82f6;   /* mid blue */
+  --blue-lt:    #60a5fa;   /* light blue */
+  --blue-pale:  #93c5fd;   /* pale blue */
+  --blue-bg:    #eff6ff;   /* lightest blue bg */
+  --blue-b:     #dbeafe;   /* border blue */
+  --blue-glow:  rgba(26,86,219,0.18);
+
+  /* Neutrals */
+  --white:      #ffffff;
+  --gray-50:    #f8fafc;
+  --gray-100:   #f1f5f9;
+  --gray-200:   #e2e8f0;
+  --gray-300:   #cbd5e1;
+  --gray-400:   #94a3b8;
+  --gray-500:   #64748b;
+  --gray-600:   #475569;
+  --gray-700:   #334155;
+  --gray-800:   #1e293b;
+  --gray-900:   #0f172a;
+
+  /* Semantic */
+  --green:      #059669;
+  --red:        #ef4444;
+  --gold:       #d97706;
+  --teal:       #0891b2;
+
+  /* Spacing & radii */
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  22px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 8px rgba(26,86,219,0.08);
+  --shadow-md:  0 4px 20px rgba(26,86,219,0.12);
+  --shadow-lg:  0 12px 48px rgba(26,86,219,0.18);
+  --shadow-xl:  0 24px 72px rgba(26,86,219,0.22);
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: linear-gradient(150deg, #f0f7ff 0%, #e8f0fe 40%, #f0f4ff 100%);
+  min-height: 100vh;
+  color: var(--gray-800);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--blue-bg); }
+::-webkit-scrollbar-thumb { background: var(--blue-b); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-pale); }
+
+/* ═══════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════ */
+header {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1.5px solid var(--blue-b);
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 16px rgba(26,86,219,0.08);
+}
+
+.logo-wrap { display: flex; align-items: center; gap: 13px; }
+.logo-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(26,86,219,0.35);
+  font-size: 19px; color: white;
+}
+.logo-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px; font-weight: 800;
+  color: var(--gray-900); letter-spacing: -.4px;
+}
+.logo-sub {
+  font-size: 10px; color: var(--blue);
+  letter-spacing: 2.5px; text-transform: uppercase; margin-top: 1px;
+}
+
+.header-right { display: flex; align-items: center; gap: 32px; }
+.header-stats { display: flex; gap: 28px; }
+.stat { text-align: center; }
+.stat-v {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px; font-weight: 800;
+  color: var(--blue); line-height: 1;
+}
+.stat-l {
+  font-size: 10px; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════════════
+   TABS BAR
+   ═══════════════════════════════════════════════════ */
+.tabs-bar {
+  background: rgba(255,255,255,0.75);
+  border-bottom: 1.5px solid var(--blue-b);
+  display: flex;
+  padding: 0 36px;
+  gap: 4px;
+}
+.tab-btn {
+  padding: 14px 22px;
+  border: none; background: transparent;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--gray-400);
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1.5px;
+  transition: all .2s; white-space: nowrap;
+}
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+.tab-btn:hover:not(.active) { color: var(--gray-600); }
+
+/* ═══════════════════════════════════════════════════
+   MAIN LAYOUT
+   ═══════════════════════════════════════════════════ */
+.main-grid {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  min-height: calc(100vh - 112px);
+}
+
+.sidebar {
+  background: rgba(255,255,255,0.80);
+  border-right: 1.5px solid var(--blue-b);
+  padding: 28px 24px 40px;
+  overflow-y: auto;
+  max-height: calc(100vh - 112px);
+}
+
+.preview-col {
+  padding: 32px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 24px;
+  overflow-y: auto;
+  max-height: calc(100vh - 112px);
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM ELEMENTS
+   ═══════════════════════════════════════════════════ */
+.section-head {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 15px; margin-top: 4px;
+}
+.section-head::before {
+  content: '';
+  width: 3px; height: 18px;
+  background: linear-gradient(180deg, var(--blue), var(--blue-lt));
+  border-radius: 2px; flex-shrink: 0;
+}
+.section-head span {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--blue);
+}
+
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--gray-500); margin-bottom: 5px;
+}
+.hint {
+  font-size: 10px; color: var(--gray-400);
+  margin-top: 4px; display: flex; align-items: center; gap: 4px;
+}
+.hint::before { content: '⚡'; font-size: 10px; }
+
+input[type=text], input[type=url], input[type=email],
+input[type=tel], input[type=date], textarea, select {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  color: var(--gray-800);
+  background: var(--white);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26,86,219,.10);
+}
+textarea { resize: vertical; min-height: 76px; }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════
+   IDENTITY TYPE BUTTONS
+   ═══════════════════════════════════════════════════ */
+.id-type-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.id-type-btn {
+  display: flex; align-items: center; gap: 13px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--r-lg);
+  background: var(--white);
+  cursor: pointer; transition: all .2s; text-align: left;
+}
+.id-type-btn:hover { border-color: var(--blue-pale); }
+.id-type-btn.active {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+  box-shadow: 0 0 0 3px rgba(26,86,219,.09);
+}
+.id-type-btn .ib-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; flex-shrink: 0;
+  background: var(--blue-b);
+  transition: background .2s;
+}
+.id-type-btn.active .ib-icon {
+  background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+}
+.ib-lbl { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+.id-type-btn.active .ib-lbl { color: var(--blue); }
+.ib-sub { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+
+/* ═══════════════════════════════════════════════════
+   CAPS / TAGS
+   ═══════════════════════════════════════════════════ */
+.caps-row { display: flex; gap: 8px; }
+.caps-row input { flex: 1; }
+.caps-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.cap-tag {
+  background: var(--blue-bg); color: var(--blue);
+  border: 1px solid var(--blue-b);
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 5px;
+}
+.cap-tag button {
+  background: none; border: none;
+  color: var(--red); cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   THEME PICKER
+   ═══════════════════════════════════════════════════ */
+.theme-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 16px;
+}
+.theme-swatch {
+  padding: 12px 10px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--gray-200);
+  cursor: pointer; transition: all .25s; text-align: center;
+}
+.theme-swatch:hover { border-color: var(--blue-pale); transform: translateY(-1px); }
+.theme-swatch.active {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26,86,219,.12);
+  transform: translateY(-1px);
+}
+.sw-name { font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+.sw-bar { width: 24px; height: 3px; border-radius: 2px; margin: 5px auto 0; }
+
+/* ═══════════════════════════════════════════════════
+   TIER SELECTOR
+   ═══════════════════════════════════════════════════ */
+.tier-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.tier-btn {
+  flex: 1; padding: 10px 8px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--r-sm);
+  background: var(--white);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--gray-400); cursor: pointer; transition: all .2s;
+}
+.tier-btn.t-basic  { border-color: #9ca3af; background: #f9fafb; color: #374151; }
+.tier-btn.t-pro    { border-color: var(--blue); background: var(--blue-bg); color: var(--blue-dark); }
+.tier-btn.t-elite  { border-color: #d97706; background: #fffbeb; color: #92400e; }
+
+/* ═══════════════════════════════════════════════════
+   CARD SIZE PRESETS
+   ═══════════════════════════════════════════════════ */
+.size-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-bottom: 16px; }
+.size-btn {
+  padding: 8px 5px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--gray-200);
+  background: var(--white); cursor: pointer;
+  transition: all .2s; text-align: center;
+  font-size: 10px; font-weight: 600; color: var(--gray-500);
+  letter-spacing: .5px;
+}
+.size-btn.active { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); }
+.size-btn .sb-icon { font-size: 15px; margin-bottom: 3px; display: block; }
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 11px 20px; border-radius: var(--r-md);
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; border: none; transition: all .25s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(26,86,219,.30);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,86,219,.38); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--blue-b); color: var(--blue);
+}
+.btn-outline:hover { background: var(--blue-bg); border-color: var(--blue-pale); }
+
+.btn-ghost {
+  background: var(--gray-100); border: none; color: var(--gray-600);
+}
+.btn-ghost:hover { background: var(--gray-200); }
+
+.btn-danger { background: transparent; border: 1.5px solid #fecaca; color: var(--red); }
+.btn-danger:hover { background: #fef2f2; }
+
+.btn-gold { background: linear-gradient(135deg, #b45309, var(--gold)); color: #fff; box-shadow: 0 4px 16px rgba(217,119,6,.28); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(217,119,6,.35); }
+
+.btn-teal { background: linear-gradient(135deg, var(--teal), #0e7490); color: #fff; box-shadow: 0 4px 16px rgba(8,145,178,.28); }
+.btn-teal:hover { transform: translateY(-2px); }
+
+.btn-sm   { padding: 8px 14px; font-size: 11px; }
+.btn-xs   { padding: 6px 11px; font-size: 10px; }
+.btn-full { width: 100%; }
+.btn-row  { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD AREA
+   ═══════════════════════════════════════════════════ */
+.upload-area {
+  border: 2px dashed var(--gray-200);
+  border-radius: var(--r-md);
+  padding: 18px; text-align: center;
+  cursor: pointer; transition: all .25s;
+  background: var(--gray-50);
+}
+.upload-area:hover { border-color: var(--blue); background: var(--blue-bg); }
+#logo-file { display: none; }
+.upload-preview {
+  width: 58px; height: 58px;
+  border-radius: 10px; object-fit: cover;
+  margin: 0 auto 8px; display: none;
+  border: 2px solid var(--blue-b);
+}
+
+/* ═══════════════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════════════ */
+hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
+
+/* ═══════════════════════════════════════════════════
+   NFT CARD THEMES
+   ═══════════════════════════════════════════════════ */
+
+/* DIVINE (White + Divine Blue — matches app) */
+.card.t-divine {
+  background-color: #ffffff;
+  background-image: linear-gradient(150deg, #ffffff 0%, #f0f7ff 60%, #e8f0fe 100%);
+  border: 1.5px solid #bfdbfe;
+  box-shadow: 0 24px 72px rgba(26,86,219,.16), 0 4px 16px rgba(0,0,0,.05);
+  --ct: #0f172a; --ca: #1a56db; --cs: #64748b;
+  --cb: #dbeafe; --cba: rgba(26,86,219,.08);
+  --qfg: 1a56db; --qbg: ffffff; --qwrap: #eff6ff;
+}
+/* Crypto Dark */
+.card.t-crypto {
+  background-color: #050d1f;
+  background-image: linear-gradient(135deg, #050d1f 0%, #0a1f4e 100%);
+  border: 1.5px solid rgba(59,130,246,.4);
+  box-shadow: 0 24px 72px rgba(59,130,246,.3);
+  --ct: #e0f2fe; --ca: #60a5fa; --cs: #7c9ac8;
+  --cb: rgba(96,165,250,.2); --cba: rgba(59,130,246,.1);
+  --qfg: 60a5fa; --qbg: 050d1f; --qwrap: rgba(59,130,246,0.12);
+}
+/* Futuristic */
+.card.t-futuristic {
+  background-color: #020b18;
+  background-image: linear-gradient(135deg, #020b18 0%, #041830 60%, #020b18 100%);
+  border: 1.5px solid rgba(56,189,248,.4);
+  box-shadow: 0 24px 72px rgba(56,189,248,.25);
+  --ct: #e0f7ff; --ca: #38bdf8; --cs: #7cb9d8;
+  --cb: rgba(56,189,248,.18); --cba: rgba(56,189,248,.08);
+  --qfg: 38bdf8; --qbg: 020b18; --qwrap: rgba(56,189,248,0.1);
+}
+/* Business */
+.card.t-business {
+  background-color: #f8faff;
+  background-image: linear-gradient(150deg, #f8faff 0%, #eef2ff 100%);
+  border: 1.5px solid #c7d2fe;
+  box-shadow: 0 24px 72px rgba(79,70,229,.14), 0 4px 16px rgba(0,0,0,.06);
+  --ct: #1e1b4b; --ca: #4338ca; --cs: #6366f1;
+  --cb: #e0e7ff; --cba: rgba(99,102,241,.08);
+  --qfg: 4338ca; --qbg: f8faff; --qwrap: #eef2ff;
+}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT PRESET BUTTONS
+   ═══════════════════════════════════════════════════ */
+.layout-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom:8px; }
+.layout-btn {
+  padding: 10px 4px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--gray-200); background: var(--white);
+  cursor: pointer; transition: all .2s; text-align: center;
+  font-size: 9px; font-weight: 700; color: var(--gray-500);
+  letter-spacing: .4px; line-height: 1.3;
+}
+.layout-btn:hover { border-color: var(--blue-pale); transform: translateY(-1px); }
+.layout-btn.active { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,.10); transform: translateY(-1px); }
+.layout-btn .lb-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+
+/* QR / Avatar size toggles */
+.size-toggle { display: flex; gap: 6px; margin-bottom: 0; }
+.stog-btn {
+  flex: 1; padding: 8px 6px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--gray-200); background: var(--white);
+  font-size: 11px; font-weight: 600; color: var(--gray-500);
+  cursor: pointer; transition: all .2s; text-align: center;
+}
+.stog-btn.active { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); }
+.stog-btn:hover:not(.active) { border-color: var(--blue-pale); }
+
+/* ═══════════════════════════════════════════════════
+   CARD LAYOUT VARIANT HELPERS
+   ═══════════════════════════════════════════════════ */
+
+/* Avatar focus — large centered circle */
+.av-focus-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; padding: 4px 22px 14px; gap: 6px; text-align: center;
+}
+.av-focus-wrap .card-name { max-width: 280px; }
+
+/* Split layout columns */
+.split-body {
+  display: grid; grid-template-columns: 1fr 1fr;
+  flex: 1; padding: 0 16px 16px; gap: 14px; align-items: center;
+}
+.split-left {
+  display: flex; flex-direction: column; gap: 8px;
+  padding-right: 12px; border-right: 1px solid var(--cb);
+}
+.split-av {
+  width: 56px; height: 56px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800;
+  border: 2px solid var(--cb); background: var(--cba);
+  color: var(--ca); overflow: hidden; flex-shrink: 0;
+}
+.split-av img { width: 100%; height: 100%; object-fit: cover; }
+.split-name { font-family: 'Syne',sans-serif; font-size: 15px; font-weight: 800; color: var(--ct); line-height: 1.2; }
+.split-role { font-size: 10px; color: var(--cs); }
+.split-right {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+}
+
+/* Landscape two-column (Card / Twitter sizes) */
+.card-ls-left {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center; padding: 22px 16px 22px 22px; gap: 10px;
+  overflow: hidden;
+}
+.card-ls-right {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 20px 22px 20px 16px; gap: 8px;
+  border-left: 1px solid var(--cb); flex-shrink: 0;
+}
+
+/* Spacer + footer pad */
+.card-spacer    { flex: 1; min-height: 16px; }
+.card-footer-pad { height: 18px; flex-shrink: 0; }
+
+/* Asset Showcase hero image */
+.card-asset-hero {
+  width: 100%; height: 200px;
+  object-fit: cover; display: block;
+  flex-shrink: 0;
+}
+.card-asset-hero-placeholder {
+  width: 100%; height: 200px;
+  background: linear-gradient(135deg, var(--cba), var(--cb));
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; flex-shrink: 0;
+  font-size: 40px; color: var(--ca); opacity: .4;
+}
+.card-asset-data-row {
+  display: flex; gap: 6px; padding: 0 22px 8px;
+  flex-wrap: wrap;
+}
+.card-asset-data-chip {
+  background: var(--cb); color: var(--ca);
+  padding: 4px 10px; border-radius: 10px;
+  font-size: 10px; font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════
+   CARD OUTPUT SIZES
+   ═══════════════════════════════════════════════════ */
+.card.sz-nft     { width: 360px; }               /* height = content */
+.card.sz-print   { width: 380px; }               /* height = content */
+.card.sz-card    { width: 430px; }               /* portrait, height = content */
+.card.sz-twitter { width: 630px; aspect-ratio: 16/9; } /* true 16:9 */
+
+/* ═══════════════════════════════════════════════════
+   CARD STRUCTURE
+   ═══════════════════════════════════════════════════ */
+.card {
+  width: 360px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s ease;
+  user-select: none; flex-shrink: 0;
+}
+.card:hover {
+  transform: perspective(1000px) rotateY(4deg) rotateX(-2.5deg) scale(1.025);
+}
+
+/* Dark theme overlays */
+.card.t-crypto .card-grid,
+.card.t-futuristic .card-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.035) 39px, rgba(255,255,255,.035) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,.035) 39px, rgba(255,255,255,.035) 40px);
+}
+
+/* Futuristic scan line */
+.card.t-futuristic .scan-line {
+  position: absolute; left: 0; right: 0; height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(56,189,248,.9), transparent);
+  animation: scanAnim 3.5s linear infinite;
+  pointer-events: none; z-index: 5;
+}
+@keyframes scanAnim {
+  0%   { top: -2px; opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Corner accents — removed per design preference */
+.card-corner { display: none; }
+
+/* Card sections */
+.card-top {
+  padding: 20px 22px 12px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  position: relative; z-index: 2;
+}
+.card-id {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; color: var(--ca);
+  opacity: .65; font-family: monospace;
+}
+.card-tier-badge { display: none; }
+.tb-basic  { background: rgba(100,116,139,.15); color: #475569; border: 1px solid #cbd5e1; }
+.tb-pro    { background: rgba(26,86,219,.15);   color: #1e40af; border: 1px solid #93c5fd; }
+.tb-elite  { background: rgba(217,119,6,.18);   color: #92400e; border: 1px solid #fcd34d; }
+
+.card-identity {
+  padding: 0 22px 14px;
+  display: flex; align-items: center; gap: 13px;
+  position: relative; z-index: 2;
+}
+.card-avatar {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800;
+  border: 2px solid var(--cb);
+  background: var(--cba);
+  color: var(--ca); overflow: hidden; flex-shrink: 0;
+}
+.card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.card-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px; font-weight: 800;
+  color: var(--ct); line-height: 1.2;
+  word-break: break-word;
+}
+.card-role {
+  font-size: 11px; color: var(--cs);
+  margin-top: 3px; letter-spacing: .5px;
+}
+
+.card-qr-section {
+  padding: 0 22px;
+  display: flex; justify-content: center;
+  position: relative; z-index: 2;
+}
+.card-qr-wrap {
+  background: var(--qwrap);
+  border: 1px solid var(--cb);
+  border-radius: 14px; padding: 10px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.card-qr-wrap canvas,
+.card-qr-wrap img {
+  border-radius: 6px; display: block;
+  image-rendering: pixelated;
+}
+.qr-placeholder {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: var(--cs); opacity: .4;
+  font-size: 10px; text-align: center;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+
+.card-cta {
+  text-align: center; padding: 10px 22px 6px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ca); position: relative; z-index: 2;
+}
+.card-tags {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  padding: 0 22px 8px; justify-content: center;
+  position: relative; z-index: 2;
+}
+.card-tag {
+  background: var(--cb); color: var(--ca);
+  padding: 3px 9px; border-radius: 12px;
+  font-size: 9px; font-weight: 600;
+}
+.card-desc {
+  padding: 4px 22px 8px;
+  font-size: 10px; color: var(--cs);
+  line-height: 1.5; overflow: hidden;
+  max-height: 34px; position: relative; z-index: 2;
+}
+.card-wallet {
+  padding: 6px 22px 14px;
+  margin: 0 22px;
+  font-size: 8.5px; color: var(--cs); opacity: .45;
+  font-family: monospace;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  position: relative; z-index: 2;
+  border-top: 1px solid var(--cb);
+}
+.card-bottom-bar {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--ca), rgba(26,86,219,.35), transparent);
+}
+
+/* ═══════════════════════════════════════════════════
+   REDIRECT MANAGER TABLE
+   ═══════════════════════════════════════════════════ */
+.redirect-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.redirect-table th {
+  background: var(--blue-bg);
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1.5px solid var(--blue-b);
+}
+.redirect-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gray-100);
+  color: var(--gray-700);
+  vertical-align: middle;
+}
+.redirect-table tr:hover td { background: var(--blue-bg); }
+.redirect-table tr:last-child td { border-bottom: none; }
+.redir-url {
+  max-width: 160px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+  font-family: monospace; font-size: 11px; color: var(--blue);
+}
+.redir-type-badge {
+  padding: 2px 8px; border-radius: 10px;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 1px; white-space: nowrap;
+}
+.rt-human   { background: #dbeafe; color: #1e40af; }
+.rt-agent   { background: #d1fae5; color: #065f46; }
+.rt-utility { background: #fef3c7; color: #92400e; }
+
+.redirect-wrap {
+  border: 1.5px solid var(--blue-b);
+  border-radius: var(--r-lg); overflow: hidden;
+  background: var(--white);
+}
+
+/* ═══════════════════════════════════════════════════
+   COLLECTION GRID
+   ═══════════════════════════════════════════════════ */
+.coll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px,1fr));
+  gap: 14px; width: 100%;
+}
+.coll-item {
+  background: var(--white);
+  border: 1.5px solid var(--blue-b);
+  border-radius: var(--r-lg); padding: 14px;
+  cursor: pointer; transition: all .25s; text-align: center;
+  position: relative;
+}
+.coll-item:hover {
+  border-color: var(--blue); transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.ci-id   { font-size: 10px; font-weight: 700; color: var(--blue); letter-spacing: 2px; margin-bottom: 5px; }
+.ci-name { font-size: 12px; font-weight: 600; color: var(--gray-800); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ci-type { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+.ci-del  { background: none; border: none; color: var(--red); cursor: pointer; position: absolute; top: 8px; right: 8px; font-size: 15px; line-height: 1; padding: 2px; opacity: .5; }
+.ci-del:hover { opacity: 1; }
+.coll-empty { grid-column: 1/-1; text-align: center; padding: 48px 20px; color: var(--gray-400); font-size: 13px; }
+
+/* ═══════════════════════════════════════════════════
+   JSON / METADATA
+   ═══════════════════════════════════════════════════ */
+.json-block {
+  background: var(--gray-50);
+  border: 1.5px solid var(--blue-b);
+  border-radius: var(--r-md);
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 12.5px; line-height: 1.85;
+  white-space: pre-wrap; word-break: break-all;
+  max-height: 440px; overflow-y: auto;
+  color: var(--gray-700);
+}
+.jk { color: var(--blue); font-weight: 700; }
+.js { color: var(--green); }
+.jn { color: var(--gold); }
+.jb { color: #db2777; }
+
+/* ═══════════════════════════════════════════════════
+   INFO CARDS / TIPS
+   ═══════════════════════════════════════════════════ */
+.info-card {
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-b);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-size: 12px; color: var(--gray-600);
+  line-height: 1.6; margin-bottom: 16px;
+}
+.info-card strong { color: var(--blue); }
+
+/* ═══════════════════════════════════════════════════
+   QR TEST BADGE
+   ═══════════════════════════════════════════════════ */
+.qr-test-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1.5px solid var(--blue-b);
+  border-radius: var(--r-md);
+  font-size: 12px; color: var(--gray-600);
+}
+.qr-test-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gray-300); flex-shrink: 0;
+  transition: background .3s;
+}
+.qr-test-dot.ok  { background: var(--green); box-shadow: 0 0 6px rgba(5,150,105,.4); }
+.qr-test-dot.bad { background: var(--red);   box-shadow: 0 0 6px rgba(239,68,68,.4); }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════ */
+#toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--gray-900); color: #fff;
+  padding: 12px 20px; border-radius: var(--r-md);
+  font-size: 12px; font-weight: 600; letter-spacing: .5px;
+  z-index: 9999; pointer-events: none;
+  transform: translateY(24px); opacity: 0;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+  border-left: 3px solid var(--blue);
+  box-shadow: var(--shadow-lg);
+  max-width: 300px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   PANEL / PREVIEW VISIBILITY
+   ═══════════════════════════════════════════════════ */
+.panel { display: none; }
+.panel.active { display: block; }
+.preview-pane { display: none; width: 100%; flex-direction: column; align-items: center; gap: 20px; }
+.preview-pane.active { display: flex; }
+
+/* ═══════════════════════════════════════════════════
+   PREVIEW LABEL
+   ═══════════════════════════════════════════════════ */
+.preview-label {
+  font-size: 10px; color: var(--gray-400);
+  letter-spacing: 2.5px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.preview-label::before,
+.preview-label::after { content: '—'; opacity: .4; }
+
+/* ═══════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════ */
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fadein { animation: fadein .28s ease both; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .4; }
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .sidebar { max-height: none; border-right: none; border-bottom: 1.5px solid var(--blue-b); }
+  .preview-col { max-height: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════ -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-icon">◈</div>
+    <div>
+      <div class="logo-title">Universal QR NFT Creator</div>
+      <div class="logo-sub">Identity · Agent · Utility</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-v" id="stat-count">0</div>
+        <div class="stat-l">In Collection</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v" id="stat-next">#001</div>
+        <div class="stat-l">Next ID</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v" id="stat-links">0</div>
+        <div class="stat-l">Redirects</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     TABS
+══════════════════════════════════════════════════ -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('create')">⬡ Create</button>
+  <button class="tab-btn" onclick="switchTab('collection')">◈ Collection</button>
+  <button class="tab-btn" onclick="switchTab('redirects')">⇄ Link Manager</button>
+  <button class="tab-btn" onclick="switchTab('metadata')">{ } Metadata</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     MAIN GRID
+══════════════════════════════════════════════════ -->
+<div class="main-grid">
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <div class="sidebar">
+
+    <!-- ── CREATE PANEL ── -->
+    <div class="panel active fadein" id="panel-create">
+
+      <!-- Identity Type -->
+      <div class="section-head"><span>Identity Type</span></div>
+      <div class="id-type-grid">
+        <button class="id-type-btn active" onclick="setType('human',this)">
+          <div class="ib-icon">👤</div>
+          <div><div class="ib-lbl">Human Identity</div><div class="ib-sub">Digital business card NFT</div></div>
+        </button>
+        <button class="id-type-btn" onclick="setType('agent',this)">
+          <div class="ib-icon">🤖</div>
+          <div><div class="ib-lbl">AI Agent Identity</div><div class="ib-sub">Agent interaction NFT</div></div>
+        </button>
+        <button class="id-type-btn" onclick="setType('utility',this)">
+          <div class="ib-icon">🔑</div>
+          <div><div class="ib-lbl">Access / Utility NFT</div><div class="ib-sub">Affiliate, access, or pass NFT</div></div>
+        </button>
+        <button class="id-type-btn" onclick="setType('asset',this)">
+          <div class="ib-icon">📊</div>
+          <div><div class="ib-lbl">Asset / RWA NFT</div><div class="ib-sub">Stocks, real estate, portfolio</div></div>
+        </button>
+      </div>
+
+      <hr class="div"/>
+
+      <!-- ── HUMAN FIELDS ── -->
+      <div id="fields-human" class="fields-section fadein">
+        <div class="section-head"><span>Human Identity</span></div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="h-name" placeholder="Jane Doe" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Role / Profession</label>
+          <input type="text" id="h-role" placeholder="Product Designer · DeFi Builder" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Bio / Description</label>
+          <textarea id="h-bio" placeholder="Short intro about yourself..." oninput="update()"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="h-phone" placeholder="+1 555 123 4567" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="h-email" placeholder="jane@example.com" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Social / Links</label>
+          <input type="text" id="h-socials" placeholder="@handle or profile URL" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Personal Website / Link Hub</label>
+          <input type="url" id="h-website" placeholder="https://jane.me" oninput="update()"/>
+          <div class="hint">This URL is encoded into the QR code</div>
+        </div>
+        <div class="form-group">
+          <label>Wallet Address (optional)</label>
+          <input type="text" id="h-wallet" placeholder="0x... or sol..." oninput="update()"/>
+        </div>
+      </div>
+
+      <!-- ── AGENT FIELDS ── -->
+      <div id="fields-agent" class="fields-section fadein" style="display:none">
+        <div class="section-head"><span>AI Agent Identity</span></div>
+        <div class="form-group">
+          <label>Agent Name</label>
+          <input type="text" id="a-name" placeholder="Crypto Trader Bot" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Agent Type</label>
+          <select id="a-type" onchange="update()">
+            <option>Trader</option><option>Writer</option><option>Analyst</option>
+            <option>Assistant</option><option>Guardian</option><option>Oracle</option>
+            <option>Builder</option><option>Sentinel</option><option>Researcher</option><option>Advisor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="a-desc" placeholder="What this agent does..." oninput="update()"></textarea>
+        </div>
+        <div class="form-group">
+          <label>API / Interaction URL</label>
+          <input type="url" id="a-url" placeholder="https://agent.app" oninput="update()"/>
+          <div class="hint">Scan = instant agent access</div>
+        </div>
+        <div class="form-group">
+          <label>Capabilities</label>
+          <div class="caps-row">
+            <input type="text" id="cap-input" placeholder="Add a capability..."/>
+            <button class="btn btn-outline btn-sm" onclick="addCap()">+ Add</button>
+          </div>
+          <div class="caps-list" id="caps-list"></div>
+        </div>
+        <div class="form-group">
+          <label>Wallet Address (optional)</label>
+          <input type="text" id="a-wallet" placeholder="0x... or sol..." oninput="update()"/>
+        </div>
+      </div>
+
+      <!-- ── UTILITY FIELDS ── -->
+      <div id="fields-utility" class="fields-section fadein" style="display:none">
+        <div class="section-head"><span>Access / Utility NFT</span></div>
+        <div class="info-card">
+          <strong>💡 Affiliate tip:</strong> Don't link raw affiliate URLs directly. Use your own landing page URL here, then place affiliate links on that page for better conversion and tracking.
+        </div>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="u-title" placeholder="Crypto Fundi Pass" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="u-desc" placeholder="What this NFT unlocks..." oninput="update()"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Destination URL</label>
+          <input type="url" id="u-link" placeholder="https://yourpage.com/offer" oninput="update()"/>
+          <div class="hint">Scan opens this URL directly</div>
+        </div>
+        <div class="form-group">
+          <label>CTA Text (below QR)</label>
+          <input type="text" id="u-cta" placeholder="Scan to Unlock" value="Scan to Unlock" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Expiry Date (optional)</label>
+          <input type="date" id="u-expiry" oninput="update()"/>
+        </div>
+      </div>
+
+      <!-- ── ASSET / RWA FIELDS ── -->
+      <div id="fields-asset" class="fields-section fadein" style="display:none">
+        <div class="section-head"><span>Asset / RWA NFT</span></div>
+        <div class="info-card" style="border-left:3px solid var(--gold)">
+          <strong style="color:var(--gold)">⚠️ Legal note:</strong> This NFT provides <em>access to asset information</em>, not legal ownership of the underlying asset. Always consult a legal professional for tokenized assets.
+        </div>
+        <div class="form-group">
+          <label>Asset Image (Hero Photo)</label>
+          <div class="upload-area" onclick="document.getElementById('asset-img-file').click()" style="position:relative">
+            <input type="file" id="asset-img-file" accept="image/*" onchange="uploadAssetImage(event)" style="display:none"/>
+            <img id="asset-img-preview" style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:none"/>
+            <div id="asset-img-hint">
+              <div style="font-size:22px;margin-bottom:5px">🏠</div>
+              <div style="font-size:11px;color:var(--gray-400)">Upload property / asset photo</div>
+            </div>
+          </div>
+          <div class="hint">Shown as hero image in Asset Showcase layout</div>
+        </div>
+        <div class="form-group">
+          <label>Asset Name</label>
+          <input type="text" id="as-name" placeholder="Dubai Apartment · AAPL Position" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Asset Type</label>
+          <select id="as-type" onchange="update()">
+            <option value="Stock">📈 Stock / Equity</option>
+            <option value="Real Estate">🏠 Real Estate</option>
+            <option value="Commodity">🪙 Commodity</option>
+            <option value="Bond">📄 Bond / Fixed Income</option>
+            <option value="Business">🏢 Business Asset</option>
+            <option value="Crypto">₿ Crypto Asset</option>
+            <option value="Other RWA">🌐 Other RWA</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ticker / Identifier (optional)</label>
+          <input type="text" id="as-ticker" placeholder="AAPL · BTC · Prop-001" oninput="update()"/>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="as-desc" placeholder="Brief description of the asset..." oninput="update()"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label>Value (optional)</label>
+            <input type="text" id="as-value" placeholder="$250,000" oninput="update()"/>
+          </div>
+          <div class="form-group">
+            <label>Ownership %</label>
+            <input type="text" id="as-ownership" placeholder="100% · 20%" oninput="update()"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Dashboard / Proof URL</label>
+          <input type="url" id="as-url" placeholder="https://portfolio.example.com" oninput="update()"/>
+          <div class="hint">QR opens this asset dashboard or proof link</div>
+        </div>
+        <div class="form-group">
+          <label>Wallet / Custodian Address (optional)</label>
+          <input type="text" id="as-wallet" placeholder="0x... or sol..." oninput="update()"/>
+        </div>
+      </div>
+
+      <hr class="div"/>
+      <div class="section-head"><span>Card Design</span></div>
+
+      <!-- Theme -->
+      <div class="form-group">
+        <label>Theme</label>
+        <div class="theme-grid">
+          <div class="theme-swatch active" data-theme="divine" onclick="setTheme('divine',this)" style="background:linear-gradient(150deg,#fff,#e8f0fe)">
+            <div class="sw-name" style="color:#0f172a">Divine</div>
+            <div class="sw-bar" style="background:#1a56db"></div>
+          </div>
+          <div class="theme-swatch" data-theme="crypto" onclick="setTheme('crypto',this)" style="background:linear-gradient(135deg,#050d1f,#0a1f4e)">
+            <div class="sw-name" style="color:#e0f2fe">Crypto</div>
+            <div class="sw-bar" style="background:#60a5fa"></div>
+          </div>
+          <div class="theme-swatch" data-theme="futuristic" onclick="setTheme('futuristic',this)" style="background:linear-gradient(135deg,#020b18,#041830)">
+            <div class="sw-name" style="color:#e0f7ff">Futuristic</div>
+            <div class="sw-bar" style="background:#38bdf8"></div>
+          </div>
+          <div class="theme-swatch" data-theme="business" onclick="setTheme('business',this)" style="background:linear-gradient(150deg,#f8faff,#eef2ff)">
+            <div class="sw-name" style="color:#1e1b4b">Business</div>
+            <div class="sw-bar" style="background:#4338ca"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smart Layout Mode -->
+      <div class="form-group">
+        <label>Layout Mode</label>
+        <div class="size-toggle" style="margin-bottom:8px">
+          <button class="stog-btn active" id="layout-mode-auto" onclick="setLayoutMode('auto',this)">⚡ Auto</button>
+          <button class="stog-btn" id="layout-mode-manual" onclick="setLayoutMode('manual',this)">✎ Manual</button>
+        </div>
+        <div id="auto-layout-info" style="font-size:10px;color:var(--blue);padding:6px 10px;background:var(--blue-bg);border-radius:var(--r-sm)">
+          ⚡ Auto — layout chosen based on identity type
+        </div>
+      </div>
+
+      <!-- Layout Presets (manual mode only) -->
+      <div class="form-group" id="manual-layout-group" style="display:none">
+        <label>Layout Style</label>
+        <div class="layout-grid">
+          <button class="layout-btn active" data-layout="classic" onclick="setLayout('classic',this)">
+            <span class="lb-icon">🟦</span>Classic
+          </button>
+          <button class="layout-btn" data-layout="qrfocus" onclick="setLayout('qrfocus',this)">
+            <span class="lb-icon">⬛</span>QR Focus
+          </button>
+          <button class="layout-btn" data-layout="avatarfocus" onclick="setLayout('avatarfocus',this)">
+            <span class="lb-icon">🟩</span>Avatar
+          </button>
+          <button class="layout-btn" data-layout="split" onclick="setLayout('split',this)">
+            <span class="lb-icon">🟧</span>Split
+          </button>
+          <button class="layout-btn" data-layout="minimal" onclick="setLayout('minimal',this)">
+            <span class="lb-icon">⬜</span>Minimal
+          </button>
+          <button class="layout-btn" data-layout="assetshowcase" onclick="setLayout('assetshowcase',this)">
+            <span class="lb-icon">🏠</span>Asset
+          </button>
+        </div>
+        <div id="layout-hint" style="font-size:10px;color:var(--blue);margin-top:4px;padding:6px 10px;background:var(--blue-bg);border-radius:var(--r-sm)">
+          🟦 Classic — identity + QR. Best for People NFTs.
+        </div>
+      </div>
+
+      <!-- QR Size -->
+      <div class="form-group">
+        <label>QR Size</label>
+        <div class="size-toggle">
+          <button class="stog-btn" id="qrs-sm" onclick="setQrSize('sm',this)">Small</button>
+          <button class="stog-btn active" id="qrs-md" onclick="setQrSize('md',this)">Medium</button>
+          <button class="stog-btn" id="qrs-lg" onclick="setQrSize('lg',this)">Large</button>
+        </div>
+      </div>
+
+      <!-- Avatar Size -->
+      <div class="form-group" id="avatar-size-group">
+        <label>Avatar Size</label>
+        <div class="size-toggle">
+          <button class="stog-btn" id="avs-sm" onclick="setAvatarSize('sm',this)">Small</button>
+          <button class="stog-btn active" id="avs-md" onclick="setAvatarSize('md',this)">Medium</button>
+          <button class="stog-btn" id="avs-lg" onclick="setAvatarSize('lg',this)">Large</button>
+        </div>
+      </div>
+
+      <!-- Tier -->
+      <div class="form-group">
+        <label>Tier</label>
+        <div class="tier-row">
+          <button class="tier-btn t-basic" id="tier-basic" onclick="setTier('Basic',this)">Basic</button>
+          <button class="tier-btn" id="tier-pro" onclick="setTier('Pro',this)">Pro</button>
+          <button class="tier-btn" id="tier-elite" onclick="setTier('Elite',this)">Elite</button>
+        </div>
+      </div>
+
+      <!-- Output Size -->
+      <div class="form-group">
+        <label>Output Size</label>
+        <div class="size-grid">
+          <button class="size-btn active" data-size="nft" onclick="setSize('nft',this)">
+            <span class="sb-icon">◻</span>NFT 1:1
+          </button>
+          <button class="size-btn" data-size="card" onclick="setSize('card',this)">
+            <span class="sb-icon">▬</span>Card
+          </button>
+          <button class="size-btn" data-size="twitter" onclick="setSize('twitter',this)">
+            <span class="sb-icon">𝕏</span>Twitter
+          </button>
+          <button class="size-btn" data-size="print" onclick="setSize('print',this)">
+            <span class="sb-icon">🖨</span>Print
+          </button>
+        </div>
+        <div id="size-hint" style="font-size:10px;color:var(--gray-500);margin-top:5px;padding:5px 8px;background:var(--gray-100);border-radius:var(--r-sm)">
+          ◻ NFT 1:1 — Recommended for minting on OpenSea / Magic Eden
+        </div>
+      </div>
+
+      <!-- Logo -->
+      <div class="form-group">
+        <label>Logo / Avatar (optional)</label>
+        <div class="upload-area" onclick="document.getElementById('logo-file').click()">
+          <input type="file" id="logo-file" accept="image/*" onchange="uploadLogo(event)"/>
+          <img id="logo-preview" class="upload-preview"/>
+          <div id="upload-hint">
+            <div style="font-size:26px;margin-bottom:6px">⬆</div>
+            <div style="font-size:11px;color:var(--gray-400)">Click to upload PNG / JPG</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="div"/>
+      <!-- Collection name inline -->
+      <div class="form-group">
+        <label>Collection Name</label>
+        <input type="text" id="col-name-create" value="My NFT Collection" oninput="update()"/>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary btn-full" onclick="mintToCollection()">⬡ Add to Collection</button>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--gray-400);margin-top:7px;line-height:1.6;padding:0 4px">
+        Saves locally — not minted on blockchain.<br/>
+        Export PNG + JSON → mint on <strong style="color:var(--blue)">OpenSea</strong> or <strong style="color:var(--blue)">Magic Eden</strong>.
+      </div>
+      <div style="height:6px"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="resetForm()">✕ Clear Form</button>
+        <button class="btn btn-teal btn-sm" style="flex:1" onclick="testQR()">⊙ Test QR Link</button>
+      </div>
+
+    </div><!-- /panel-create -->
+
+    <!-- ── COLLECTION PANEL ── -->
+    <div class="panel fadein" id="panel-collection">
+      <div class="section-head"><span>Collection Settings</span></div>
+      <div class="form-group">
+        <label>Collection Name</label>
+        <input type="text" id="col-name2" value="My NFT Collection"/>
+      </div>
+      <div class="form-group">
+        <label>Collection Description</label>
+        <textarea id="col-desc" placeholder="Describe your collection...">Universal identity and utility NFTs — people, agents, and access passes.</textarea>
+      </div>
+      <hr class="div"/>
+      <div class="btn-row" style="margin-bottom:20px">
+        <button class="btn btn-gold btn-sm" onclick="exportAll()">⬇ Export All Metadata</button>
+        <button class="btn btn-danger btn-sm" onclick="clearCollection()">🗑 Clear All</button>
+      </div>
+      <div class="section-head"><span>Items in Collection (<span id="col-count">0</span>)</span></div>
+      <div id="col-sidebar-list"></div>
+    </div>
+
+    <!-- ── REDIRECT MANAGER PANEL ── -->
+    <div class="panel fadein" id="panel-redirects">
+      <div class="section-head"><span>Smart Link / Redirect Manager</span></div>
+      <div class="info-card">
+        <strong>Dynamic QR Strategy:</strong> Your QR code always points to a fixed short URL. You can update the destination anytime — useful for affiliate campaigns, A/B testing offers, and content updates — without reprinting or reminting.
+      </div>
+
+      <div class="form-group">
+        <label>Add / Update Redirect</label>
+        <input type="text" id="redir-label" placeholder="Link label (e.g. Binance Affiliate)" style="margin-bottom:8px"/>
+        <input type="url" id="redir-dest" placeholder="Destination URL (https://...)"/>
+        <div class="hint" style="margin-top:6px">Updating destination does not change the QR code</div>
+      </div>
+      <div class="form-group">
+        <label>NFT Type</label>
+        <select id="redir-type">
+          <option value="utility">Utility / Affiliate</option>
+          <option value="human">Human Identity</option>
+          <option value="agent">AI Agent</option>
+        </select>
+      </div>
+      <div class="btn-row" style="margin-bottom:20px">
+        <button class="btn btn-primary btn-sm" onclick="addRedirect()">+ Add Redirect</button>
+      </div>
+
+      <div class="section-head"><span>Active Redirects (<span id="redir-count">0</span>)</span></div>
+      <div class="redirect-wrap">
+        <table class="redirect-table" id="redir-table">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Destination</th>
+              <th>Type</th>
+              <th>Scans</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="redir-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-400);font-size:12px">No redirects yet. Add one above.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── METADATA PANEL ── -->
+    <div class="panel fadein" id="panel-metadata">
+      <div class="section-head"><span>NFT Metadata Preview</span></div>
+      <p style="font-size:11px;color:var(--gray-400);margin-bottom:14px;line-height:1.6">
+        Ethereum / Solana compatible JSON. Select an item from Collection or mint one first. Compatible with ERC-721, ERC-1155 and Metaplex standards.
+      </p>
+      <div class="json-block" id="meta-json-left">// Add to collection or select an NFT to view metadata</div>
+      <hr class="div"/>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="downloadMeta()">⬇ Download JSON</button>
+        <button class="btn btn-outline btn-sm" onclick="copyMeta()">⎘ Copy</button>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ════════════ PREVIEW COLUMN ════════════ -->
+  <div class="preview-col">
+
+    <!-- ── CREATE PREVIEW ── -->
+    <div class="preview-pane active" id="preview-create">
+      <div class="preview-label">Live Preview</div>
+
+      <!-- THE NFT CARD -->
+      <div id="nft-card" class="card t-divine">
+        <div class="card-grid"></div>
+        <div class="scan-line"></div>
+        <div class="card-corner cc-tl"></div>
+        <div class="card-corner cc-tr"></div>
+        <div class="card-corner cc-bl"></div>
+        <div class="card-corner cc-br"></div>
+
+        <div class="card-top">
+          <span class="card-id" id="c-id">◈ IDENTITY #001</span>
+          <span class="card-tier-badge tb-basic" id="c-tier">BASIC</span>
+        </div>
+
+        <div class="card-identity">
+          <div class="card-avatar" id="c-avatar">?</div>
+          <div style="overflow:hidden">
+            <div class="card-name" id="c-name">Your Name</div>
+            <div class="card-role" id="c-role">Role / Type</div>
+          </div>
+        </div>
+
+        <div class="card-qr-section">
+          <div class="card-qr-wrap" id="c-qr-wrap">
+            <div id="c-qr-render"></div>
+            <div class="qr-placeholder" id="c-qr-placeholder" style="width:160px;height:160px">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/>
+                <rect x="19" y="17" width="2" height="4"/><rect x="17" y="19" width="4" height="2"/>
+              </svg>
+              ENTER URL TO GENERATE QR
+            </div>
+          </div>
+        </div>
+
+        <div class="card-cta" id="c-cta">Scan to Connect</div>
+        <div class="card-tags" id="c-tags"></div>
+        <div class="card-desc" id="c-desc"></div>
+        <div class="card-wallet" id="c-wallet"></div>
+        <div class="card-bottom-bar"></div>
+      </div>
+
+      <!-- QR Test Status -->
+      <div class="qr-test-wrap" id="qr-test-status" style="max-width:360px;width:100%">
+        <div class="qr-test-dot" id="qr-dot"></div>
+        <span id="qr-test-msg">Enter a URL to validate QR link</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="btn-row" style="justify-content:center;flex-wrap:wrap;max-width:360px;width:100%">
+        <button class="btn btn-primary" onclick="downloadCard()">⬇ Download PNG</button>
+        <button class="btn btn-outline" onclick="switchTab('metadata')">{ } Metadata</button>
+        <button class="btn btn-gold" onclick="mintToCollection()">⬡ Add to Collection</button>
+      </div>
+      <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6">
+        Hover card for 3D effect · PNG exports at 3× resolution<br/>
+        <span style="color:var(--blue);font-weight:600">⬡ Add to Collection</span> saves locally — export to mint on-chain
+      </div>
+    </div>
+
+    <!-- ── COLLECTION PREVIEW ── -->
+    <div class="preview-pane" id="preview-collection">
+      <div class="preview-label">Collection Gallery</div>
+      <div class="coll-grid" id="coll-grid">
+        <div class="coll-empty">No NFTs minted yet.<br/>Use the ⬡ Create tab to mint your first.</div>
+      </div>
+    </div>
+
+    <!-- ── REDIRECTS PREVIEW ── -->
+    <div class="preview-pane" id="preview-redirects">
+      <div class="preview-label">Link Manager</div>
+      <div style="max-width:640px;width:100%">
+        <div class="info-card" style="margin-bottom:20px">
+          <strong>How dynamic links work:</strong> Instead of encoding your affiliate URL directly in the QR, encode a short URL you control (e.g. <code>yoursite.com/r/binance</code>). This page then redirects to the affiliate link. You can change the destination anytime without changing the QR code.
+        </div>
+        <div style="background:var(--white);border:1.5px solid var(--blue-b);border-radius:var(--r-lg);padding:24px;text-align:center;color:var(--gray-400)">
+          <div style="font-size:32px;margin-bottom:12px">⇄</div>
+          <div style="font-size:13px;font-weight:600;color:var(--gray-600);margin-bottom:6px">Redirect Manager</div>
+          <div style="font-size:12px">Manage your dynamic links in the sidebar panel →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── METADATA PREVIEW ── -->
+    <div class="preview-pane" id="preview-metadata">
+      <div class="preview-label">Metadata Output</div>
+      <div class="json-block" id="meta-json-right" style="width:100%;max-width:680px;font-size:13px"></div>
+    </div>
+
+  </div><!-- /preview-col -->
+</div><!-- /main-grid -->
+
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let identityType  = 'human';
+let currentTheme  = 'divine';
+let currentTier   = 'Basic';
+let currentSize   = 'nft';
+let logoDataUrl   = null;
+let assetImageDataUrl = null;   // hero image for RWA layout
+let layoutMode    = 'auto';     // 'auto' | 'manual'
+let caps          = [];
+let collection    = [];
+let redirects     = [];
+let selectedMeta  = null;
+let qrTimer       = null;
+
+const SIZE_CLASSES   = ['sz-nft','sz-card','sz-twitter','sz-print'];
+const LAYOUT_CLASSES = ['layout-qrfocus','layout-avatarfocus','layout-split','layout-minimal'];
+
+const QR_COLORS = {
+  divine:     { fg: '#1a56db', bg: 'rgba(0,0,0,0)' },
+  crypto:     { fg: '#60a5fa', bg: 'rgba(0,0,0,0)' },
+  futuristic: { fg: '#38bdf8', bg: 'rgba(0,0,0,0)' },
+  business:   { fg: '#4338ca', bg: 'rgba(0,0,0,0)' },
+};
+
+// ═══════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════
+function switchTab(t) {
+  const tabs = ['create','collection','redirects','metadata'];
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', tabs[i] === t);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.preview-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + t).classList.add('active');
+  document.getElementById('preview-' + t).classList.add('active');
+  if (t === 'collection') renderCollectionGallery();
+  if (t === 'metadata')   renderMetadataView();
+  if (t === 'redirects')  renderRedirectTable();
+}
+
+// ═══════════════════════════════════════════════
+// IDENTITY TYPE
+// ═══════════════════════════════════════════════
+// Auto-layout map per identity type
+const AUTO_LAYOUT_MAP = {
+  human:   'classic',
+  agent:   'qrfocus',
+  utility: 'qrfocus',
+  asset:   'assetshowcase',
+};
+const AUTO_LAYOUT_DESC = {
+  human:   '⚡ Auto → Classic layout (avatar + QR balanced)',
+  agent:   '⚡ Auto → QR Focus layout (QR primary)',
+  utility: '⚡ Auto → QR Focus layout (QR primary)',
+  asset:   '⚡ Auto → Asset Showcase (hero image + small QR)',
+};
+
+function setType(type, btn) {
+  identityType = type;
+  document.querySelectorAll('.id-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.fields-section').forEach(s => s.style.display = 'none');
+  document.getElementById('fields-' + type).style.display = 'block';
+  // Update auto-layout info text
+  const info = document.getElementById('auto-layout-info');
+  if (info) info.textContent = AUTO_LAYOUT_DESC[type] || '⚡ Auto — layout chosen based on identity type';
+  // If in auto mode, apply the recommended layout
+  if (layoutMode === 'auto') {
+    currentLayout = AUTO_LAYOUT_MAP[type] || 'classic';
+  }
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// LAYOUT MODE (Auto / Manual)
+// ═══════════════════════════════════════════════
+function setLayoutMode(mode, btn) {
+  layoutMode = mode;
+  document.querySelectorAll('[id^="layout-mode-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const manualGroup = document.getElementById('manual-layout-group');
+  const autoInfo    = document.getElementById('auto-layout-info');
+  if (mode === 'auto') {
+    manualGroup.style.display = 'none';
+    autoInfo.style.display    = 'block';
+    currentLayout = AUTO_LAYOUT_MAP[identityType] || 'classic';
+  } else {
+    manualGroup.style.display = 'block';
+    autoInfo.style.display    = 'none';
+  }
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════
+function setTheme(theme, el) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const card = document.getElementById('nft-card');
+  const layoutClass = LAYOUT_CLASSES.find(c => card.classList.contains(c)) || '';
+  const sizeClass   = SIZE_CLASSES.find(c => card.classList.contains(c)) || 'sz-nft';
+  card.className = 'card t-' + theme + ' ' + sizeClass + (layoutClass ? ' ' + layoutClass : '');
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// TIER
+// ═══════════════════════════════════════════════
+function setTier(tier, btn) {
+  currentTier = tier;
+  document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('t-basic','t-pro','t-elite'));
+  btn.classList.add('t-' + tier.toLowerCase());
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// OUTPUT SIZE
+// ═══════════════════════════════════════════════
+const SIZE_HINTS = {
+  nft:     '◻ NFT 1:1 — Recommended for minting on OpenSea / Magic Eden',
+  card:    '▬ Card — Portrait business card, slightly wider than NFT',
+  twitter: '𝕏 Twitter — 16:9 landscape, ideal for social media posting',
+  print:   '🖨 Print — Physical stickers, posters, merchandise',
+};
+
+function setSize(size, btn) {
+  currentSize = size;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const card = document.getElementById('nft-card');
+  SIZE_CLASSES.forEach(c => card.classList.remove(c));
+  card.classList.add('sz-' + size);
+  card.style.width = '';
+  card.style.minHeight = '';
+  const hint = document.getElementById('size-hint');
+  if (hint) hint.textContent = SIZE_HINTS[size] || '';
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// LAYOUT PRESETS
+// ═══════════════════════════════════════════════
+let currentLayout = 'classic';
+const LAYOUT_HINTS = {
+  classic:     '🟦 Classic — identity + QR. Best for People NFTs.',
+  qrfocus:     '⬛ QR Focus — QR prominent. Best for Affiliate & Utility NFTs.',
+  avatarfocus: '🟩 Avatar Focus — large profile photo. Best for Personal Branding.',
+  split:       '🟧 Split — side-by-side layout. Best for Business Cards.',
+  minimal:     '⬜ Minimal — QR + title only. Best for mass collections & print.',
+};
+
+function setLayout(layout, btn) {
+  currentLayout = layout;
+  document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const card = document.getElementById('nft-card');
+  const sizeClass = SIZE_CLASSES.find(c => card.classList.contains(c)) || 'sz-nft';
+  LAYOUT_CLASSES.forEach(c => card.classList.remove(c));
+  if (layout !== 'classic') card.classList.add('layout-' + layout);
+  const avGroup = document.getElementById('avatar-size-group');
+  if (avGroup) avGroup.style.display = (layout === 'minimal') ? 'none' : 'block';
+  const hint = document.getElementById('layout-hint');
+  if (hint) hint.textContent = LAYOUT_HINTS[layout] || '';
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// QR SIZE TOGGLE
+// ═══════════════════════════════════════════════
+let currentQrSize = 'md';
+const QR_SIZES = { sm: 120, md: 160, lg: 200 };
+
+function setQrSize(sz, btn) {
+  currentQrSize = sz;
+  document.querySelectorAll('[id^="qrs-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// AVATAR SIZE TOGGLE
+// ═══════════════════════════════════════════════
+let currentAvatarSize = 'md';
+const AV_SIZES = { sm: 36, md: 48, lg: 72 };
+
+function setAvatarSize(sz, btn) {
+  currentAvatarSize = sz;
+  document.querySelectorAll('[id^="avs-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  update();
+}
+
+// ═══════════════════════════════════════════════
+// CAPABILITIES
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.target.id === 'cap-input' && e.key === 'Enter') { e.preventDefault(); addCap(); }
+});
+function addCap() {
+  const val = document.getElementById('cap-input').value.trim();
+  if (!val) return;
+  caps.push(val);
+  document.getElementById('cap-input').value = '';
+  renderCaps();
+  update();
+}
+function removeCap(i) { caps.splice(i,1); renderCaps(); update(); }
+function renderCaps() {
+  document.getElementById('caps-list').innerHTML = caps.map((c,i) =>
+    `<span class="cap-tag">${esc(c)}<button onclick="removeCap(${i})">×</button></span>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+// LOGO UPLOAD
+// ═══════════════════════════════════════════════
+function uploadLogo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    logoDataUrl = ev.target.result;
+    const img = document.getElementById('logo-preview');
+    img.src = logoDataUrl; img.style.display = 'block';
+    document.getElementById('upload-hint').style.display = 'none';
+    update();
+  };
+  reader.readAsDataURL(file);
+}
+
+function uploadAssetImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    assetImageDataUrl = ev.target.result;
+    const img = document.getElementById('asset-img-preview');
+    img.src = assetImageDataUrl; img.style.display = 'block';
+    document.getElementById('asset-img-hint').style.display = 'none';
+    update();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════
+// LIVE UPDATE — delegates to renderCard()
+// ═══════════════════════════════════════════════
+function update() {
+  renderCard();
+  updateMetaJson();
+  setQrStatus('idle', getQrData() ? 'Click "Test QR Link" to verify' : 'Enter a URL to validate QR link');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER CARD — builds correct HTML for size+layout
+// ═══════════════════════════════════════════════
+function renderCard() {
+  const name   = getTitle();
+  const role   = getSubtitle();
+  const cta    = getCta();
+  const desc   = getDesc();
+  const wallet = getWallet();
+  const qrData = getQrData();
+  const tags   = getTags();
+  const idNum  = collection.length + 1;
+  const typePrefix = identityType==='human' ? '◈ IDENTITY' : identityType==='agent' ? '⬡ AGENT' : identityType==='asset' ? '⬟ ASSET' : '⬟ UTILITY';
+  const idStr  = typePrefix + ' #' + pad(idNum);
+  const tierHtml = `<span class="card-tier-badge tb-${currentTier.toLowerCase()}">${currentTier.toUpperCase()}</span>`;
+  const avPx = AV_SIZES[currentAvatarSize] || 48;
+  const isLandscape = (currentSize === 'twitter');
+  const qrSz = isLandscape ? 180
+             : currentLayout === 'assetshowcase' ? (isLandscape ? 100 : 96)
+             : currentLayout === 'avatarfocus' ? 90
+             : (QR_SIZES[currentQrSize] || 160);
+
+  const avHtml = (px, radius='12px') => {
+    // For asset type, prefer the asset hero image; for others use logo
+    const imgSrc = (identityType === 'asset' && assetImageDataUrl)
+      ? assetImageDataUrl
+      : logoDataUrl;
+    const inner = imgSrc
+      ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;border-radius:${radius}"/>`
+      : `<span>${esc((name||'?').charAt(0).toUpperCase())}</span>`;
+    return `<div style="width:${px}px;height:${px}px;border-radius:${radius};display:flex;align-items:center;justify-content:center;font-size:${Math.round(px*.42)}px;font-weight:800;border:2px solid var(--cb);background:var(--cba);color:var(--ca);overflow:hidden;flex-shrink:0">${inner}</div>`;
+  };
+
+  const qrContainerHtml = `
+    <div class="card-qr-wrap" id="c-qr-wrap">
+      <div id="c-qr-render"></div>
+      <div class="qr-placeholder" id="c-qr-placeholder" style="width:${qrSz}px;height:${qrSz}px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        ENTER URL
+      </div>
+    </div>`;
+
+  const tagsHtml = tags.length
+    ? `<div style="display:flex;flex-wrap:wrap;gap:5px;padding:0 22px 10px;justify-content:center;position:relative;z-index:2">${tags.map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>`
+    : '';
+
+  const headerHtml = `
+    <div class="card-top">
+      <span class="card-id">${esc(idStr)}</span>
+      ${tierHtml}
+    </div>`;
+
+  const decorHtml = `
+    <div class="card-grid"></div>
+    <div class="scan-line"></div>
+    <div class="card-corner cc-tl"></div>
+    <div class="card-corner cc-tr"></div>
+    <div class="card-corner cc-bl"></div>
+    <div class="card-corner cc-br"></div>`;
+
+  let innerHtml = '';
+
+  if (isLandscape && currentLayout !== 'assetshowcase' && currentLayout !== 'avatarfocus') {
+    // Twitter 16:9 — 630px wide, height set by aspect-ratio. Grid fills full height.
+    innerHtml = `
+      ${decorHtml}${headerHtml}
+      <div style="display:grid;grid-template-columns:1fr 220px;flex:1;align-self:stretch;height:0;min-height:270px">
+        <div style="display:flex;flex-direction:column;justify-content:center;padding:8px 18px 20px 24px;gap:12px;overflow:hidden;border-right:1px solid var(--cb)">
+          <div style="display:flex;align-items:center;gap:14px">
+            ${avHtml(52)}
+            <div style="overflow:hidden;min-width:0;flex:1">
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Your Name')}</div>
+              <div style="font-size:12px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
+            </div>
+          </div>
+          ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px">${tags.slice(0,3).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+          ${desc ? `<div style="font-size:11px;color:var(--cs);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+          ${wallet ? `<div style="margin-top:4px;font-size:9px;color:var(--cs);opacity:.4;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">◈ ${esc(wallet.substring(0,30))}…</div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 14px;gap:8px">
+          ${qrContainerHtml}
+          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ca);text-align:center">${esc(cta)}</div>
+        </div>
+      </div>
+      <div class="card-bottom-bar"></div>`;
+
+  } else if (currentLayout === 'split') {
+    innerHtml = `
+      ${decorHtml}${headerHtml}
+      <div class="split-body">
+        <div class="split-left">
+          ${avHtml(56)}
+          <div>
+            <div class="split-name">${esc(name||'Your Name')}</div>
+            <div class="split-role">${esc(role||'Role / Type')}</div>
+          </div>
+          ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px">${tags.map(t=>`<span class="card-tag" style="font-size:9px">${esc(t)}</span>`).join('')}</div>` : ''}
+          ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.4;overflow:hidden;max-height:40px">${esc(desc)}</div>` : ''}
+        </div>
+        <div class="split-right">
+          ${qrContainerHtml}
+          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ca);text-align:center;margin-top:4px">${esc(cta)}</div>
+        </div>
+      </div>
+      <div style="height:16px;flex-shrink:0"></div>
+      <div class="card-bottom-bar"></div>`;
+
+  } else if (currentLayout === 'qrfocus') {
+    innerHtml = `
+      ${decorHtml}${headerHtml}
+      <div style="padding:0 22px 14px;display:flex;justify-content:center">${qrContainerHtml}</div>
+      <div class="card-cta">${esc(cta)}</div>
+      <div style="padding:0 22px 12px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--cb);margin:0 22px;padding-top:12px">
+        ${avHtml(40)}
+        <div>
+          <div class="card-name" style="font-size:15px">${esc(name||'Your Name')}</div>
+          <div class="card-role">${esc(role||'Role / Type')}</div>
+        </div>
+      </div>
+      ${tagsHtml}
+      ${desc ? `<div style="padding:0 22px 16px;font-size:10px;color:var(--cs);line-height:1.6">${esc(desc)}</div>` : ''}
+      <div class="card-bottom-bar"></div>`;
+
+  } else if (currentLayout === 'avatarfocus') {
+    // AVATAR FOCUS — avatar is hero, QR is secondary
+    // On Twitter (16:9): split horizontally — big avatar left, info+small QR right
+    // On portrait: vertical stack — big avatar top, info, small QR bottom
+    const avHeroSz = AV_SIZES[currentAvatarSize] === 36 ? 100
+                   : AV_SIZES[currentAvatarSize] === 72 ? 160
+                   : 130;
+    const smallQrSz = isLandscape ? 85 : 90;
+    const smallQrHtml = `
+      <div class="card-qr-wrap" id="c-qr-wrap" style="padding:7px">
+        <div id="c-qr-render"></div>
+        <div class="qr-placeholder" id="c-qr-placeholder" style="width:${smallQrSz}px;height:${smallQrSz}px;font-size:8px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+      </div>`;
+
+    if (isLandscape) {
+      // Twitter 16:9 avatar focus: large avatar LEFT, name+info+small QR RIGHT
+      // Avatar column = 38% of card width, content = 62%
+      const lsAvSz = AV_SIZES[currentAvatarSize] === 36 ? 100
+                   : AV_SIZES[currentAvatarSize] === 72 ? 160
+                   : 130;
+      innerHtml = `
+        ${decorHtml}${headerHtml}
+        <div style="display:grid;grid-template-columns:38% 62%;flex:1;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 12px 14px;border-right:1px solid var(--cb)">
+            ${avHtml(lsAvSz, '50%')}
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:center;padding:10px 18px 14px;gap:8px;overflow:hidden">
+            <div style="overflow:hidden">
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;word-break:break-word">${esc(name||'Your Name')}</div>
+              <div style="font-size:12px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
+            </div>
+            ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px">${tags.slice(0,3).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+            ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              ${smallQrHtml}
+              <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ca);line-height:1.4">${esc(cta)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-bottom-bar"></div>`;
+    } else {
+      // Portrait avatar focus: vertical stack
+      innerHtml = `
+        ${decorHtml}${headerHtml}
+        <div style="display:flex;flex-direction:column;align-items:center;padding:8px 22px 16px;gap:10px;text-align:center">
+          ${avHtml(avHeroSz, '50%')}
+          <div>
+            <div class="card-name" style="font-size:20px;text-align:center">${esc(name||'Your Name')}</div>
+            <div class="card-role" style="text-align:center;margin-top:4px">${esc(role||'Role / Type')}</div>
+          </div>
+          ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center">${tags.map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+          ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.6;max-width:260px">${esc(desc)}</div>` : ''}
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            ${smallQrHtml}
+            <div class="card-cta" style="padding:4px 0 0">${esc(cta)}</div>
+          </div>
+        </div>
+        <div class="card-bottom-bar"></div>`;
+    }
+
+  } else if (currentLayout === 'minimal') {
+    innerHtml = `
+      ${decorHtml}${headerHtml}
+      <div style="padding:12px 22px 14px;display:flex;justify-content:center">${qrContainerHtml}</div>
+      <div class="card-cta">${esc(cta)}</div>
+      <div style="text-align:center;padding:0 22px 4px;font-size:14px;font-weight:800;font-family:'Syne',sans-serif;color:var(--ct)">${esc(name||'')}</div>
+      <div style="text-align:center;padding:0 22px 16px;font-size:10px;color:var(--cs)">${esc(role||'')}</div>
+      <div class="card-bottom-bar"></div>`;
+
+  } else if (currentLayout === 'assetshowcase') {
+    const assetType = v('as-type') || '';
+    const assetVal  = v('as-value') || '';
+    const assetOwn  = v('as-ownership') || '';
+    const ticker    = v('as-ticker') || '';
+    // Use asset image if available, fall back to logo upload, then placeholder
+    const heroImgSrc = assetImageDataUrl || logoDataUrl || null;
+    const hasImg    = !!heroImgSrc;
+
+    if (isLandscape) {
+      // TWITTER ASSET SHOWCASE — image left 42%, right 58% split into info-top + QR-bottom
+      const smallQrSz = 85;
+      const smallQrHtml = `
+        <div class="card-qr-wrap" id="c-qr-wrap" style="padding:6px;border-radius:10px;flex-shrink:0">
+          <div id="c-qr-render"></div>
+          <div class="qr-placeholder" id="c-qr-placeholder" style="width:${smallQrSz}px;height:${smallQrSz}px;font-size:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+        </div>`;
+      const imgCol = hasImg
+        ? `<img src="${heroImgSrc}" style="width:100%;height:100%;object-fit:cover;display:block" alt="Asset"/>`
+        : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--cba),var(--cb));display:flex;align-items:center;justify-content:center;font-size:56px">🏠</div>`;
+      innerHtml = `
+        ${decorHtml}
+        <div style="display:grid;grid-template-columns:42% 58%;flex:1;overflow:hidden">
+          <div style="overflow:hidden;border-right:1px solid var(--cb)">
+            ${imgCol}
+          </div>
+          <div style="display:flex;flex-direction:column;padding:10px 12px 10px 14px;overflow:hidden;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+              <span class="card-id" style="font-size:9px">${esc(idStr)}</span>
+              ${tierHtml}
+            </div>
+            <div style="flex:1;overflow:hidden;min-height:0">
+              <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ct);line-height:1.2;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Asset Name')}</div>
+              <div style="font-size:10px;color:var(--cs);margin-bottom:4px">${esc(role||'Asset Type')}</div>
+              ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0">
+              ${assetType ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">${esc(assetType)}</span>` : ''}
+              ${ticker    ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">◈ ${esc(ticker)}</span>` : ''}
+              ${assetVal  ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">💰 ${esc(assetVal)}</span>` : ''}
+              ${assetOwn  ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">📊 ${esc(assetOwn)}</span>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;border-top:1px solid var(--cb);padding-top:6px">
+              ${smallQrHtml}
+              <div style="font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ca);line-height:1.4">${esc(cta)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-bottom-bar"></div>`;
+
+    } else {
+      // PORTRAIT ASSET SHOWCASE — hero image top, info below, small QR bottom-right
+      const heroHeight = 200;
+      const smallQrSz = 96;
+      const heroHtml = hasImg
+        ? `<img src="${heroImgSrc}" style="width:100%;height:${heroHeight}px;object-fit:cover;display:block;flex-shrink:0" alt="Asset"/>`
+        : `<div style="width:100%;height:${heroHeight}px;background:linear-gradient(135deg,var(--cba),var(--cb));display:flex;align-items:center;justify-content:center;font-size:48px;flex-shrink:0;opacity:.6">🏠</div>`;
+      const smallQrHtml = `
+        <div class="card-qr-wrap" id="c-qr-wrap" style="padding:7px;border-radius:12px">
+          <div id="c-qr-render"></div>
+          <div class="qr-placeholder" id="c-qr-placeholder" style="width:${smallQrSz}px;height:${smallQrSz}px;font-size:8px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+        </div>`;
+      innerHtml = `
+        ${decorHtml}
+        ${heroHtml}
+        <div class="card-top" style="padding:12px 18px 6px">
+          <span class="card-id">${esc(idStr)}</span>
+          ${tierHtml}
+        </div>
+        <div style="padding:0 18px 8px;position:relative">
+          <div style="padding-right:${smallQrSz + 28}px">
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:3px;word-break:break-word">${esc(name||'Asset Name')}</div>
+            <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'6px':'0'}">${esc(role||'Asset Type')}</div>
+            ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+          </div>
+          <div style="position:absolute;top:0;right:18px;display:flex;flex-direction:column;align-items:center;gap:3px">
+            ${smallQrHtml}
+            <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ca);text-align:center;white-space:nowrap;max-width:${smallQrSz+14}px">${esc(cta)}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 8px">
+          ${assetType ? `<span class="card-asset-data-chip">${esc(assetType)}</span>` : ''}
+          ${ticker    ? `<span class="card-asset-data-chip">◈ ${esc(ticker)}</span>` : ''}
+          ${assetVal  ? `<span class="card-asset-data-chip">💰 ${esc(assetVal)}</span>` : ''}
+          ${assetOwn  ? `<span class="card-asset-data-chip">📊 ${esc(assetOwn)}</span>` : ''}
+        </div>
+        ${wallet ? `<div style="padding:4px 18px 14px;font-size:8.5px;color:var(--cs);opacity:.4;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-top:1px solid var(--cb);margin:0 18px">◈ ${esc(wallet.substring(0,34))}${wallet.length>34?'…':''}</div>` : `<div style="height:12px"></div>`}
+        <div class="card-bottom-bar"></div>`;
+    }
+
+  } else {
+    // CLASSIC (default) — height driven by content, no forced padding at bottom
+    innerHtml = `
+      ${decorHtml}${headerHtml}
+      <div style="padding:0 22px 14px;display:flex;align-items:center;gap:13px;position:relative;z-index:2">
+        ${avHtml(avPx)}
+        <div style="overflow:hidden">
+          <div class="card-name">${esc(name||'Your Name')}</div>
+          <div class="card-role">${esc(role||'Role / Type')}</div>
+        </div>
+      </div>
+      <div style="padding:0 22px;display:flex;justify-content:center;position:relative;z-index:2">${qrContainerHtml}</div>
+      <div class="card-cta">${esc(cta)}</div>
+      ${tagsHtml}
+      ${desc ? `<div style="padding:6px 22px 14px;font-size:10px;color:var(--cs);line-height:1.6;position:relative;z-index:2">${esc(desc)}</div>` : ''}
+      ${wallet ? `<div style="padding:6px 22px 16px;font-size:8.5px;color:var(--cs);opacity:.45;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative;z-index:2;border-top:1px solid var(--cb);margin:0 22px">◈ ${esc(wallet.substring(0,32))}${wallet.length>32?'…':''}</div>` : `<div style="height:16px"></div>`}
+      <div class="card-bottom-bar"></div>`;
+  }
+
+  const card = document.getElementById('nft-card');
+  card.innerHTML = innerHtml;
+  generateQR(qrData);
+}
+
+// ═══════════════════════════════════════════════
+// FIELD GETTERS
+// ═══════════════════════════════════════════════
+function v(id) { const el=document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function getTitle() {
+  if (identityType==='human')  return v('h-name');
+  if (identityType==='agent')  return v('a-name');
+  if (identityType==='asset')  return v('as-name');
+  return v('u-title');
+}
+function getSubtitle() {
+  if (identityType==='human')  return v('h-role');
+  if (identityType==='agent')  return v('a-type');
+  if (identityType==='asset')  return v('as-type') + (v('as-ticker') ? ' · ' + v('as-ticker') : '');
+  return v('u-cta') || 'Scan to Unlock';
+}
+function getCta() {
+  if (identityType === 'human') {
+    if (currentTier === 'Elite') return '⭐ VIP Connect';
+    if (currentTier === 'Pro')   return 'Scan to Connect Pro';
+    return 'Scan to Connect';
+  }
+  if (identityType === 'agent') {
+    if (currentTier === 'Elite') return '⭐ VIP Agent Access';
+    if (currentTier === 'Pro')   return 'Scan to Interact Pro';
+    return 'Scan to Interact';
+  }
+  if (identityType === 'asset') {
+    if (currentTier === 'Elite') return '⭐ View Asset Dashboard';
+    return 'Scan to View Asset';
+  }
+  const custom = v('u-cta');
+  if (currentTier === 'Elite') return custom ? '⭐ ' + custom : '⭐ VIP Access';
+  return custom || 'Scan to Unlock';
+}
+function getDesc() {
+  if (identityType==='human')  return v('h-bio');
+  if (identityType==='agent')  return v('a-desc');
+  if (identityType==='asset')  return v('as-desc'); // value/ownership shown as chips, not in bio
+  return v('u-desc');
+}
+function getWallet() {
+  if (identityType==='human')  return v('h-wallet');
+  if (identityType==='agent')  return v('a-wallet');
+  if (identityType==='asset')  return v('as-wallet');
+  return '';
+}
+function getQrData() {
+  if (identityType==='human') {
+    const website = v('h-website');
+    if (website) return website;
+    const n=v('h-name'), r=v('h-role'), p=v('h-phone'), em=v('h-email');
+    if (!n && !p && !em) return '';
+    // Build minimal vCard — only include lines with actual values
+    const lines = ['BEGIN:VCARD','VERSION:3.0'];
+    if (n)  lines.push('FN:'+n);
+    if (r)  lines.push('TITLE:'+r);
+    if (p)  lines.push('TEL:'+p);
+    if (em) lines.push('EMAIL:'+em);
+    lines.push('END:VCARD');
+    return lines.join('\n');
+  }
+  if (identityType==='agent')  return v('a-url');
+  if (identityType==='asset')  return v('as-url');
+  return v('u-link');
+}
+function getTags() {
+  if (identityType==='agent')  return caps.slice(0,3);
+  if (identityType==='human')  return [v('h-email'), v('h-phone')].filter(Boolean).slice(0,2);
+  if (identityType==='asset')  return [v('as-type'), v('as-ticker'), v('as-value')].filter(Boolean).slice(0,3);
+  return [];
+}
+
+// ═══════════════════════════════════════════════
+// QR GENERATION
+// ═══════════════════════════════════════════════
+function generateQR(data) {
+  clearTimeout(qrTimer);
+  qrTimer = setTimeout(() => _buildQR(data), 300);
+}
+
+function _buildQR(data) {
+  const container   = document.getElementById('c-qr-render');
+  const placeholder = document.getElementById('c-qr-placeholder');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const isLandscape = (currentSize === 'twitter');
+  const sz = isLandscape ? 180
+           : currentLayout === 'assetshowcase' ? (isLandscape ? 100 : 96)
+           : currentLayout === 'avatarfocus' ? 90
+           : (QR_SIZES[currentQrSize] || 160);
+
+  if (!data || !data.trim()) {
+    if (placeholder) { placeholder.style.display='flex'; placeholder.style.width=sz+'px'; placeholder.style.height=sz+'px'; }
+    return;
+  }
+  if (placeholder) placeholder.style.display = 'none';
+
+  const colors = QR_COLORS[currentTheme] || QR_COLORS.divine;
+  // vCards are long text — use Level M (15% EC) to reduce density
+  // URLs are short — use Level H (30% EC) for better logo compatibility
+  const isVcard = data.startsWith('BEGIN:VCARD');
+  const corrLevel = isVcard ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H;
+  try {
+    new QRCode(container, {
+      text: data, width: sz, height: sz,
+      colorDark: colors.fg, colorLight: colors.bg,
+      correctLevel: corrLevel,
+    });
+  } catch(e) {
+    container.innerHTML = `<div style="width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--red);text-align:center;padding:10px">Invalid URL</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// QR TEST
+// ═══════════════════════════════════════════════
+function testQR() {
+  const data = getQrData();
+  if (!data) { setQrStatus('bad', 'No URL entered — nothing to test'); return; }
+  if (data.startsWith('BEGIN:VCARD')) { setQrStatus('ok', 'vCard QR — scan will open contacts app'); return; }
+  try {
+    const url = new URL(data);
+    if (url.protocol === 'https:' || url.protocol === 'http:') {
+      setQrStatus('ok', '✓ Valid URL — scan will open: ' + url.hostname);
+      setTimeout(() => { if (confirm('QR URL valid ✓\n\nOpen "' + data + '" in new tab to verify?')) window.open(data, '_blank', 'noopener'); }, 100);
+    } else { setQrStatus('bad', 'Non-HTTP URL — may not open in all apps'); }
+  } catch(e) { setQrStatus('bad', 'Invalid URL format — scanner may not open correctly'); }
+}
+
+function setQrStatus(state, msg) {
+  const dot = document.getElementById('qr-dot');
+  const txt = document.getElementById('qr-test-msg');
+  if (dot) dot.className = 'qr-test-dot' + (state==='ok' ? ' ok' : state==='bad' ? ' bad' : '');
+  if (txt) txt.textContent = msg;
+}
+
+// ═══════════════════════════════════════════════
+// METADATA
+// ═══════════════════════════════════════════════
+function buildMeta(snap, idx) {
+  const idStr = '#' + pad(idx + 1);
+  const type  = snap.identityType;
+  return {
+    name:         `${snap.title || 'Unnamed'} ${idStr}`,
+    description:  snap.desc || '',
+    image:        `ipfs://YOUR_COLLECTION_CID/${pad(idx+1)}.png`,
+    external_url: snap.externalUrl || '',
+    attributes: [
+      { trait_type: 'Type',  value: type==='human' ? 'Human Identity' : type==='agent' ? 'AI Agent' : type==='asset' ? 'Asset NFT' : 'Utility NFT' },
+      { trait_type: 'Tier',  value: snap.tier  },
+      { trait_type: 'Theme', value: snap.theme },
+      { trait_type: 'ID',    value: idStr      },
+      ...(type==='human' ? [
+        { trait_type: 'Role',  value: snap.role  || '' },
+        { trait_type: 'Email', value: snap.email || '' },
+        { trait_type: 'Phone', value: snap.phone || '' },
+      ] : type==='agent' ? [
+        { trait_type: 'Agent Type',   value: snap.agentType || '' },
+        { trait_type: 'Capabilities', value: (snap.caps||[]).join(', ') },
+        { trait_type: 'API URL',      value: snap.externalUrl || '' },
+      ] : type==='asset' ? [
+        { trait_type: 'Asset Type',   value: snap.assetType  || '' },
+        { trait_type: 'Ticker',       value: snap.ticker     || '' },
+        { trait_type: 'Value',        value: snap.assetValue || '' },
+        { trait_type: 'Ownership',    value: snap.ownership  || '' },
+        { trait_type: 'Dashboard',    value: snap.externalUrl|| '' },
+        { trait_type: 'Note',         value: 'Asset access NFT — not legal ownership' },
+      ] : [
+        { trait_type: 'CTA',    value: snap.cta    || '' },
+        { trait_type: 'Link',   value: snap.externalUrl || '' },
+        ...(snap.expiry ? [{ trait_type: 'Expiry', value: snap.expiry }] : []),
+      ]),
+    ],
+    properties: { category: 'universal_qr_nft', standards: ['ERC-721','ERC-1155','Metaplex'], collection: snap.collectionName || 'My NFT Collection' }
+  };
+}
+
+function snapshotCurrent() {
+  return {
+    identityType,
+    tier: currentTier, theme: currentTheme,
+    layout: currentLayout, layoutMode,
+    qrSize: currentQrSize, avatarSize: currentAvatarSize,
+    collectionName: v('col-name-create'),
+    title:   getTitle(), desc: getDesc(),
+    role:    v('h-role'), email: v('h-email'), phone: v('h-phone'),
+    agentType: v('a-type'), caps: [...caps],
+    cta: v('u-cta'), expiry: v('u-expiry'),
+    assetType: v('as-type'), ticker: v('as-ticker'),
+    assetValue: v('as-value'), ownership: v('as-ownership'),
+    externalUrl: getQrData(),
+    wallet: getWallet(), logo: logoDataUrl,
+    assetImage: assetImageDataUrl,
+  };
+}
+
+let currentMetaJson = '';
+function updateMetaJson() {
+  const snap = snapshotCurrent();
+  currentMetaJson = JSON.stringify(buildMeta(snap, collection.length), null, 2);
+  const hl = highlight(currentMetaJson);
+  const l = document.getElementById('meta-json-left');
+  const r = document.getElementById('meta-json-right');
+  if (l) l.innerHTML = hl;
+  if (r) r.innerHTML = hl;
+}
+
+function renderMetadataView() {
+  if (selectedMeta) {
+    const hl = highlight(selectedMeta);
+    const l = document.getElementById('meta-json-left');
+    const r = document.getElementById('meta-json-right');
+    if (l) l.innerHTML = hl;
+    if (r) r.innerHTML = hl;
+  } else { updateMetaJson(); }
+}
+
+function highlight(json) {
+  return json.replace(/("[\w\s\-_\/:.#@+]+":)|("[^"]*")|(\b\d+\.?\d*\b)|(true|false|null)/g, (m,key,str,num,kw) => {
+    if (key) return `<span class="jk">${m}</span>`;
+    if (str) return `<span class="js">${m}</span>`;
+    if (num) return `<span class="jn">${m}</span>`;
+    if (kw)  return `<span class="jb">${m}</span>`;
+    return m;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// MINT / ADD TO COLLECTION
+// ═══════════════════════════════════════════════
+function mintToCollection() {
+  const name = getTitle();
+  if (!name) { toast('Please enter a name or title first'); return; }
+  const snap = snapshotCurrent();
+  snap.idNum = collection.length + 1;
+  collection.push(snap);
+  updateStats();
+  toast(`✓ Added to collection: ${name} #${pad(collection.length)}`);
+  updateMetaJson();
+}
+
+function updateStats() {
+  document.getElementById('stat-count').textContent = collection.length;
+  document.getElementById('stat-next').textContent  = '#' + pad(collection.length + 1);
+  renderCard();
+  renderCollectionSidebar();
+}
+
+// ═══════════════════════════════════════════════
+// COLLECTION
+// ═══════════════════════════════════════════════
+function renderCollectionGallery() {
+  const grid = document.getElementById('coll-grid');
+  document.getElementById('col-count').textContent = collection.length;
+  if (!collection.length) {
+    grid.innerHTML = '<div class="coll-empty">No NFTs minted yet.<br/>Use ⬡ Create to get started.</div>';
+    return;
+  }
+  grid.innerHTML = collection.map((s,i) => `
+    <div class="coll-item" onclick="loadSnap(${i})">
+      <button class="ci-del" onclick="event.stopPropagation();deleteItem(${i})" title="Remove">×</button>
+      <div class="ci-id">#${pad(s.idNum||i+1)}</div>
+      <div class="ci-name">${esc(s.title)}</div>
+      <div class="ci-type">${s.identityType==='human'?'👤 Human':s.identityType==='agent'?'🤖 Agent':s.identityType==='asset'?'📊 Asset':'🔑 Utility'} · ${s.tier}</div>
+    </div>`
+  ).join('');
+}
+
+function renderCollectionSidebar() {
+  const el = document.getElementById('col-sidebar-list');
+  if (!el) return;
+  if (!collection.length) { el.innerHTML = '<p style="font-size:12px;color:var(--gray-400);padding:4px 0">No items minted yet.</p>'; return; }
+  el.innerHTML = collection.map((s,i) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1.5px solid var(--blue-b);border-radius:var(--r-md);margin-bottom:8px;cursor:pointer;background:var(--white);transition:all .2s"
+      onclick="loadSnap(${i})"
+      onmouseover="this.style.borderColor='var(--blue)'"
+      onmouseout="this.style.borderColor='var(--blue-b)'">
+      <div>
+        <span style="font-size:10px;font-weight:700;color:var(--blue)">#${pad(s.idNum||i+1)}</span>
+        <span style="font-size:12px;margin-left:8px;font-weight:500">${esc(s.title)}</span>
+        <span style="font-size:10px;color:var(--gray-400);margin-left:6px">${s.tier}</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="redir-type-badge rt-${s.identityType==='asset'?'utility':s.identityType}">${s.identityType==='human'?'Human':s.identityType==='agent'?'Agent':s.identityType==='asset'?'Asset':'Utility'}</span>
+        <button style="background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;opacity:.5" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5" onclick="event.stopPropagation();deleteItem(${i})">×</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function loadSnap(i) {
+  const s = collection[i];
+  selectedMeta = JSON.stringify(buildMeta(s, i), null, 2);
+  identityType = s.identityType;
+  currentTheme = s.theme;
+  currentTier  = s.tier;
+  currentLayout = s.layout || AUTO_LAYOUT_MAP[s.identityType] || 'classic';
+  layoutMode    = s.layoutMode || 'auto';
+  currentQrSize = s.qrSize || 'md';
+  currentAvatarSize = s.avatarSize || 'md';
+  logoDataUrl       = s.logo;
+  assetImageDataUrl = s.assetImage || null;
+  caps         = [...(s.caps||[])];
+  renderCaps();
+  // Restore asset image preview
+  if (assetImageDataUrl) {
+    const ai = document.getElementById('asset-img-preview');
+    const ah = document.getElementById('asset-img-hint');
+    if (ai) { ai.src = assetImageDataUrl; ai.style.display = 'block'; }
+    if (ah) ah.style.display = 'none';
+  }
+  // Restore layout mode UI
+  document.querySelectorAll('[id^="layout-mode-"]').forEach(b => b.classList.remove('active'));
+  const lmBtn = document.getElementById('layout-mode-' + layoutMode);
+  if (lmBtn) lmBtn.classList.add('active');
+  const manualGroup = document.getElementById('manual-layout-group');
+  const autoInfo    = document.getElementById('auto-layout-info');
+  if (manualGroup) manualGroup.style.display = layoutMode === 'manual' ? 'block' : 'none';
+  if (autoInfo)    autoInfo.style.display    = layoutMode === 'auto'   ? 'block' : 'none';
+
+  document.querySelectorAll('.id-type-btn').forEach((b,idx) => {
+    b.classList.toggle('active', ['human','agent','utility','asset'][idx] === s.identityType);
+  });
+  document.querySelectorAll('.fields-section').forEach(f => f.style.display = 'none');
+  const fieldsEl = document.getElementById('fields-' + s.identityType);
+  if (fieldsEl) fieldsEl.style.display = 'block';
+
+  if (s.identityType==='human') {
+    setId('h-name', s.title); setId('h-role', s.role); setId('h-bio', s.desc);
+    setId('h-email', s.email); setId('h-phone', s.phone); setId('h-wallet', s.wallet);
+    setId('h-website', s.externalUrl);
+  } else if (s.identityType==='agent') {
+    setId('a-name', s.title); setId('a-type', s.agentType); setId('a-desc', s.desc);
+    setId('a-url', s.externalUrl); setId('a-wallet', s.wallet);
+  } else if (s.identityType==='asset') {
+    setId('as-name', s.title); setId('as-type', s.assetType); setId('as-ticker', s.ticker);
+    setId('as-desc', s.desc); setId('as-value', s.assetValue); setId('as-ownership', s.ownership);
+    setId('as-url', s.externalUrl); setId('as-wallet', s.wallet);
+  } else {
+    setId('u-title', s.title); setId('u-desc', s.desc);
+    setId('u-link', s.externalUrl); setId('u-cta', s.cta); setId('u-expiry', s.expiry);
+  }
+
+  if (logoDataUrl) {
+    document.getElementById('logo-preview').src = logoDataUrl;
+    document.getElementById('logo-preview').style.display = 'block';
+    document.getElementById('upload-hint').style.display = 'none';
+  } else {
+    document.getElementById('logo-preview').style.display = 'none';
+    document.getElementById('upload-hint').style.display = 'block';
+  }
+
+  document.querySelectorAll('.theme-swatch').forEach(el => el.classList.toggle('active', el.dataset.theme === s.theme));
+  const card = document.getElementById('nft-card');
+  const sizeClass = SIZE_CLASSES.find(c => card.classList.contains(c)) || 'sz-nft';
+  const layoutClass = currentLayout !== 'classic' ? 'layout-' + currentLayout : '';
+  card.className = ['card','t-'+s.theme, sizeClass, layoutClass].filter(Boolean).join(' ');
+
+  document.querySelectorAll('.layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === currentLayout));
+  document.querySelectorAll('[id^="qrs-"]').forEach(b => b.classList.toggle('active', b.id === 'qrs-' + currentQrSize));
+  document.querySelectorAll('[id^="avs-"]').forEach(b => b.classList.toggle('active', b.id === 'avs-' + currentAvatarSize));
+  document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('t-basic','t-pro','t-elite'));
+  const tierMap = { Basic:'tier-basic', Pro:'tier-pro', Elite:'tier-elite' };
+  const tierBtn = document.getElementById(tierMap[s.tier]);
+  if (tierBtn) tierBtn.classList.add('t-' + s.tier.toLowerCase());
+
+  switchTab('create');
+  update();
+  toast('Loaded into editor');
+}
+
+function deleteItem(i) {
+  if (!confirm('Remove this NFT from the collection?')) return;
+  collection.splice(i, 1);
+  if (selectedMeta && i <= collection.length) selectedMeta = null;
+  updateStats();
+  renderCollectionGallery();
+  toast('Removed from collection');
+}
+
+function clearCollection() {
+  if (!collection.length || !confirm('Clear entire collection? This cannot be undone.')) return;
+  collection = []; selectedMeta = null;
+  updateStats(); renderCollectionGallery();
+  toast('Collection cleared');
+}
+
+// ═══════════════════════════════════════════════
+// REDIRECT MANAGER
+// ═══════════════════════════════════════════════
+function addRedirect() {
+  const label = document.getElementById('redir-label').value.trim();
+  const dest  = document.getElementById('redir-dest').value.trim();
+  const type  = document.getElementById('redir-type').value;
+  if (!label) { toast('Please enter a label'); return; }
+  if (!dest)  { toast('Please enter a destination URL'); return; }
+  try { new URL(dest); } catch(e) { toast('Please enter a valid URL (include https://)'); return; }
+  redirects.push({ label, dest, type, scans: 0, created: new Date().toLocaleDateString() });
+  document.getElementById('redir-label').value = '';
+  document.getElementById('redir-dest').value  = '';
+  renderRedirectTable();
+  document.getElementById('stat-links').textContent = redirects.length;
+  toast('Redirect added: ' + label);
+}
+
+function editRedirect(i) {
+  const newDest = prompt('Update destination URL for "' + redirects[i].label + '":', redirects[i].dest);
+  if (!newDest || newDest === redirects[i].dest) return;
+  try { new URL(newDest); } catch(e) { toast('Invalid URL'); return; }
+  redirects[i].dest = newDest;
+  renderRedirectTable();
+  toast('Redirect updated — QR code unchanged ✓');
+}
+
+function deleteRedirect(i) {
+  if (!confirm('Delete this redirect?')) return;
+  redirects.splice(i,1);
+  renderRedirectTable();
+  document.getElementById('stat-links').textContent = redirects.length;
+  toast('Redirect deleted');
+}
+
+function simulateScan(i) {
+  redirects[i].scans++;
+  renderRedirectTable();
+  window.open(redirects[i].dest, '_blank', 'noopener');
+  toast('Simulated scan → opening destination');
+}
+
+function renderRedirectTable() {
+  document.getElementById('redir-count').textContent = redirects.length;
+  const tbody = document.getElementById('redir-tbody');
+  if (!redirects.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-400);font-size:12px">No redirects yet. Add one above.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = redirects.map((r,i) => `
+    <tr>
+      <td style="font-weight:600">${esc(r.label)}</td>
+      <td><div class="redir-url" title="${esc(r.dest)}">${esc(r.dest)}</div></td>
+      <td><span class="redir-type-badge rt-${r.type}">${r.type==='human'?'Human':r.type==='agent'?'Agent':'Utility'}</span></td>
+      <td style="font-weight:600;color:var(--blue)">${r.scans}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-outline btn-xs" onclick="simulateScan(${i})">▶</button>
+        <button class="btn btn-ghost btn-xs" onclick="editRedirect(${i})">✎</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteRedirect(${i})">✕</button>
+      </div></td>
+    </tr>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════
+function downloadMeta() {
+  const json = selectedMeta || currentMetaJson;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], {type:'application/json'}));
+  a.download = `nft-metadata-${Date.now()}.json`;
+  a.click();
+  toast('Metadata JSON downloaded');
+}
+
+function copyMeta() {
+  const json = selectedMeta || currentMetaJson;
+  navigator.clipboard.writeText(json).then(() => toast('Copied to clipboard ✓'));
+}
+
+function exportAll() {
+  const colName = document.getElementById('col-name2').value;
+  const colDesc = document.getElementById('col-desc').value;
+  const manifest = {
+    collection: { name: colName, description: colDesc, symbol: 'UQNFT', total: collection.length, created: new Date().toISOString() },
+    nfts: collection.map((s,i) => buildMeta(s,i)),
+    redirects: redirects.map(r => ({ label: r.label, destination: r.dest, type: r.type })),
+  };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(manifest,null,2)], {type:'application/json'}));
+  a.download = `${colName.replace(/\s+/g,'-')}-manifest.json`;
+  a.click();
+  toast(`Exported ${collection.length} NFTs + ${redirects.length} redirects`);
+}
+
+// ═══════════════════════════════════════════════
+// DOWNLOAD CARD — V1 proven approach + solid bg
+// ═══════════════════════════════════════════════
+const THEME_BASE_COLORS = {
+  divine:     '#ffffff',
+  crypto:     '#050d1f',
+  futuristic: '#020b18',
+  business:   '#f8faff',
+};
+
+function downloadCard() {
+  const card      = document.getElementById('nft-card');
+  const name      = getTitle() || 'nft-card';
+  const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
+
+  toast('Rendering PNG...');
+  const prevTransform  = card.style.transform;
+  const prevTransition = card.style.transition;
+  card.style.transform  = 'none';
+  card.style.transition = 'none';
+
+  html2canvas(card, {
+    backgroundColor: baseColor,
+    scale: 3,
+    useCORS: true,
+    allowTaint: true,
+    logging: false,
+  }).then(captured => {
+    const S = 3;
+    const W = card.offsetWidth  * S;
+    const H = card.offsetHeight * S;
+    const R = 22 * S;
+
+    const out = document.createElement('canvas');
+    out.width  = W;
+    out.height = H;
+    const ctx  = out.getContext('2d');
+
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.beginPath();
+    ctx.moveTo(R, 0);
+    ctx.lineTo(W-R, 0); ctx.arcTo(W, 0,  W,  R,   R);
+    ctx.lineTo(W, H-R); ctx.arcTo(W, H,  W-R, H,   R);
+    ctx.lineTo(R, H);   ctx.arcTo(0, H,  0,   H-R, R);
+    ctx.lineTo(0, R);   ctx.arcTo(0, 0,  R,   0,   R);
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.drawImage(captured, 0, 0, W, H);
+
+    const a   = document.createElement('a');
+    a.download = name.replace(/\s+/g, '-') + '-NFT.png';
+    a.href     = out.toDataURL('image/png');
+    a.click();
+    toast('Downloaded — clean edges, 3× resolution ✓');
+  }).catch(err => {
+    console.error('Export error:', err);
+    toast('Download failed — please try again');
+  }).finally(() => {
+    card.style.transform  = prevTransform;
+    card.style.transition = prevTransition;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════
+function resetForm() {
+  ['h-name','h-role','h-bio','h-phone','h-email','h-socials','h-wallet','h-website',
+   'a-name','a-desc','a-url','a-wallet',
+   'u-title','u-desc','u-link','u-expiry',
+   'as-name','as-ticker','as-desc','as-value','as-ownership','as-url','as-wallet',
+  ].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  setId('u-cta', 'Scan to Unlock');
+  caps = []; renderCaps();
+  logoDataUrl = null;
+  assetImageDataUrl = null;
+  document.getElementById('logo-preview').style.display      = 'none';
+  document.getElementById('upload-hint').style.display       = 'block';
+  const aiPrev = document.getElementById('asset-img-preview');
+  const aiHint = document.getElementById('asset-img-hint');
+  if (aiPrev) aiPrev.style.display = 'none';
+  if (aiHint) aiHint.style.display = 'block';
+  // Reset layout mode to auto
+  layoutMode = 'auto';
+  currentLayout = AUTO_LAYOUT_MAP[identityType] || 'classic';
+  document.querySelectorAll('[id^="layout-mode-"]').forEach(b => b.classList.remove('active'));
+  const autoBtn = document.getElementById('layout-mode-auto');
+  if (autoBtn) autoBtn.classList.add('active');
+  const mg = document.getElementById('manual-layout-group');
+  const ai = document.getElementById('auto-layout-info');
+  if (mg) mg.style.display = 'none';
+  if (ai) ai.style.display = 'block';
+  selectedMeta = null;
+  setQrStatus('idle', 'Enter a URL to validate QR link');
+  update();
+  toast('Form cleared');
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function esc(s)       { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function set(id, txt) { const el=document.getElementById(id); if(el) el.textContent = txt; }
+function setId(id,val){ const el=document.getElementById(id); if(el) el.value = val||''; }
+function pad(n)       { return String(n).padStart(3,'0'); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+update();
+</script>
+</body>
+</html>
