@@ -1791,12 +1791,12 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   <div class="sheet-body" id="sheet-body">
     <!-- NFT card clone injected here by JS -->
     <div class="sheet-actions">
-      <button class="btn btn-primary" onclick="downloadCard()">⬇ Download PNG</button>
+      <button class="btn btn-primary" onclick="downloadCard()">⬇ Save Image</button>
       <button class="btn btn-gold" onclick="mintToCollection();closeMobilePreview()">+ Collection</button>
       <button class="btn btn-outline" onclick="closeMobilePreview();switchTab('metadata')">JSON</button>
     </div>
     <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6">
-      PNG exports at 3× resolution · Hover for 3D effect on desktop
+      Tap <strong style="color:var(--blue)">Save Image</strong> → long-press image → Save to Photos
     </div>
   </div>
 </div>
@@ -2936,7 +2936,13 @@ const THEME_BASE_COLORS = {
 };
 
 function downloadCard() {
-  const card      = document.getElementById('nft-card');
+  const isMobile = window.innerWidth <= 700;
+  // On mobile use the sheet clone if available (it's the visible card),
+  // otherwise fall back to the hidden original
+  const card = (isMobile && document.getElementById('nft-card-sheet-clone'))
+    ? document.getElementById('nft-card-sheet-clone')
+    : document.getElementById('nft-card');
+
   const name      = getTitle() || 'nft-card';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
 
@@ -2948,12 +2954,14 @@ function downloadCard() {
 
   html2canvas(card, {
     backgroundColor: baseColor,
-    scale: 3,
+    scale: isMobile ? 2 : 3,
     useCORS: true,
     allowTaint: true,
     logging: false,
+    windowWidth: card.scrollWidth,
+    windowHeight: card.scrollHeight,
   }).then(captured => {
-    const S = 3;
+    const S = isMobile ? 2 : 3;
     const W = card.offsetWidth  * S;
     const H = card.offsetHeight * S;
     const R = 22 * S;
@@ -2974,14 +2982,43 @@ function downloadCard() {
     ctx.lineTo(0, R);   ctx.arcTo(0, 0,  R,   0,   R);
     ctx.closePath();
     ctx.clip();
-
     ctx.drawImage(captured, 0, 0, W, H);
 
-    const a   = document.createElement('a');
-    a.download = name.replace(/\s+/g, '-') + '-NFT.png';
-    a.href     = out.toDataURL('image/png');
-    a.click();
-    toast('Downloaded — clean edges, 3× resolution ✓');
+    const dataUrl = out.toDataURL('image/png');
+
+    if (isMobile) {
+      // iOS Safari blocks programmatic anchor clicks — open image in new tab
+      // User can then long-press → Save Image
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(`
+          <!DOCTYPE html><html><head>
+          <meta name="viewport" content="width=device-width,initial-scale=1"/>
+          <title>${name} NFT</title>
+          <style>
+            body{margin:0;background:#0f172a;display:flex;flex-direction:column;
+                 align-items:center;justify-content:flex-start;min-height:100vh;padding:20px;box-sizing:border-box;}
+            img{max-width:100%;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+            p{color:#94a3b8;font-family:system-ui,sans-serif;font-size:13px;margin-top:16px;text-align:center;line-height:1.6;}
+            strong{color:#60a5fa;}
+          </style></head><body>
+          <img src="${dataUrl}" alt="${name} NFT"/>
+          <p>Long-press the image above and tap<br/><strong>Save to Photos</strong> or <strong>Add to Photos</strong></p>
+          </body></html>`);
+        win.document.close();
+        toast('Image opened — long-press to Save to Photos ✓');
+      } else {
+        // Pop-up blocked fallback — create a temporary link the user can tap
+        toast('Tap-and-hold the image in Preview to save it');
+      }
+    } else {
+      // Desktop: normal anchor download
+      const a   = document.createElement('a');
+      a.download = name.replace(/\s+/g, '-') + '-NFT.png';
+      a.href     = dataUrl;
+      a.click();
+      toast('Downloaded — clean edges, 3× resolution ✓');
+    }
   }).catch(err => {
     console.error('Export error:', err);
     toast('Download failed — please try again');
