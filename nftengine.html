@@ -1048,13 +1048,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   .preview-col { display: flex !important; }
   .mobile-preview-fab { display: none !important; }
   .mobile-stats-footer { display: none !important; }
-  .design-collapse-toggle { display: none !important; }
-  .design-toggle-row { display: none !important; }
-  .design-toggle-spacer { display: none !important; }
   .mobile-only-preview-btn { display: none !important; }
-  .design-options-body { display: block !important; }
   .id-type-grid { display: flex !important; flex-direction: column; }
   .id-type-pills { display: none !important; }
+  /* design-collapse-toggle and design-toggle-row ARE shown on desktop */
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1087,9 +1084,6 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   /* Identity type: pills on mobile, hide card grid */
   .id-type-grid { display: none; }
   .id-type-pills { display: flex; }
-
-  /* Design options: collapsible */
-  .design-collapse-toggle { display: flex; }
 
   /* FAB + overlay */
   .mobile-preview-fab { display: none !important; }  /* preview now inline in Design Options row */
@@ -1508,8 +1502,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
         </div>
       </div>
 
-      <!-- Logo -->
-      <div class="form-group">
+      </div><!-- /design-options-body -->
+
+      <!-- Logo / Avatar — always visible, outside the collapsible -->
+      <div class="form-group" style="margin-top:16px">
         <label>Logo / Avatar (optional)</label>
         <div class="upload-area" onclick="document.getElementById('logo-file').click()">
           <input type="file" id="logo-file" accept="image/*" onchange="uploadLogo(event)"/>
@@ -1520,8 +1516,6 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           </div>
         </div>
       </div>
-
-      </div><!-- /design-options-body -->
 
       <hr class="div"/>
       <!-- Collection name inline -->
@@ -3039,15 +3033,27 @@ function toggleDesignOptions() {
   }
 }
 
-// On desktop, always show design options body
+// On desktop, show toggle but hide Preview button; on mobile show both
 function syncDesignOptionsVisibility() {
-  const body = document.getElementById('design-options-body');
+  const body   = document.getElementById('design-options-body');
   const toggle = document.getElementById('design-toggle');
+  const row    = document.querySelector('.design-toggle-row');
+  const spacer = document.querySelector('.design-toggle-spacer');
+  const previewBtn = document.querySelector('.mobile-only-preview-btn');
   if (!body || !toggle) return;
+
   if (window.innerWidth > 700) {
-    body.style.display = 'block';
-    toggle.style.display = 'none';
+    // Desktop: show toggle row (no Preview btn), keep current open/closed state
+    if (row) row.style.display = 'flex';
+    if (spacer) spacer.style.display = 'block';
+    if (previewBtn) previewBtn.style.display = 'none';
+    toggle.style.display = 'flex';
+    body.style.display = designOptionsOpen ? 'block' : 'none';
   } else {
+    // Mobile: show toggle row including Preview btn
+    if (row) row.style.display = 'flex';
+    if (spacer) spacer.style.display = 'block';
+    if (previewBtn) previewBtn.style.display = 'inline-flex';
     toggle.style.display = 'flex';
     body.style.display = designOptionsOpen ? 'block' : 'none';
   }
