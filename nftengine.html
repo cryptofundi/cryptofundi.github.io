@@ -871,12 +871,253 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 }
 
 /* ═══════════════════════════════════════════════════
+   MOBILE — IDENTITY TYPE PILLS
+   ═══════════════════════════════════════════════════ */
+.id-type-pills {
+  display: none;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  margin-bottom: 18px;
+  scrollbar-width: none;
+}
+.id-type-pills::-webkit-scrollbar { display: none; }
+.id-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 16px;
+  border-radius: 99px;
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+  white-space: nowrap;
+  cursor: pointer; transition: all .2s;
+  font-size: 13px; font-weight: 600; color: var(--gray-600);
+  flex-shrink: 0;
+}
+.id-pill .pill-emoji { font-size: 15px; }
+.id-pill:hover { border-color: var(--blue-pale); }
+.id-pill.active {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+  color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26,86,219,.09);
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE PREVIEW BOTTOM SHEET
+   ═══════════════════════════════════════════════════ */
+.mobile-preview-fab {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 500;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: #fff;
+  border: none;
+  border-radius: 28px;
+  padding: 14px 22px;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: .8px;
+  box-shadow: 0 8px 28px rgba(26,86,219,.45);
+  cursor: pointer;
+  transition: all .25s;
+  align-items: center; gap: 8px;
+}
+.mobile-preview-fab:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(26,86,219,.5); }
+
+.mobile-sheet-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.55);
+  backdrop-filter: blur(4px);
+  z-index: 600;
+}
+.mobile-sheet-overlay.open { display: block; }
+
+.mobile-sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  z-index: 700;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.34,1.1,.64,1);
+  padding: 0 0 32px;
+}
+.mobile-sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  display: flex; justify-content: center;
+  padding: 12px 0 8px;
+}
+.sheet-handle-bar {
+  width: 36px; height: 4px;
+  background: var(--gray-300); border-radius: 2px;
+}
+.sheet-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 20px 14px;
+  border-bottom: 1px solid var(--gray-100);
+  margin-bottom: 4px;
+}
+.sheet-title {
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--gray-600);
+}
+.sheet-close {
+  background: var(--gray-100); border: none;
+  width: 30px; height: 30px; border-radius: 50%;
+  font-size: 16px; color: var(--gray-500);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.sheet-body {
+  padding: 16px 20px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+}
+.sheet-actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center; width: 100%;
+  max-width: 400px;
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE STATS FOOTER
+   ═══════════════════════════════════════════════════ */
+.mobile-stats-footer {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--blue-b);
+  padding: 10px 20px 10px;
+  z-index: 400;
+  justify-content: space-around;
+}
+.mobile-stat { text-align: center; }
+.mobile-stat-v { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: var(--blue); }
+.mobile-stat-l { font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1px; }
+
+/* ═══════════════════════════════════════════════════
+   COLLAPSIBLE DESIGN OPTIONS
+   ═══════════════════════════════════════════════════ */
+.design-collapse-toggle {
+  display: none;
+  width: 100%;
+  background: var(--blue-bg);
+  border: 1.5px solid var(--blue-b);
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--blue);
+  cursor: pointer;
+  margin-bottom: 14px;
+  text-align: left;
+  justify-content: space-between; align-items: center;
+}
+.design-collapse-toggle .dct-arrow {
+  font-size: 10px;
+  transition: transform .2s;
+}
+.design-collapse-toggle.open .dct-arrow { transform: rotate(180deg); }
+.design-options-body { }
+
+/* ═══════════════════════════════════════════════════
+   COLLAPSIBLE INFO CARDS
+   ═══════════════════════════════════════════════════ */
+.info-card-toggle {
+  cursor: pointer; user-select: none;
+}
+.info-card-toggle .ic-header {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+}
+.info-card-toggle .ic-arrow {
+  font-size: 10px; color: var(--blue); flex-shrink: 0; margin-top: 1px;
+  transition: transform .2s;
+}
+.info-card-toggle.open .ic-arrow { transform: rotate(180deg); }
+.info-card-body { margin-top: 8px; font-size: 11px; color: var(--gray-600); line-height: 1.65; }
+
+@media (min-width: 701px) {
+  .preview-col { display: flex !important; }
+  .mobile-preview-fab { display: none !important; }
+  .mobile-stats-footer { display: none !important; }
+  .design-collapse-toggle { display: none !important; }
+  .design-toggle-row { display: none !important; }
+  .design-toggle-spacer { display: none !important; }
+  .mobile-only-preview-btn { display: none !important; }
+  .design-options-body { display: block !important; }
+  .id-type-grid { display: flex !important; flex-direction: column; }
+  .id-type-pills { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 900px) {
   .main-grid { grid-template-columns: 1fr; }
   .sidebar { max-height: none; border-right: none; border-bottom: 1.5px solid var(--blue-b); }
   .preview-col { max-height: none; }
+}
+
+@media (max-width: 700px) {
+  /* Header: hide stats from header, show in footer */
+  header { padding: 0 16px; height: 58px; }
+  .header-stats { display: none; }
+  .logo-title { font-size: 14px; }
+  .logo-sub { display: none; }
+  .logo-icon { width: 34px; height: 34px; font-size: 15px; }
+
+  /* Tabs: compact */
+  .tabs-bar { padding: 0 12px; overflow-x: auto; scrollbar-width: none; }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .tab-btn { padding: 12px 14px; font-size: 10px; letter-spacing: 1.2px; }
+
+  /* Main grid: single column */
+  .main-grid { grid-template-columns: 1fr; }
+  .sidebar { padding: 20px 16px 120px; border-right: none; max-height: none; }
+  .preview-col { display: none; } /* hidden on mobile — shown in bottom sheet */
+
+  /* Identity type: pills on mobile, hide card grid */
+  .id-type-grid { display: none; }
+  .id-type-pills { display: flex; }
+
+  /* Design options: collapsible */
+  .design-collapse-toggle { display: flex; }
+
+  /* FAB + overlay */
+  .mobile-preview-fab { display: none !important; }  /* preview now inline in Design Options row */
+  .mobile-stats-footer { display: flex; }
+
+  /* Add padding at bottom for FAB + stats footer */
+  .sidebar { padding-bottom: 140px; }
+
+  /* Compact form labels */
+  .form-group label { font-size: 10px; }
+
+  /* Theme grid: 4 columns on mobile stays, but smaller */
+  .theme-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .theme-swatch { padding: 8px 4px; }
+  .sw-name { font-size: 9px; }
+  .sw-bar { display: none; }
+
+  /* Layout grid: 3 cols on mobile */
+  .layout-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Size grid: 2x2 on mobile */
+  .size-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Toast: full-width at bottom */
+  #toast { bottom: 90px; left: 16px; right: 16px; max-width: none; font-size: 12px; }
+
+  /* Section head smaller */
+  .section-head span { font-size: 9px; letter-spacing: 2px; }
 }
 </style>
 </head>
@@ -915,10 +1156,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
      TABS
 ══════════════════════════════════════════════════ -->
 <div class="tabs-bar">
-  <button class="tab-btn active" onclick="switchTab('create')">⬡ Create</button>
-  <button class="tab-btn" onclick="switchTab('collection')">◈ Collection</button>
-  <button class="tab-btn" onclick="switchTab('redirects')">⇄ Link Manager</button>
-  <button class="tab-btn" onclick="switchTab('metadata')">{ } Metadata</button>
+  <button class="tab-btn active" onclick="switchTab('create')">Create</button>
+  <button class="tab-btn" onclick="switchTab('collection')">Collection</button>
+  <button class="tab-btn" onclick="switchTab('redirects')">Link Manager</button>
+  <button class="tab-btn" onclick="switchTab('metadata')">Metadata</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -934,6 +1175,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 
       <!-- Identity Type -->
       <div class="section-head"><span>Identity Type</span></div>
+      <!-- Identity Type — Card grid (desktop) -->
       <div class="id-type-grid">
         <button class="id-type-btn active" onclick="setType('human',this)">
           <div class="ib-icon">👤</div>
@@ -951,6 +1193,14 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           <div class="ib-icon">📊</div>
           <div><div class="ib-lbl">Asset / RWA NFT</div><div class="ib-sub">Stocks, real estate, portfolio</div></div>
         </button>
+      </div>
+
+      <!-- Identity Type — Pills (mobile) -->
+      <div class="id-type-pills" id="id-type-pills-mobile">
+        <button class="id-pill active" onclick="setTypeMobile('human',this)"><span class="pill-emoji">👤</span> Human</button>
+        <button class="id-pill" onclick="setTypeMobile('agent',this)"><span class="pill-emoji">🤖</span> AI Agent</button>
+        <button class="id-pill" onclick="setTypeMobile('utility',this)"><span class="pill-emoji">🔑</span> Access</button>
+        <button class="id-pill" onclick="setTypeMobile('asset',this)"><span class="pill-emoji">📊</span> Asset</button>
       </div>
 
       <hr class="div"/>
@@ -1034,8 +1284,12 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <!-- ── UTILITY FIELDS ── -->
       <div id="fields-utility" class="fields-section fadein" style="display:none">
         <div class="section-head"><span>Access / Utility NFT</span></div>
-        <div class="info-card">
-          <strong>💡 Affiliate tip:</strong> Don't link raw affiliate URLs directly. Use your own landing page URL here, then place affiliate links on that page for better conversion and tracking.
+        <div class="info-card info-card-toggle" onclick="toggleInfoCard(this)">
+          <div class="ic-header">
+            <strong>💡 Affiliate tip</strong>
+            <span class="ic-arrow">▼</span>
+          </div>
+          <div class="info-card-body" style="display:none">Don't link raw affiliate URLs directly. Use your own landing page URL here, then place affiliate links on that page for better conversion and tracking.</div>
         </div>
         <div class="form-group">
           <label>Title</label>
@@ -1063,8 +1317,12 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <!-- ── ASSET / RWA FIELDS ── -->
       <div id="fields-asset" class="fields-section fadein" style="display:none">
         <div class="section-head"><span>Asset / RWA NFT</span></div>
-        <div class="info-card" style="border-left:3px solid var(--gold)">
-          <strong style="color:var(--gold)">⚠️ Legal note:</strong> This NFT provides <em>access to asset information</em>, not legal ownership of the underlying asset. Always consult a legal professional for tokenized assets.
+        <div class="info-card info-card-toggle" style="border-left:3px solid var(--gold)" onclick="toggleInfoCard(this)">
+          <div class="ic-header">
+            <strong style="color:var(--gold)">⚠️ Legal note</strong>
+            <span class="ic-arrow" style="color:var(--gold)">▼</span>
+          </div>
+          <div class="info-card-body" style="display:none">This NFT provides <em>access to asset information</em>, not legal ownership of the underlying asset. Always consult a legal professional for tokenized assets.</div>
         </div>
         <div class="form-group">
           <label>Asset Image (Hero Photo)</label>
@@ -1126,7 +1384,16 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <hr class="div"/>
       <div class="section-head"><span>Card Design</span></div>
 
-      <!-- Theme -->
+      <!-- Collapsible toggle for mobile -->
+      <div class="design-toggle-row" style="display:flex;gap:8px;align-items:stretch">
+        <button class="design-collapse-toggle" id="design-toggle" onclick="toggleDesignOptions()" style="flex:1;margin-bottom:0">
+          Design Options <span class="dct-arrow">▼</span>
+        </button>
+        <button class="btn btn-primary mobile-only-preview-btn" onclick="openMobilePreview()" style="flex-shrink:0;padding:10px 14px;font-size:11px;border-radius:var(--r-md)">
+          👁 Preview
+        </button>
+      </div>
+      <div class="design-toggle-spacer" style="height:14px"></div>      <div class="design-options-body" id="design-options-body">
       <div class="form-group">
         <label>Theme</label>
         <div class="theme-grid">
@@ -1253,6 +1520,8 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           </div>
         </div>
       </div>
+
+      </div><!-- /design-options-body -->
 
       <hr class="div"/>
       <!-- Collection name inline -->
@@ -1456,7 +1725,59 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   </div><!-- /preview-col -->
 </div><!-- /main-grid -->
 
-<div id="toast"></div>
+<!-- ══════════════════════════════════════════════════
+     MOBILE PREVIEW FAB
+══════════════════════════════════════════════════ -->
+<button class="mobile-preview-fab" id="preview-fab" onclick="openMobilePreview()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="17" width="2" height="4"/><rect x="17" y="19" width="4" height="2"/></svg>
+  Preview Card
+</button>
+
+<!-- ══════════════════════════════════════════════════
+     MOBILE BOTTOM SHEET OVERLAY
+══════════════════════════════════════════════════ -->
+<div class="mobile-sheet-overlay" id="sheet-overlay" onclick="closeMobilePreview()"></div>
+<div class="mobile-sheet" id="mobile-sheet">
+  <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+  <div class="sheet-header">
+    <span class="sheet-title">Live Preview</span>
+    <button class="sheet-close" onclick="closeMobilePreview()">✕</button>
+  </div>
+  <div class="sheet-body" id="sheet-body">
+    <!-- NFT card clone injected here by JS -->
+    <div class="sheet-actions">
+      <button class="btn btn-primary" onclick="downloadCard()">⬇ Download PNG</button>
+      <button class="btn btn-gold" onclick="mintToCollection();closeMobilePreview()">+ Collection</button>
+      <button class="btn btn-outline" onclick="closeMobilePreview();switchTab('metadata')">JSON</button>
+    </div>
+    <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6">
+      PNG exports at 3× resolution · Hover for 3D effect on desktop
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     MOBILE STATS FOOTER
+══════════════════════════════════════════════════ -->
+<div class="mobile-stats-footer" id="mobile-stats-footer">
+  <div class="mobile-stat">
+    <div class="mobile-stat-v" id="mstat-count">0</div>
+    <div class="mobile-stat-l">Collection</div>
+  </div>
+  <div class="mobile-stat">
+    <div class="mobile-stat-v" id="mstat-next">#001</div>
+    <div class="mobile-stat-l">Next ID</div>
+  </div>
+  <div class="mobile-stat">
+    <div class="mobile-stat-v" id="mstat-links">0</div>
+    <div class="mobile-stat-l">Redirects</div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="openMobilePreview()" style="padding:8px 16px;font-size:10px;display:none">
+    Preview ▶
+  </button>
+</div>
+
+
 
 <!-- ══════════════════════════════════════════════════
      JAVASCRIPT
@@ -1536,6 +1857,8 @@ function setType(type, btn) {
   if (layoutMode === 'auto') {
     currentLayout = AUTO_LAYOUT_MAP[type] || 'classic';
   }
+  // Sync mobile pills
+  if (typeof syncPillsToType === 'function') syncPillsToType(type);
   update();
 }
 
@@ -2302,6 +2625,11 @@ function loadCollection() {
 function updateStats() {
   document.getElementById('stat-count').textContent = collection.length;
   document.getElementById('stat-next').textContent  = '#' + pad(collection.length + 1);
+  // Sync mobile footer stats
+  const mc = document.getElementById('mstat-count');
+  const mn = document.getElementById('mstat-next');
+  if (mc) mc.textContent = collection.length;
+  if (mn) mn.textContent = '#' + pad(collection.length + 1);
   renderCard();
   renderCollectionSidebar();
 }
@@ -2381,6 +2709,7 @@ function loadSnap(i) {
   document.querySelectorAll('.id-type-btn').forEach((b,idx) => {
     b.classList.toggle('active', ['human','agent','utility','asset'][idx] === s.identityType);
   });
+  if (typeof syncPillsToType === 'function') syncPillsToType(s.identityType);
   document.querySelectorAll('.fields-section').forEach(f => f.style.display = 'none');
   const fieldsEl = document.getElementById('fields-' + s.identityType);
   if (fieldsEl) fieldsEl.style.display = 'block';
@@ -2462,6 +2791,8 @@ function addRedirect() {
   document.getElementById('redir-dest').value  = '';
   renderRedirectTable();
   document.getElementById('stat-links').textContent = redirects.length;
+  const ml = document.getElementById('mstat-links');
+  if (ml) ml.textContent = redirects.length;
   toast('Redirect added: ' + label);
 }
 
@@ -2479,6 +2810,8 @@ function deleteRedirect(i) {
   redirects.splice(i,1);
   renderRedirectTable();
   document.getElementById('stat-links').textContent = redirects.length;
+  const ml = document.getElementById('mstat-links');
+  if (ml) ml.textContent = redirects.length;
   toast('Redirect deleted');
 }
 
@@ -2659,11 +2992,142 @@ function toast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+
+// ═══════════════════════════════════════════════
+// MOBILE — PILL TYPE SELECTOR (syncs with card grid)
+// ═══════════════════════════════════════════════
+function setTypeMobile(type, pillBtn) {
+  // Sync desktop card grid buttons
+  const typeOrder = ['human','agent','utility','asset'];
+  document.querySelectorAll('.id-type-btn').forEach((b,i) => {
+    b.classList.toggle('active', typeOrder[i] === type);
+  });
+  // Sync pills
+  document.querySelectorAll('.id-pill').forEach(p => p.classList.remove('active'));
+  pillBtn.classList.add('active');
+  // Apply same logic as setType (inline, no circular call)
+  identityType = type;
+  document.querySelectorAll('.fields-section').forEach(s => s.style.display = 'none');
+  document.getElementById('fields-' + type).style.display = 'block';
+  const info = document.getElementById('auto-layout-info');
+  if (info) info.textContent = AUTO_LAYOUT_DESC[type] || '⚡ Auto — layout chosen based on identity type';
+  if (layoutMode === 'auto') currentLayout = AUTO_LAYOUT_MAP[type] || 'classic';
+  update();
+}
+
+function syncPillsToType(type) {
+  const typeOrder = ['human','agent','utility','asset'];
+  document.querySelectorAll('.id-pill').forEach((p,i) => {
+    p.classList.toggle('active', typeOrder[i] === type);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// MOBILE — DESIGN OPTIONS COLLAPSE
+// ═══════════════════════════════════════════════
+let designOptionsOpen = false;
+function toggleDesignOptions() {
+  designOptionsOpen = !designOptionsOpen;
+  const body = document.getElementById('design-options-body');
+  const toggle = document.getElementById('design-toggle');
+  if (designOptionsOpen) {
+    body.style.display = 'block';
+    toggle.classList.add('open');
+  } else {
+    body.style.display = 'none';
+    toggle.classList.remove('open');
+  }
+}
+
+// On desktop, always show design options body
+function syncDesignOptionsVisibility() {
+  const body = document.getElementById('design-options-body');
+  const toggle = document.getElementById('design-toggle');
+  if (!body || !toggle) return;
+  if (window.innerWidth > 700) {
+    body.style.display = 'block';
+    toggle.style.display = 'none';
+  } else {
+    toggle.style.display = 'flex';
+    body.style.display = designOptionsOpen ? 'block' : 'none';
+  }
+}
+window.addEventListener('resize', syncDesignOptionsVisibility);
+syncDesignOptionsVisibility();
+
+// ═══════════════════════════════════════════════
+// MOBILE — COLLAPSIBLE INFO CARDS
+// ═══════════════════════════════════════════════
+function toggleInfoCard(card) {
+  card.classList.toggle('open');
+  const body = card.querySelector('.info-card-body');
+  if (body) body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════════
+// MOBILE — PREVIEW BOTTOM SHEET
+// ═══════════════════════════════════════════════
+function openMobilePreview() {
+  if (window.innerWidth > 700) return;
+  const overlay = document.getElementById('sheet-overlay');
+  const sheet   = document.getElementById('mobile-sheet');
+  const body    = document.getElementById('sheet-body');
+  // Clone the current NFT card into the sheet
+  const original = document.getElementById('nft-card');
+  const clone = original.cloneNode(true);
+  clone.id = 'nft-card-sheet-clone';
+  clone.style.maxWidth = '100%';
+  clone.style.width = '100%';
+  clone.style.boxSizing = 'border-box';
+  // Remove any existing clone
+  const old = document.getElementById('nft-card-sheet-clone');
+  if (old) old.remove();
+  // Insert clone before .sheet-actions
+  const actions = body.querySelector('.sheet-actions');
+  body.insertBefore(clone, actions);
+  overlay.classList.add('open');
+  sheet.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Also sync QR status
+  const srcStatus = document.getElementById('qr-test-status');
+  if (srcStatus) {
+    const existClone = body.querySelector('.qr-test-wrap-clone');
+    if (existClone) existClone.remove();
+    const statusClone = srcStatus.cloneNode(true);
+    statusClone.classList.add('qr-test-wrap-clone');
+    statusClone.style.maxWidth = '100%';
+    statusClone.style.width = '100%';
+    body.insertBefore(statusClone, actions);
+  }
+}
+
+function closeMobilePreview() {
+  const overlay = document.getElementById('sheet-overlay');
+  const sheet   = document.getElementById('mobile-sheet');
+  overlay.classList.remove('open');
+  sheet.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+
+// ═══════════════════════════════════════════════
+// MOBILE — SYNC STATS HELPER
+// ═══════════════════════════════════════════════
+function syncMobileStats() {
+  const mc = document.getElementById('mstat-count');
+  const mn = document.getElementById('mstat-next');
+  const ml = document.getElementById('mstat-links');
+  if (mc) mc.textContent = collection.length;
+  if (mn) mn.textContent = '#' + pad(collection.length + 1);
+  if (ml) ml.textContent = redirects.length;
+}
+
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 loadCollection();   // restore saved collection from previous session
 update();
+syncMobileStats();
 </script>
 </body>
 </html>
