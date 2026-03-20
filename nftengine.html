@@ -1919,10 +1919,12 @@ function renderCard() {
       <div class="card-bottom-bar"></div>`;
 
   } else if (currentLayout === 'assetshowcase') {
-    const assetType = v('as-type') || '';
-    const assetVal  = v('as-value') || '';
-    const assetOwn  = v('as-ownership') || '';
-    const ticker    = v('as-ticker') || '';
+    // Only read asset fields if actually on asset identity type
+    const isAssetType = identityType === 'asset';
+    const assetType = isAssetType ? (v('as-type') || '') : '';
+    const assetVal  = isAssetType ? (v('as-value') || '') : '';
+    const assetOwn  = isAssetType ? (v('as-ownership') || '') : '';
+    const ticker    = isAssetType ? (v('as-ticker') || '') : '';
     // Use asset image if available, fall back to logo upload, then placeholder
     const heroImgSrc = assetImageDataUrl || logoDataUrl || null;
     const hasImg    = !!heroImgSrc;
@@ -1991,7 +1993,7 @@ function renderCard() {
           <span class="card-id">${esc(idStr)}</span>
           ${tierHtml}
         </div>
-        <div style="padding:0 18px 8px;position:relative">
+        <div style="padding:0 18px 8px;position:relative;min-height:${smallQrSz + 20}px">
           <div style="padding-right:${smallQrSz + 28}px">
             <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:3px;word-break:break-word">${esc(name||'Asset Name')}</div>
             <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'6px':'0'}">${esc(role||'Asset Type')}</div>
