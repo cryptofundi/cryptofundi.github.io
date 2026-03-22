@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Universal QR NFT Identity & Access Creator</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -16,14 +16,21 @@ html { overflow-x: hidden; width: 100%; max-width: 100%; }
 
 :root {
   /* Divine Blue Palette */
-  --blue:       #1a56db;   /* primary divine blue */
-  --blue-dark:  #1e40af;   /* deeper blue */
+  --blue:       #2563eb;   /* richer primary blue */
+  --blue-dark:  #1d4ed8;   /* deeper blue */
   --blue-mid:   #3b82f6;   /* mid blue */
   --blue-lt:    #60a5fa;   /* light blue */
   --blue-pale:  #93c5fd;   /* pale blue */
   --blue-bg:    #eff6ff;   /* lightest blue bg */
   --blue-b:     #dbeafe;   /* border blue */
-  --blue-glow:  rgba(26,86,219,0.18);
+  --blue-glow:  rgba(37,99,235,0.18);
+
+  /* Violet accent — Web3 personality */
+  --violet:      #7c3aed;
+  --violet-dark: #6d28d9;
+  --violet-lt:   #a78bfa;
+  --violet-bg:   #f5f3ff;
+  --violet-b:    #ede9fe;
 
   /* Neutrals */
   --white:      #ffffff;
@@ -51,10 +58,10 @@ html { overflow-x: hidden; width: 100%; max-width: 100%; }
   --r-xl:  22px;
 
   /* Shadows */
-  --shadow-sm:  0 1px 8px rgba(26,86,219,0.08);
-  --shadow-md:  0 4px 20px rgba(26,86,219,0.12);
-  --shadow-lg:  0 12px 48px rgba(26,86,219,0.18);
-  --shadow-xl:  0 24px 72px rgba(26,86,219,0.22);
+  --shadow-sm:  0 1px 8px rgba(37,99,235,0.08);
+  --shadow-md:  0 4px 20px rgba(37,99,235,0.12);
+  --shadow-lg:  0 12px 48px rgba(37,99,235,0.18);
+  --shadow-xl:  0 24px 72px rgba(37,99,235,0.22);
 }
 
 body {
@@ -98,20 +105,20 @@ header {
 
 .logo-wrap { display: flex; align-items: center; gap: 13px; }
 .logo-icon {
-  width: 42px; height: 42px;
-  background: linear-gradient(135deg, var(--blue), var(--blue-mid));
-  border-radius: 12px;
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  border-radius: 13px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(26,86,219,0.35);
-  font-size: 19px; color: white;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.40);
+  font-size: 20px; color: white;
 }
 .logo-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', 'Syne', sans-serif;
   font-size: 17px; font-weight: 800;
-  color: var(--gray-900); letter-spacing: -.4px;
+  color: var(--gray-900); letter-spacing: -.5px;
 }
 .logo-sub {
-  font-size: 10px; color: var(--blue);
+  font-size: 10px; color: var(--violet);
   letter-spacing: 2.5px; text-transform: uppercase; margin-top: 1px;
 }
 
@@ -119,7 +126,7 @@ header {
 .header-stats { display: flex; gap: 28px; }
 .stat { text-align: center; }
 .stat-v {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', 'Syne', sans-serif;
   font-size: 20px; font-weight: 800;
   color: var(--blue); line-height: 1;
 }
@@ -139,17 +146,22 @@ header {
   gap: 4px;
 }
 .tab-btn {
-  padding: 14px 22px;
+  padding: 10px 18px;
   border: none; background: transparent;
   font-size: 11px; font-weight: 700;
-  letter-spacing: 1.8px; text-transform: uppercase;
+  letter-spacing: 1.4px; text-transform: uppercase;
   color: var(--gray-400);
   border-bottom: 2.5px solid transparent;
   margin-bottom: -1.5px;
+  border-radius: 8px 8px 0 0;
   transition: all .2s; white-space: nowrap;
 }
-.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
-.tab-btn:hover:not(.active) { color: var(--gray-600); }
+.tab-btn.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  background: var(--blue-bg);
+}
+.tab-btn:hover:not(.active) { color: var(--gray-600); background: var(--gray-50); }
 
 /* ═══════════════════════════════════════════════════
    MAIN LAYOUT
@@ -161,8 +173,8 @@ header {
 }
 
 .sidebar {
-  background: rgba(255,255,255,0.80);
-  border-right: 1.5px solid var(--blue-b);
+  background: #ffffff;
+  border-right: 1.5px solid var(--gray-200);
   padding: 28px 24px 40px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -188,7 +200,7 @@ header {
 .section-head::before {
   content: '';
   width: 3px; height: 18px;
-  background: linear-gradient(180deg, var(--blue), var(--blue-lt));
+  background: linear-gradient(180deg, var(--violet), var(--blue));
   border-radius: 2px; flex-shrink: 0;
 }
 .section-head span {
@@ -200,8 +212,8 @@ header {
 .form-group { margin-bottom: 14px; }
 .form-group label {
   display: block; font-size: 11px; font-weight: 600;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--gray-500); margin-bottom: 5px;
+  letter-spacing: 0.3px;
+  color: var(--gray-600); margin-bottom: 5px;
 }
 .hint {
   font-size: 10px; color: var(--gray-400);
@@ -213,7 +225,7 @@ input[type=text], input[type=url], input[type=email],
 input[type=tel], input[type=date], textarea, select {
   width: 100%;
   padding: 10px 13px;
-  border: 1.5px solid var(--gray-200);
+  border: 1px solid var(--gray-200);
   border-radius: var(--r-md);
   font-size: 13px;
   color: var(--gray-800);
@@ -223,7 +235,7 @@ input[type=tel], input[type=date], textarea, select {
 }
 input:focus, textarea:focus, select:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(26,86,219,.10);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.10), inset 0 2px 4px rgba(37,99,235,.06);
 }
 textarea { resize: vertical; min-height: 76px; }
 select {
@@ -261,7 +273,7 @@ select {
   transition: background .2s;
 }
 .id-type-btn.active .ib-icon {
-  background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+  background: linear-gradient(135deg, var(--violet), var(--blue));
 }
 .ib-lbl { font-size: 13px; font-weight: 600; color: var(--gray-800); }
 .id-type-btn.active .ib-lbl { color: var(--blue); }
@@ -351,11 +363,11 @@ select {
   white-space: nowrap;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  background: linear-gradient(135deg, var(--violet), var(--blue));
   color: #fff;
-  box-shadow: 0 4px 16px rgba(26,86,219,.30);
+  box-shadow: 0 4px 16px rgba(124,58,237,.28);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,86,219,.38); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,.38); }
 .btn-primary:active { transform: translateY(0); }
 
 .btn-outline {
@@ -411,25 +423,25 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
    NFT CARD THEMES
    ═══════════════════════════════════════════════════ */
 
-/* DIVINE (White + Divine Blue — matches app) */
+/* DIVINE (White + Divine Blue — frosted glass) */
 .card.t-divine {
   background-color: #ffffff;
-  background-image: linear-gradient(150deg, #ffffff 0%, #f0f7ff 60%, #e8f0fe 100%);
-  border: 1.5px solid #bfdbfe;
-  box-shadow: 0 24px 72px rgba(26,86,219,.16), 0 4px 16px rgba(0,0,0,.05);
-  --ct: #0f172a; --ca: #1a56db; --cs: #64748b;
-  --cb: #dbeafe; --cba: rgba(26,86,219,.08);
-  --qfg: 1a56db; --qbg: ffffff; --qwrap: #eff6ff;
+  background-image: linear-gradient(160deg, #ffffff 0%, #f5f3ff 50%, #eff6ff 100%);
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 24px 72px rgba(37,99,235,.14), 0 4px 16px rgba(124,58,237,.08), inset 0 1px 0 rgba(255,255,255,1);
+  --ct: #0f172a; --ca: #2563eb; --cs: #64748b;
+  --cb: #ede9fe; --cba: rgba(124,58,237,.07);
+  --qfg: 2563eb; --qbg: ffffff; --qwrap: #f5f3ff;
 }
 /* Crypto Dark */
 .card.t-crypto {
   background-color: #050d1f;
-  background-image: linear-gradient(135deg, #050d1f 0%, #0a1f4e 100%);
-  border: 1.5px solid rgba(59,130,246,.4);
-  box-shadow: 0 24px 72px rgba(59,130,246,.3);
-  --ct: #e0f2fe; --ca: #60a5fa; --cs: #7c9ac8;
-  --cb: rgba(96,165,250,.2); --cba: rgba(59,130,246,.1);
-  --qfg: 60a5fa; --qbg: 050d1f; --qwrap: rgba(59,130,246,0.12);
+  background-image: linear-gradient(135deg, #050d1f 0%, #0d1f4e 50%, #12094a 100%);
+  border: 1.5px solid rgba(124,58,237,.35);
+  box-shadow: 0 24px 72px rgba(124,58,237,.25), 0 4px 24px rgba(37,99,235,.2);
+  --ct: #f1f5f9; --ca: #38bdf8; --cs: #7c9ac8;
+  --cb: rgba(56,189,248,.18); --cba: rgba(56,189,248,.08);
+  --qfg: 38bdf8; --qbg: 050d1f; --qwrap: rgba(56,189,248,0.1);
 }
 /* Futuristic */
 .card.t-futuristic {
@@ -450,6 +462,25 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   --ct: #1e1b4b; --ca: #4338ca; --cs: #6366f1;
   --cb: #e0e7ff; --cba: rgba(99,102,241,.08);
   --qfg: 4338ca; --qbg: f8faff; --qwrap: #eef2ff;
+}
+/* Midnight — pure black + violet + white QR */
+.card.t-midnight {
+  background-color: #000000;
+  background-image: linear-gradient(145deg, #0a0014 0%, #000000 60%, #000810 100%);
+  border: 1.5px solid rgba(124,58,237,.5);
+  box-shadow: 0 24px 72px rgba(124,58,237,.4), 0 4px 24px rgba(0,0,0,.6);
+  --ct: #ffffff; --ca: #a78bfa; --cs: #94a3b8;
+  --cb: rgba(167,139,250,.2); --cba: rgba(124,58,237,.12);
+  --qfg: ffffff; --qbg: 000000; --qwrap: rgba(124,58,237,0.15);
+}
+.card.t-midnight .card-bottom-bar {
+  background: linear-gradient(90deg, #7c3aed, rgba(124,58,237,.2), transparent);
+}
+.card.t-midnight .card-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(124,58,237,.04) 39px, rgba(124,58,237,.04) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(124,58,237,.04) 39px, rgba(124,58,237,.04) 40px);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -506,7 +537,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   color: var(--ca); overflow: hidden; flex-shrink: 0;
 }
 .split-av img { width: 100%; height: 100%; object-fit: cover; }
-.split-name { font-family: 'Syne',sans-serif; font-size: 15px; font-weight: 800; color: var(--ct); line-height: 1.2; }
+.split-name { font-family: 'Outfit','Syne',sans-serif; font-size: 15px; font-weight: 800; color: var(--ct); line-height: 1.2; }
 .split-role { font-size: 10px; color: var(--cs); }
 .split-right {
   display: flex; flex-direction: column;
@@ -578,7 +609,6 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   transform: perspective(1000px) rotateY(4deg) rotateX(-2.5deg) scale(1.025);
 }
 
-/* Dark theme overlays */
 .card.t-crypto .card-grid,
 .card.t-futuristic .card-grid {
   position: absolute; inset: 0; pointer-events: none;
@@ -592,6 +622,13 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   position: absolute; left: 0; right: 0; height: 1.5px;
   background: linear-gradient(90deg, transparent, rgba(56,189,248,.9), transparent);
   animation: scanAnim 3.5s linear infinite;
+  pointer-events: none; z-index: 5;
+}
+/* Midnight scan line — violet tint */
+.card.t-midnight .scan-line {
+  position: absolute; left: 0; right: 0; height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.8), transparent);
+  animation: scanAnim 4s linear infinite;
   pointer-events: none; z-index: 5;
 }
 @keyframes scanAnim {
@@ -631,7 +668,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 }
 .card-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .card-name {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', 'Syne', sans-serif;
   font-size: 17px; font-weight: 800;
   color: var(--ct); line-height: 1.2;
   word-break: break-word;
@@ -1020,7 +1057,8 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   justify-content: space-around;
 }
 .mobile-stat { text-align: center; }
-.mobile-stat-v { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: var(--blue); }
+.mobile-stat-v { font-family: 'Outfit','Syne',sans-serif; font-size: 16px; font-weight: 800; color: var(--blue); }
+.mobile-stat-v.v-violet { color: var(--violet); }
 .mobile-stat-l { font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1px; }
 
 /* ═══════════════════════════════════════════════════
@@ -1029,13 +1067,13 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 .design-collapse-toggle {
   display: none;
   width: 100%;
-  background: var(--blue-bg);
-  border: 1.5px solid var(--blue-b);
+  background: linear-gradient(135deg, var(--violet-bg), var(--blue-bg));
+  border: 1.5px solid var(--violet-b);
   border-radius: var(--r-md);
   padding: 11px 14px;
   font-size: 12px; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase;
-  color: var(--blue);
+  color: var(--violet);
   cursor: pointer;
   margin-bottom: 14px;
   text-align: left;
@@ -1147,9 +1185,9 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   /* Compact form labels */
   .form-group label { font-size: 10px; }
 
-  /* Theme grid: 4 columns on mobile stays, but smaller */
-  .theme-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .theme-swatch { padding: 8px 4px; }
+  /* Theme grid: 3 cols on mobile to fit 5 swatches */
+  .theme-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 5px; }
+  .theme-swatch { padding: 7px 4px; }
   .sw-name { font-size: 9px; }
   .sw-bar { display: none; }
 
@@ -1441,14 +1479,14 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <div class="design-toggle-spacer" style="height:14px"></div>      <div class="design-options-body" id="design-options-body">
       <div class="form-group">
         <label>Theme</label>
-        <div class="theme-grid">
-          <div class="theme-swatch active" data-theme="divine" onclick="setTheme('divine',this)" style="background:linear-gradient(150deg,#fff,#e8f0fe)">
+        <div class="theme-grid" style="grid-template-columns:repeat(3,1fr);gap:7px">
+          <div class="theme-swatch active" data-theme="divine" onclick="setTheme('divine',this)" style="background:linear-gradient(160deg,#fff,#f5f3ff,#eff6ff)">
             <div class="sw-name" style="color:#0f172a">Divine</div>
-            <div class="sw-bar" style="background:#1a56db"></div>
+            <div class="sw-bar" style="background:linear-gradient(90deg,#7c3aed,#2563eb)"></div>
           </div>
-          <div class="theme-swatch" data-theme="crypto" onclick="setTheme('crypto',this)" style="background:linear-gradient(135deg,#050d1f,#0a1f4e)">
-            <div class="sw-name" style="color:#e0f2fe">Crypto</div>
-            <div class="sw-bar" style="background:#60a5fa"></div>
+          <div class="theme-swatch" data-theme="crypto" onclick="setTheme('crypto',this)" style="background:linear-gradient(135deg,#050d1f,#12094a)">
+            <div class="sw-name" style="color:#f1f5f9">Crypto</div>
+            <div class="sw-bar" style="background:#38bdf8"></div>
           </div>
           <div class="theme-swatch" data-theme="futuristic" onclick="setTheme('futuristic',this)" style="background:linear-gradient(135deg,#020b18,#041830)">
             <div class="sw-name" style="color:#e0f7ff">Futuristic</div>
@@ -1457,6 +1495,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           <div class="theme-swatch" data-theme="business" onclick="setTheme('business',this)" style="background:linear-gradient(150deg,#f8faff,#eef2ff)">
             <div class="sw-name" style="color:#1e1b4b">Business</div>
             <div class="sw-bar" style="background:#4338ca"></div>
+          </div>
+          <div class="theme-swatch" data-theme="midnight" onclick="setTheme('midnight',this)" style="background:linear-gradient(145deg,#0a0014,#000000);border-color:#4a1d96">
+            <div class="sw-name" style="color:#a78bfa">Midnight</div>
+            <div class="sw-bar" style="background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div>
           </div>
         </div>
       </div>
@@ -1810,7 +1852,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
     <div class="mobile-stat-l">Collection</div>
   </div>
   <div class="mobile-stat">
-    <div class="mobile-stat-v" id="mstat-next">#001</div>
+    <div class="mobile-stat-v v-violet" id="mstat-next">#001</div>
     <div class="mobile-stat-l">Next ID</div>
   </div>
   <div class="mobile-stat">
@@ -1849,10 +1891,11 @@ const SIZE_CLASSES   = ['sz-nft','sz-card','sz-twitter','sz-print'];
 const LAYOUT_CLASSES = ['layout-qrfocus','layout-avatarfocus','layout-split','layout-minimal'];
 
 const QR_COLORS = {
-  divine:     { fg: '#1a56db', bg: 'rgba(0,0,0,0)' },
-  crypto:     { fg: '#60a5fa', bg: 'rgba(0,0,0,0)' },
+  divine:     { fg: '#2563eb', bg: 'rgba(0,0,0,0)' },
+  crypto:     { fg: '#38bdf8', bg: 'rgba(0,0,0,0)' },
   futuristic: { fg: '#38bdf8', bg: 'rgba(0,0,0,0)' },
   business:   { fg: '#4338ca', bg: 'rgba(0,0,0,0)' },
+  midnight:   { fg: '#ffffff', bg: 'rgba(0,0,0,0)' },
 };
 
 // ═══════════════════════════════════════════════
@@ -2167,7 +2210,7 @@ function renderCard() {
           <div style="display:flex;align-items:center;gap:14px">
             ${avHtml(52)}
             <div style="overflow:hidden;min-width:0;flex:1">
-              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Your Name')}</div>
+              <div style="font-family:'Outfit','Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Your Name')}</div>
               <div style="font-size:12px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
             </div>
           </div>
@@ -2249,7 +2292,7 @@ function renderCard() {
           </div>
           <div style="display:flex;flex-direction:column;justify-content:center;padding:10px 18px 14px;gap:8px;overflow:hidden">
             <div style="overflow:hidden">
-              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;word-break:break-word">${esc(name||'Your Name')}</div>
+              <div style="font-family:'Outfit','Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;word-break:break-word">${esc(name||'Your Name')}</div>
               <div style="font-size:12px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
             </div>
             ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px">${tags.slice(0,3).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
@@ -2286,7 +2329,7 @@ function renderCard() {
       ${decorHtml}${headerHtml}
       <div style="padding:12px 22px 14px;display:flex;justify-content:center">${qrContainerHtml}</div>
       <div class="card-cta">${esc(cta)}</div>
-      <div style="text-align:center;padding:0 22px 4px;font-size:14px;font-weight:800;font-family:'Syne',sans-serif;color:var(--ct)">${esc(name||'')}</div>
+      <div style="text-align:center;padding:0 22px 4px;font-size:14px;font-weight:800;font-family:'Outfit','Syne',sans-serif;color:var(--ct)">${esc(name||'')}</div>
       <div style="text-align:center;padding:0 22px 16px;font-size:10px;color:var(--cs)">${esc(role||'')}</div>
       <div class="card-bottom-bar"></div>`;
 
@@ -2326,7 +2369,7 @@ function renderCard() {
               ${tierHtml}
             </div>
             <div style="flex:1;overflow:hidden;min-height:0">
-              <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ct);line-height:1.2;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Asset Name')}</div>
+              <div style="font-family:'Outfit','Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ct);line-height:1.2;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Asset Name')}</div>
               <div style="font-size:10px;color:var(--cs);margin-bottom:4px">${esc(role||'Asset Type')}</div>
               ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
             </div>
@@ -2367,7 +2410,7 @@ function renderCard() {
         </div>
         <div style="padding:0 18px 8px;position:relative;min-height:${smallQrSz + 20}px">
           <div style="padding-right:${smallQrSz + 28}px">
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:3px;word-break:break-word">${esc(name||'Asset Name')}</div>
+            <div style="font-family:'Outfit','Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:3px;word-break:break-word">${esc(name||'Asset Name')}</div>
             <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'6px':'0'}">${esc(role||'Asset Type')}</div>
             ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
           </div>
@@ -2933,6 +2976,7 @@ const THEME_BASE_COLORS = {
   crypto:     '#050d1f',
   futuristic: '#020b18',
   business:   '#f8faff',
+  midnight:   '#000000',
 };
 
 function downloadCard() {
