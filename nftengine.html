@@ -2996,6 +2996,13 @@ function downloadCard() {
   const name      = getTitle() || 'nft-card';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
   const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const filename  = name.replace(/\s+/g, '-') + '-NFT.png';
+
+  // Guard: check html2canvas loaded
+  if (typeof html2canvas === 'undefined') {
+    toast('Error: html2canvas not loaded. Check internet connection.');
+    return;
+  }
 
   toast('Rendering PNG...');
   const prevTransform  = card.style.transform;
@@ -3003,80 +3010,99 @@ function downloadCard() {
   card.style.transform  = 'none';
   card.style.transition = 'none';
 
-  html2canvas(card, {
-    backgroundColor: baseColor,
-    scale: 3,
-    useCORS: true,
-    allowTaint: true,
-    logging: false,
-  }).then(captured => {
-    const S = 3;
-    const W = card.offsetWidth  * S;
-    const H = card.offsetHeight * S;
-    const R = 22 * S;
+  try {
+    html2canvas(card, {
+      backgroundColor: baseColor,
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    }).then(captured => {
+      const S = 3;
+      const W = card.offsetWidth  * S;
+      const H = card.offsetHeight * S;
+      const R = 22 * S;
 
-    const out = document.createElement('canvas');
-    out.width  = W;
-    out.height = H;
-    const ctx  = out.getContext('2d');
+      const out = document.createElement('canvas');
+      out.width  = W;
+      out.height = H;
+      const ctx  = out.getContext('2d');
 
-    ctx.fillStyle = baseColor;
-    ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = baseColor;
+      ctx.fillRect(0, 0, W, H);
+      ctx.beginPath();
+      ctx.moveTo(R, 0);
+      ctx.lineTo(W-R, 0); ctx.arcTo(W, 0,  W,  R,   R);
+      ctx.lineTo(W, H-R); ctx.arcTo(W, H,  W-R, H,   R);
+      ctx.lineTo(R, H);   ctx.arcTo(0, H,  0,   H-R, R);
+      ctx.lineTo(0, R);   ctx.arcTo(0, 0,  R,   0,   R);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(captured, 0, 0, W, H);
 
-    ctx.beginPath();
-    ctx.moveTo(R, 0);
-    ctx.lineTo(W-R, 0); ctx.arcTo(W, 0,  W,  R,   R);
-    ctx.lineTo(W, H-R); ctx.arcTo(W, H,  W-R, H,   R);
-    ctx.lineTo(R, H);   ctx.arcTo(0, H,  0,   H-R, R);
-    ctx.lineTo(0, R);   ctx.arcTo(0, 0,  R,   0,   R);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(captured, 0, 0, W, H);
+      out.toBlob(blob => {
+        if (!blob) { toast('Blob failed — try again'); return; }
 
-    if (isIOS) {
-      // iOS Safari: open image in new tab — user long-presses to save
-      const dataUrl = out.toDataURL('image/png');
-      const win = window.open('', '_blank');
-      if (win) {
-        win.document.write(`<!DOCTYPE html><html><head>
-          <meta charset="UTF-8"/>
-          <meta name="viewport" content="width=device-width,initial-scale=1"/>
-          <title>${esc(name)} NFT</title>
-          <style>
-            *{box-sizing:border-box;margin:0;padding:0}
-            body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;
-                 align-items:center;padding:24px 16px 40px;font-family:system-ui,sans-serif}
-            img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
-            .tip{margin-top:20px;background:rgba(255,255,255,.08);border-radius:12px;
-                 padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;width:100%;max-width:340px}
-            .tip strong{color:#a78bfa;display:block;margin-bottom:6px;font-size:15px}
-          </style></head><body>
-          <img src="${dataUrl}" alt="${esc(name)} NFT"/>
-          <div class="tip">
-            <strong>Save this image</strong>
-            Long-press the image and tap<br/><em>Add to Photos</em> or <em>Save to Photos</em>
-          </div>
-        </body></html>`);
-        win.document.close();
-        toast('Long-press the image → Save to Photos ✓');
-      } else {
-        toast('Allow pop-ups then try again');
-      }
-    } else {
-      // Desktop + Android: direct anchor download
-      const a   = document.createElement('a');
-      a.download = name.replace(/\s+/g, '-') + '-NFT.png';
-      a.href     = out.toDataURL('image/png');
-      a.click();
-      toast('Downloaded — clean edges, 3× resolution ✓');
-    }
-  }).catch(err => {
-    console.error('Export error:', err);
-    toast('Download failed — please try again');
-  }).finally(() => {
+        if (isIOS) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result;
+            const win = window.open('', '_blank');
+            if (win) {
+              win.document.write(`<!DOCTYPE html><html><head>
+                <meta charset="UTF-8"/>
+                <meta name="viewport" content="width=device-width,initial-scale=1"/>
+                <title>${esc(filename)}</title>
+                <style>
+                  *{box-sizing:border-box;margin:0;padding:0}
+                  body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;
+                       align-items:center;padding:24px 16px 40px;font-family:system-ui,sans-serif}
+                  img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
+                  .tip{margin-top:20px;background:rgba(255,255,255,.08);border-radius:12px;
+                       padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;max-width:340px}
+                  .tip strong{color:#a78bfa;display:block;margin-bottom:6px;font-size:15px}
+                </style></head><body>
+                <img src="${dataUrl}"/>
+                <div class="tip">
+                  <strong>Save this image</strong>
+                  Long-press the image → <em>Add to Photos</em>
+                </div>
+              </body></html>`);
+              win.document.close();
+              toast('Long-press the image → Save to Photos ✓');
+            } else {
+              toast('Allow pop-ups then try again');
+            }
+          };
+          reader.onerror = () => toast('FileReader failed — try again');
+          reader.readAsDataURL(blob);
+        } else {
+          // Desktop + Android
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href     = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+          toast('Downloaded ✓  —  3× resolution, clean edges');
+        }
+      }, 'image/png');
+
+    }).catch(err => {
+      toast('Render failed: ' + (err.message || err));
+      console.error('html2canvas error:', err);
+    }).finally(() => {
+      card.style.transform  = prevTransform;
+      card.style.transition = prevTransition;
+    });
+  } catch(syncErr) {
     card.style.transform  = prevTransform;
     card.style.transition = prevTransition;
-  });
+    toast('Error: ' + (syncErr.message || syncErr));
+    console.error('downloadCard sync error:', syncErr);
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -3335,5 +3361,8 @@ loadCollection();   // restore saved collection from previous session
 update();
 syncMobileStats();
 </script>
+
+<div id="toast"></div>
+
 </body>
 </html>
