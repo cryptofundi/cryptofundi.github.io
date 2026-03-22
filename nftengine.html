@@ -2154,7 +2154,10 @@ function renderCard() {
   const typePrefix = identityType==='human' ? '◈ IDENTITY' : identityType==='agent' ? '⬡ AGENT' : identityType==='asset' ? '⬟ ASSET' : '⬟ UTILITY';
   const idStr  = typePrefix + ' #' + pad(idNum);
   const tierHtml = `<span class="card-tier-badge tb-${currentTier.toLowerCase()}">${currentTier.toUpperCase()}</span>`;
-  const avPx = AV_SIZES[currentAvatarSize] || 48;
+  const avPx      = AV_SIZES[currentAvatarSize] || 48;
+  const avPxLs    = Math.min(avPx + 8, 68);
+  const avPxSplit = Math.min(avPx + 8, 72);
+  const avPxQr    = Math.max(avPx - 8, 32);
   const isLandscape = (currentSize === 'twitter');
   const qrSz = isLandscape ? 180
              : currentLayout === 'assetshowcase' ? (isLandscape ? 100 : 96)
@@ -2211,7 +2214,7 @@ function renderCard() {
       <div style="display:grid;grid-template-columns:1fr 220px;flex:1;align-self:stretch;height:0;min-height:270px">
         <div style="display:flex;flex-direction:column;justify-content:center;padding:8px 18px 20px 24px;gap:12px;overflow:hidden;border-right:1px solid var(--cb)">
           <div style="display:flex;align-items:center;gap:14px">
-            ${avHtml(52)}
+            ${avHtml(avPxLs)}
             <div style="overflow:hidden;min-width:0;flex:1">
               <div style="font-family:'Outfit','Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Your Name')}</div>
               <div style="font-size:12px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
@@ -2233,7 +2236,7 @@ function renderCard() {
       ${decorHtml}${headerHtml}
       <div class="split-body">
         <div class="split-left">
-          ${avHtml(56)}
+          ${avHtml(avPxSplit)}
           <div>
             <div class="split-name">${esc(name||'Your Name')}</div>
             <div class="split-role">${esc(role||'Role / Type')}</div>
@@ -2255,7 +2258,7 @@ function renderCard() {
       <div style="padding:0 22px 14px;display:flex;justify-content:center">${qrContainerHtml}</div>
       <div class="card-cta">${esc(cta)}</div>
       <div style="padding:0 22px 12px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--cb);margin:0 22px;padding-top:12px">
-        ${avHtml(40)}
+        ${avHtml(avPxQr)}
         <div>
           <div class="card-name" style="font-size:15px">${esc(name||'Your Name')}</div>
           <div class="card-role">${esc(role||'Role / Type')}</div>
