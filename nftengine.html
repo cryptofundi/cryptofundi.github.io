@@ -591,7 +591,12 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 .card.sz-nft     { width: 360px; }               /* height = content */
 .card.sz-print   { width: 380px; }               /* height = content */
 .card.sz-card    { width: 430px; }               /* portrait, height = content */
-.card.sz-twitter { width: 630px; aspect-ratio: 16/9; } /* true 16:9 */
+.card.sz-twitter { width: 630px; aspect-ratio: 16/9; } /* true 16:9 on desktop */
+
+/* On mobile, Twitter renders as portrait (same as NFT 1:1) */
+@media (max-width: 700px) {
+  .card.sz-twitter { width: 360px; aspect-ratio: unset; }
+}
 
 /* ═══════════════════════════════════════════════════
    CARD STRUCTURE
@@ -1630,8 +1635,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       </div>
       <div style="height:6px"></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="resetForm()">✕ Clear Form</button>
-        <button class="btn btn-teal btn-sm" style="flex:1" onclick="testQR()">⊙ Test QR Link</button>
+        <button class="btn btn-ghost btn-sm btn-full" onclick="resetForm()">✕ Clear Form</button>
       </div>
 
     </div><!-- /panel-create -->
@@ -2158,7 +2162,7 @@ function renderCard() {
   const avPxLs    = Math.min(avPx + 8, 68);
   const avPxSplit = Math.min(avPx + 8, 72);
   const avPxQr    = Math.max(avPx - 8, 32);
-  const isLandscape = (currentSize === 'twitter');
+  const isLandscape = (currentSize === 'twitter') && window.innerWidth > 700;
   const qrSz = isLandscape ? 180
              : currentLayout === 'assetshowcase' ? (isLandscape ? 100 : 96)
              : currentLayout === 'avatarfocus' ? 90
@@ -2547,7 +2551,7 @@ function _buildQR(data) {
   if (!container) return;
   container.innerHTML = '';
 
-  const isLandscape = (currentSize === 'twitter');
+  const isLandscape = (currentSize === 'twitter') && window.innerWidth > 700;
   const sz = isLandscape ? 180
            : currentLayout === 'assetshowcase' ? (isLandscape ? 100 : 96)
            : currentLayout === 'avatarfocus' ? 90
