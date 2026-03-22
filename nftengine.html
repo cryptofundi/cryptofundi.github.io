@@ -3161,6 +3161,10 @@ function downloadCard() {
     } catch(e) {}
   });
 
+  // Remove DOM watermark from clone — canvas layers handle watermarking instead
+  const cloneWm = clone.querySelector('#card-watermark-el, .card-watermark');
+  if (cloneWm) cloneWm.remove();
+
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
@@ -3168,14 +3172,14 @@ function downloadCard() {
   requestAnimationFrame(() => {
     html2canvas(clone, {
       backgroundColor: baseColor,
-      scale: 3,
+      scale: currentPlan === 'free' ? 1.5 : 3,  // Layer 3: lower resolution for free
       useCORS: true,
       allowTaint: true,
       logging: false,
     }).then(captured => {
       document.body.removeChild(wrapper);
 
-      const S = 3;
+      const S = currentPlan === 'free' ? 1.5 : 3;
       const W = cardW * S;
       const H = cardH * S;
       const R = 22 * S;
@@ -3196,6 +3200,50 @@ function downloadCard() {
       ctx.closePath();
       ctx.clip();
       ctx.drawImage(captured, 0, 0, W, H);
+
+      // ── WATERMARK LAYERS (free plan only) ──────────────
+      if (currentPlan === 'free') {
+        const cx = W / 2;
+        const cy = H / 2;
+        const angle = -Math.PI / 6;  // -30° diagonal
+
+        // Layer 1a: Main diagonal "cryptofundi.io"
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = '#1e293b';
+        const fs1 = Math.max(24, Math.round(W * 0.075));
+        ctx.font = `bold ${fs1}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.fillText('cryptofundi.io', 0, 0);
+        ctx.restore();
+
+        // Layer 1b: "FREE VERSION" below it
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.fillStyle = '#1e293b';
+        const fs2 = Math.max(16, Math.round(W * 0.048));
+        ctx.font = `bold ${fs2}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.translate(cx, cy + Math.round(fs1 * 1.4));
+        ctx.rotate(angle);
+        ctx.fillText('FREE VERSION', 0, 0);
+        ctx.restore();
+
+        // Layer 2: Corner branding bottom-right
+        ctx.save();
+        ctx.globalAlpha = 0.45;
+        ctx.fillStyle = '#475569';
+        ctx.font = `700 ${Math.max(12, Math.round(S * 9))}px monospace`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('CRYPTOFUNDI.IO', W - Math.round(S * 14), H - Math.round(S * 12));
+        ctx.restore();
+      }
+      // ────────────────────────────────────────────────────
 
       if (isIOS) {
         out.toBlob(blob => {
