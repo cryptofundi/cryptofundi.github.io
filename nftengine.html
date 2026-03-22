@@ -2994,122 +2994,135 @@ const THEME_BASE_COLORS = {
 function downloadCard() {
   const isMobile  = window.innerWidth <= 700;
   const original  = document.getElementById('nft-card');
-  const clone     = document.getElementById('nft-card-sheet-clone');
+  const sheetClone = document.getElementById('nft-card-sheet-clone');
 
-  // On mobile the original card is hidden (display:none) — use the sheet clone
-  // On desktop use the original directly
-  const card = (isMobile && clone) ? clone : original;
-
-  if (!card) { toast('Card not found — please try again'); return; }
+  if (!original) { toast('Card not found — please try again'); return; }
+  if (typeof html2canvas === 'undefined') {
+    toast('Error: html2canvas not loaded. Check internet connection.');
+    return;
+  }
 
   const name      = getTitle() || 'nft-card';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
   const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const filename  = name.replace(/\s+/g, '-') + '-NFT.png';
 
-  if (typeof html2canvas === 'undefined') {
-    toast('Error: html2canvas not loaded. Check internet connection.');
-    return;
-  }
-
   toast('Rendering PNG...');
 
-  // Save and clear any transforms (hover effect + mobile scale)
-  const prevTransform  = card.style.transform;
-  const prevTransition = card.style.transition;
-  card.style.transform  = 'none';
-  card.style.transition = 'none';
+  // Get natural card dimensions from original
+  const cardW = original.scrollWidth  || original.offsetWidth  || 360;
+  const cardH = original.scrollHeight || original.offsetHeight || 520;
 
-  // Natural card dimensions (no scale)
-  const W = original.offsetWidth  || 360;
-  const H = original.offsetHeight || 520;
+  // Clone the card into an isolated fixed container — no parent backgrounds
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = [
+    'position:fixed', 'left:-9999px', 'top:0',
+    'width:' + cardW + 'px',
+    'background:' + baseColor,
+    'z-index:-1', 'pointer-events:none',
+  ].join(';');
 
-  html2canvas(card, {
-    backgroundColor: baseColor,
-    scale: 3,
-    useCORS: true,
-    allowTaint: true,
-    logging: false,
-    width:  W,
-    height: H,
-  }).then(captured => {
-    const S  = 3;
-    const cW = captured.width;
-    const cH = captured.height;
-    const R  = 22 * S;
+  const clone = original.cloneNode(true);
+  clone.id = '';
+  clone.style.cssText = [
+    'transform:none', 'transition:none',
+    'position:static', 'width:' + cardW + 'px',
+    'max-width:none',
+  ].join(';');
 
-    const out = document.createElement('canvas');
-    out.width  = cW;
-    out.height = cH;
-    const ctx  = out.getContext('2d');
+  // Copy canvas QR pixel data — cloneNode doesn't copy canvas content
+  const origCanvases  = original.querySelectorAll('canvas');
+  const cloneCanvases = clone.querySelectorAll('canvas');
+  origCanvases.forEach((oc, i) => {
+    const cc = cloneCanvases[i];
+    if (!cc) return;
+    try {
+      cc.width  = oc.width;
+      cc.height = oc.height;
+      const ctx = cc.getContext('2d');
+      if (ctx && oc.width > 0) ctx.drawImage(oc, 0, 0);
+    } catch(e) {}
+  });
 
-    ctx.fillStyle = baseColor;
-    ctx.fillRect(0, 0, cW, cH);
-    ctx.beginPath();
-    ctx.moveTo(R, 0);
-    ctx.lineTo(cW-R, 0); ctx.arcTo(cW, 0,   cW,  R,    R);
-    ctx.lineTo(cW, cH-R); ctx.arcTo(cW, cH, cW-R, cH,   R);
-    ctx.lineTo(R, cH);   ctx.arcTo(0,  cH,  0,   cH-R,  R);
-    ctx.lineTo(0, R);    ctx.arcTo(0,  0,   R,   0,     R);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(captured, 0, 0, cW, cH);
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
 
-    out.toBlob(blob => {
-      if (!blob) { toast('Blob failed — try again'); return; }
+  // Wait one frame for layout
+  requestAnimationFrame(() => {
+    html2canvas(clone, {
+      backgroundColor: baseColor,
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    }).then(captured => {
+      document.body.removeChild(wrapper);
+
+      const S = 3;
+      const W = cardW * S;
+      const H = cardH * S;
+      const R = 22 * S;
+
+      const out = document.createElement('canvas');
+      out.width  = W;
+      out.height = H;
+      const ctx  = out.getContext('2d');
+
+      ctx.fillStyle = baseColor;
+      ctx.fillRect(0, 0, W, H);
+      ctx.beginPath();
+      ctx.moveTo(R, 0);
+      ctx.lineTo(W-R, 0); ctx.arcTo(W, 0,  W,  R,   R);
+      ctx.lineTo(W, H-R); ctx.arcTo(W, H,  W-R, H,   R);
+      ctx.lineTo(R, H);   ctx.arcTo(0, H,  0,   H-R, R);
+      ctx.lineTo(0, R);   ctx.arcTo(0, 0,  R,   0,   R);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(captured, 0, 0, W, H);
 
       if (isIOS) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const dataUrl = reader.result;
-          const win = window.open('', '_blank');
-          if (win) {
-            win.document.write(`<!DOCTYPE html><html><head>
-              <meta charset="UTF-8"/>
-              <meta name="viewport" content="width=device-width,initial-scale=1"/>
-              <title>${esc(filename)}</title>
-              <style>
-                *{box-sizing:border-box;margin:0;padding:0}
-                body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;
-                     align-items:center;padding:24px 16px 40px;font-family:system-ui,sans-serif}
-                img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
-                .tip{margin-top:20px;background:rgba(255,255,255,.08);border-radius:12px;
-                     padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;max-width:340px}
-                .tip strong{color:#a78bfa;display:block;margin-bottom:6px;font-size:15px}
-              </style></head><body>
-              <img src="${dataUrl}"/>
-              <div class="tip">
-                <strong>Save this image</strong>
-                Long-press the image → <em>Add to Photos</em>
-              </div>
-            </body></html>`);
-            win.document.close();
-            toast('Long-press the image → Save to Photos ✓');
-          } else {
-            toast('Allow pop-ups then try again');
-          }
-        };
-        reader.onerror = () => toast('FileReader error — try again');
-        reader.readAsDataURL(blob);
+        out.toBlob(blob => {
+          if (!blob) { toast('Export failed — try again'); return; }
+          const reader = new FileReader();
+          reader.onload = () => {
+            const win = window.open('', '_blank');
+            if (win) {
+              win.document.write(`<!DOCTYPE html><html><head>
+                <meta charset="UTF-8"/>
+                <meta name="viewport" content="width=device-width,initial-scale=1"/>
+                <title>${esc(filename)}</title>
+                <style>
+                  *{box-sizing:border-box;margin:0;padding:0}
+                  body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;
+                       align-items:center;padding:24px 16px 40px;font-family:system-ui,sans-serif}
+                  img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
+                  .tip{margin-top:20px;background:rgba(255,255,255,.08);border-radius:12px;
+                       padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;max-width:340px}
+                  .tip strong{color:#a78bfa;display:block;margin-bottom:6px;font-size:15px}
+                </style></head><body>
+                <img src="${reader.result}"/>
+                <div class="tip"><strong>Save this image</strong>Long-press → <em>Add to Photos</em></div>
+              </body></html>`);
+              win.document.close();
+              toast('Long-press the image → Save to Photos ✓');
+            } else { toast('Allow pop-ups then try again'); }
+          };
+          reader.readAsDataURL(blob);
+        }, 'image/png');
       } else {
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href     = blobUrl;
+        // Desktop + Android
+        const a   = document.createElement('a');
         a.download = filename;
-        document.body.appendChild(a);
+        a.href     = out.toDataURL('image/png');
         a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-        toast('Downloaded ✓  —  3× resolution, clean edges');
+        toast('Downloaded — clean edges, 3× resolution ✓');
       }
-    }, 'image/png');
 
-  }).catch(err => {
-    toast('Render failed: ' + (err.message || err));
-    console.error('html2canvas error:', err);
-  }).finally(() => {
-    card.style.transform  = prevTransform;
-    card.style.transition = prevTransition;
+    }).catch(err => {
+      document.body.removeChild(wrapper);
+      console.error('Export error:', err);
+      toast('Render failed: ' + (err.message || err));
+    });
   });
 }
 
