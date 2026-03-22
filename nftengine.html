@@ -2282,21 +2282,21 @@ function renderCard() {
       </div>`;
 
     if (isLandscape) {
-      // Twitter 16:9 avatar focus: large avatar LEFT, name+info+small QR RIGHT
-      // Avatar column = 38% of card width, content = 62%
+      // Twitter 16:9 avatar focus: large avatar LEFT (fixed px), info+QR RIGHT
       const lsAvSz = AV_SIZES[currentAvatarSize] === 36 ? 100
                    : AV_SIZES[currentAvatarSize] === 72 ? 160
                    : 130;
+      const leftColW = lsAvSz + 32; // avatar + padding
       innerHtml = `
         ${decorHtml}${headerHtml}
-        <div style="display:grid;grid-template-columns:38% 62%;flex:1;overflow:hidden">
-          <div style="display:flex;align-items:center;justify-content:center;padding:10px 12px 14px;border-right:1px solid var(--cb)">
+        <div style="display:grid;grid-template-columns:${leftColW}px 1fr;flex:1;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 8px 14px;border-right:1px solid var(--cb)">
             ${avHtml(lsAvSz, '50%')}
           </div>
-          <div style="display:flex;flex-direction:column;justify-content:center;padding:10px 18px 14px;gap:8px;overflow:hidden">
-            <div style="overflow:hidden">
-              <div style="font-family:'Outfit','Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ct);line-height:1.2;word-break:break-word">${esc(name||'Your Name')}</div>
-              <div style="font-size:12px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
+          <div style="display:flex;flex-direction:column;justify-content:center;padding:10px 14px 14px;gap:8px;overflow:hidden;min-width:0">
+            <div style="overflow:hidden;min-width:0">
+              <div style="font-family:'Outfit','Syne',sans-serif;font-size:18px;font-weight:800;color:var(--ct);line-height:1.2;word-break:break-word">${esc(name||'Your Name')}</div>
+              <div style="font-size:11px;color:var(--cs);margin-top:3px">${esc(role||'Role / Type')}</div>
             </div>
             ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px">${tags.slice(0,3).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
             ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
@@ -2582,8 +2582,17 @@ function testQR() {
   try {
     const url = new URL(data);
     if (url.protocol === 'https:' || url.protocol === 'http:') {
-      setQrStatus('ok', '✓ Valid URL — scan will open: ' + url.hostname);
-      setTimeout(() => { if (confirm('QR URL valid ✓\n\nOpen "' + data + '" in new tab to verify?')) window.open(data, '_blank', 'noopener'); }, 100);
+      setQrStatus('ok', '✓ Valid URL — ' + url.hostname);
+      const isMobile = window.innerWidth <= 700;
+      if (isMobile) {
+        // On mobile: don't use confirm() — it closes overlays on iOS.
+        // Just show the status and a tap-to-open toast.
+        toast('QR valid ✓ — tap to open: ' + url.hostname);
+        // Brief delay then open directly without confirm
+        setTimeout(() => window.open(data, '_blank', 'noopener'), 1200);
+      } else {
+        setTimeout(() => { if (confirm('QR URL valid ✓\n\nOpen "' + data + '" in new tab to verify?')) window.open(data, '_blank', 'noopener'); }, 100);
+      }
     } else { setQrStatus('bad', 'Non-HTTP URL — may not open in all apps'); }
   } catch(e) { setQrStatus('bad', 'Invalid URL format — scanner may not open correctly'); }
 }
@@ -2983,49 +2992,37 @@ const THEME_BASE_COLORS = {
 };
 
 function downloadCard() {
-  const isMobile = window.innerWidth <= 700;
-  const isIOS    = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const card      = document.getElementById('nft-card');
   const name      = getTitle() || 'nft-card';
-  const filename  = name.replace(/\s+/g, '-') + '-NFT.png';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
+  const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-  // Always render from the real hidden card (cloned off-screen for accurate capture)
-  const original = document.getElementById('nft-card');
+  toast('Rendering PNG...');
+  const prevTransform  = card.style.transform;
+  const prevTransition = card.style.transition;
+  card.style.transform  = 'none';
+  card.style.transition = 'none';
 
-  // Clone card into a fixed off-screen container so html2canvas sees full dimensions
-  const container = document.createElement('div');
-  container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;pointer-events:none;';
-  const clone = original.cloneNode(true);
-  clone.style.transform = 'none';
-  clone.style.transition = 'none';
-  // Reset size to natural — remove sz-twitter aspect-ratio override for capture
-  clone.style.width = original.offsetWidth + 'px';
-  clone.style.height = 'auto';
-  container.appendChild(clone);
-  document.body.appendChild(container);
-
-  toast('Rendering image...');
-
-  html2canvas(clone, {
+  html2canvas(card, {
     backgroundColor: baseColor,
     scale: 3,
     useCORS: true,
     allowTaint: true,
     logging: false,
-    width:  original.offsetWidth,
-    height: original.offsetHeight,
   }).then(captured => {
     const S = 3;
-    const W = clone.offsetWidth  * S;
-    const H = clone.offsetHeight * S;
+    const W = card.offsetWidth  * S;
+    const H = card.offsetHeight * S;
     const R = 22 * S;
 
     const out = document.createElement('canvas');
     out.width  = W;
     out.height = H;
     const ctx  = out.getContext('2d');
+
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, W, H);
+
     ctx.beginPath();
     ctx.moveTo(R, 0);
     ctx.lineTo(W-R, 0); ctx.arcTo(W, 0,  W,  R,   R);
@@ -3037,7 +3034,7 @@ function downloadCard() {
     ctx.drawImage(captured, 0, 0, W, H);
 
     if (isIOS) {
-      // iOS: open image page — user long-presses to save
+      // iOS Safari: open image in new tab — user long-presses to save
       const dataUrl = out.toDataURL('image/png');
       const win = window.open('', '_blank');
       if (win) {
@@ -3050,41 +3047,35 @@ function downloadCard() {
             body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;
                  align-items:center;padding:24px 16px 40px;font-family:system-ui,sans-serif}
             img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
-            .tip{margin-top:20px;background:rgba(255,255,255,.07);border-radius:12px;
+            .tip{margin-top:20px;background:rgba(255,255,255,.08);border-radius:12px;
                  padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;width:100%;max-width:340px}
-            .tip strong{color:#a78bfa;display:block;margin-bottom:4px;font-size:14px}
+            .tip strong{color:#a78bfa;display:block;margin-bottom:6px;font-size:15px}
           </style></head><body>
           <img src="${dataUrl}" alt="${esc(name)} NFT"/>
           <div class="tip">
             <strong>Save this image</strong>
-            Long-press the image above, then tap<br/>
-            <em>Save to Photos</em> or <em>Add to Photos</em>
+            Long-press the image and tap<br/><em>Add to Photos</em> or <em>Save to Photos</em>
           </div>
         </body></html>`);
         win.document.close();
-        toast('Image ready — long-press to save ✓');
+        toast('Long-press the image → Save to Photos ✓');
       } else {
-        toast('Allow pop-ups to save the image');
+        toast('Allow pop-ups then try again');
       }
     } else {
-      // Desktop + Android: Blob URL download (synchronous, works everywhere)
-      out.toBlob(blob => {
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href     = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-        toast(isMobile ? 'Saved to Downloads ✓' : 'Downloaded — 3× resolution ✓');
-      }, 'image/png');
+      // Desktop + Android: direct anchor download
+      const a   = document.createElement('a');
+      a.download = name.replace(/\s+/g, '-') + '-NFT.png';
+      a.href     = out.toDataURL('image/png');
+      a.click();
+      toast('Downloaded — clean edges, 3× resolution ✓');
     }
   }).catch(err => {
     console.error('Export error:', err);
-    toast('Export failed — try again');
+    toast('Download failed — please try again');
   }).finally(() => {
-    document.body.removeChild(container);
+    card.style.transform  = prevTransform;
+    card.style.transition = prevTransition;
   });
 }
 
@@ -3244,7 +3235,7 @@ function _renderMobileSheet() {
   const original = document.getElementById('nft-card');
   if (!original) return;
 
-  // Remove any existing card clone + status clone
+  // Remove any existing clones
   const old = document.getElementById('nft-card-sheet-clone');
   if (old) old.remove();
   const oldStatus = body.querySelector('.qr-test-wrap-clone');
@@ -3260,34 +3251,57 @@ function _renderMobileSheet() {
   clone.style.transform = '';
   clone.style.transition = 'none';
 
+  // Copy canvas QR pixel data (cloneNode does not copy canvas content)
+  const origCanvases = original.querySelectorAll('canvas');
+  const cloneCanvases = clone.querySelectorAll('canvas');
+  origCanvases.forEach((oc, i) => {
+    const cc = cloneCanvases[i];
+    if (!cc) return;
+    try {
+      cc.width  = oc.width;
+      cc.height = oc.height;
+      const ctx = cc.getContext('2d');
+      if (ctx && oc.width > 0) ctx.drawImage(oc, 0, 0);
+    } catch(e) {}
+  });
+
   // Wrap in scaler
   const scaler = document.createElement('div');
   scaler.className = 'sheet-card-scaler';
   scaler.appendChild(clone);
   body.insertBefore(scaler, actions);
 
-  // Always scale card to fit the sheet width (handles all sizes, not just Twitter)
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const sheetW = document.getElementById('mobile-sheet').offsetWidth || window.innerWidth;
-    const padding = 32; // 16px each side
-    const available = sheetW - padding;
-    const cardW = clone.offsetWidth || 360;
-    const scale = Math.min(1, available / cardW);
-    clone.style.transformOrigin = 'top left';
-    clone.style.transform = `translateX(${Math.round((available - cardW * scale) / 2)}px) scale(${scale})`;
-    scaler.style.height = Math.round(clone.offsetHeight * scale) + 'px';
-    scaler.style.width = available + 'px';
-    scaler.style.overflow = 'hidden';
-    scaler.style.flexShrink = '0';
-  }));
+  // Wait for all images (avatar, logo) to load before computing scale
+  const imgs = Array.from(clone.querySelectorAll('img'));
+  const loadPromises = imgs.map(img => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise(res => { img.onload = res; img.onerror = res; });
+  });
 
-  // QR test status
+  Promise.all(loadPromises).then(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const sheetW    = document.getElementById('mobile-sheet').offsetWidth || window.innerWidth;
+      const available = sheetW - 32;
+      const cardW     = clone.offsetWidth || 360;
+      const scale     = Math.min(1, available / cardW);
+      const offsetX   = Math.round((available - cardW * scale) / 2);
+      clone.style.transformOrigin = 'top left';
+      clone.style.transform = `translateX(${offsetX}px) scale(${scale})`;
+      scaler.style.height   = Math.round(clone.scrollHeight * scale) + 'px';
+      scaler.style.width    = available + 'px';
+      scaler.style.overflow = 'visible';
+      scaler.style.flexShrink = '0';
+    }));
+  });
+
+  // QR test status strip
   const srcStatus = document.getElementById('qr-test-status');
   if (srcStatus) {
     const statusClone = srcStatus.cloneNode(true);
     statusClone.className += ' qr-test-wrap-clone';
     statusClone.style.maxWidth = '100%';
-    statusClone.style.width = '100%';
+    statusClone.style.width    = '100%';
+    statusClone.style.padding  = '0 16px';
     body.insertBefore(statusClone, actions);
   }
 }
