@@ -1256,7 +1256,6 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 <div class="tabs-bar">
   <button class="tab-btn active" onclick="switchTab('create')">Create</button>
   <button class="tab-btn" onclick="switchTab('collection')">Collection</button>
-  <button class="tab-btn" onclick="switchTab('redirects')">Link Manager</button>
   <button class="tab-btn" onclick="switchTab('metadata')">Metadata</button>
 </div>
 
@@ -1921,7 +1920,7 @@ const QR_COLORS = {
 // TAB SWITCHING
 // ═══════════════════════════════════════════════
 function switchTab(t) {
-  const tabs = ['create','collection','redirects','metadata'];
+  const tabs = ['create','collection','metadata'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
     b.classList.toggle('active', tabs[i] === t);
   });
@@ -3015,14 +3014,27 @@ function importCollection(e) {
   reader.onload = ev => {
     try {
       const data = JSON.parse(ev.target.result);
-      // Support both formats: manifest with _raw, or plain array
-      const items = data._raw || (Array.isArray(data) ? data : null);
-      if (!items || !items.length) {
-        toast('No collection items found in this file');
+
+      // Detect single NFT metadata file (has "name", "attributes" but no "_raw")
+      if (data.name && data.attributes && !data._raw && !Array.isArray(data)) {
+        toast('This is a single NFT metadata file. Use "Export All Metadata" to get the importable collection file.');
+        e.target.value = '';
         return;
       }
-      if (!confirm(`Import ${items.length} item${items.length!==1?'s':''} into your collection? This will ADD to existing items.`)) return;
-      // Renumber idNums to avoid conflicts
+
+      // Support: manifest with _raw snapshots, or plain snapshot array
+      const items = data._raw || (Array.isArray(data) ? data : null);
+      if (!items || !items.length) {
+        toast('No collection items found. Use "Export All Metadata" button to export the correct file.');
+        e.target.value = '';
+        return;
+      }
+
+      if (!confirm(`Import ${items.length} item${items.length!==1?'s':''} into your collection?\nThis will ADD to your existing ${collection.length} item${collection.length!==1?'s':''}.`)) {
+        e.target.value = '';
+        return;
+      }
+
       const startIdx = collection.length;
       items.forEach((snap, i) => {
         snap.idNum = startIdx + i + 1;
@@ -3031,19 +3043,18 @@ function importCollection(e) {
       saveCollection();
       updateStats();
       renderCollectionGallery();
-      // Restore collection name if present
+
       if (data.collection && data.collection.name) {
         const nameEl = document.getElementById('col-name2');
         if (nameEl) nameEl.value = data.collection.name;
       }
       toast(`✓ Imported ${items.length} item${items.length!==1?'s':''} into collection`);
     } catch(err) {
-      toast('Invalid JSON file — could not import');
+      toast('Invalid file — could not read JSON');
       console.error('Import error:', err);
     }
   };
   reader.readAsText(file);
-  // Reset input so same file can be re-imported if needed
   e.target.value = '';
 }
 
