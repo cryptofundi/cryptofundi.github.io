@@ -3010,8 +3010,8 @@ function downloadCard() {
   toast('Rendering PNG...');
 
   // Get natural card dimensions from original
-  const cardW = original.scrollWidth  || original.offsetWidth  || 360;
-  const cardH = original.scrollHeight || original.offsetHeight || 520;
+  const cardW = original.offsetWidth  || 360;
+  const cardH = original.offsetHeight || 520;
 
   // Clone the card into an isolated fixed container — no parent backgrounds
   const wrapper = document.createElement('div');
@@ -3026,8 +3026,11 @@ function downloadCard() {
   clone.id = '';
   clone.style.cssText = [
     'transform:none', 'transition:none',
-    'position:static', 'width:' + cardW + 'px',
+    'position:static',
+    'width:' + cardW + 'px',
     'max-width:none',
+    'box-shadow:none',       // remove shadow — prevents glow bleeding outside card
+    'border-radius:22px',    // keep rounded corners
   ].join(';');
 
   // Copy canvas QR pixel data — cloneNode doesn't copy canvas content
