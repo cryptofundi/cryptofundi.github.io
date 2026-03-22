@@ -593,6 +593,11 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 .card.sz-card    { width: 430px; }               /* portrait, height = content */
 .card.sz-twitter { width: 630px; aspect-ratio: 16/9; } /* true 16:9 on desktop */
 
+/* Show Home button in metadata only on mobile */
+@media (max-width: 700px) {
+  #meta-home-btn { display: inline-flex !important; }
+}
+
 /* On mobile, Twitter renders as portrait (same as NFT 1:1) */
 @media (max-width: 700px) {
   .card.sz-twitter { width: 360px; aspect-ratio: unset; }
@@ -1715,6 +1720,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <div class="btn-row">
         <button class="btn btn-primary btn-sm" onclick="downloadMeta()">⬇ Download JSON</button>
         <button class="btn btn-outline btn-sm" onclick="copyMeta()">⎘ Copy</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('create')" style="display:none" id="meta-home-btn">⌂ Home</button>
       </div>
     </div>
 
@@ -1841,8 +1847,12 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
     <!-- NFT card clone injected here by JS -->
     <div class="sheet-actions">
       <button class="btn btn-primary" onclick="downloadCard()">⬇ Save Image</button>
-      <button class="btn btn-teal btn-sm" onclick="testQR();closeMobilePreview()" style="white-space:nowrap">⊙ Test QR</button>
+      <button class="btn btn-teal btn-sm" onclick="testQR()" style="white-space:nowrap">⊙ Test QR</button>
       <button class="btn btn-outline" onclick="closeMobilePreview();switchTab('metadata')">JSON</button>
+    </div>
+    <div id="mobile-qr-result" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--gray-50);border-radius:var(--r-md);margin:0 16px;font-size:11px;color:var(--gray-600)">
+      <div id="mobile-qr-dot" class="qr-test-dot" style="flex-shrink:0"></div>
+      <span id="mobile-qr-msg"></span>
     </div>
     <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6;padding:0 16px">
       Android: saves to Downloads · iOS: long-press image → Save to Photos
@@ -2605,10 +2615,18 @@ function testQR() {
 }
 
 function setQrStatus(state, msg) {
+  // Desktop status bar
   const dot = document.getElementById('qr-dot');
   const txt = document.getElementById('qr-test-msg');
   if (dot) dot.className = 'qr-test-dot' + (state==='ok' ? ' ok' : state==='bad' ? ' bad' : '');
   if (txt) txt.textContent = msg;
+  // Mobile sheet result strip
+  const mDot    = document.getElementById('mobile-qr-dot');
+  const mTxt    = document.getElementById('mobile-qr-msg');
+  const mResult = document.getElementById('mobile-qr-result');
+  if (mDot) mDot.className = 'qr-test-dot' + (state==='ok' ? ' ok' : state==='bad' ? ' bad' : '');
+  if (mTxt) mTxt.textContent = msg;
+  if (mResult) mResult.style.display = (state !== 'idle') ? 'flex' : 'none';
 }
 
 // ═══════════════════════════════════════════════
