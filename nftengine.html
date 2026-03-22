@@ -3675,14 +3675,7 @@ async function activateLicense() {
 
   let activated = false;
   for (const p of plans) {
-    if (p.id.startsWith('YOUR_')) {
-      // Gumroad not yet configured — show setup message
-      if (msg) {
-        msg.innerHTML = '⚙️ Gumroad not configured yet. <a href="https://gumroad.com" target="_blank" style="color:#2563eb">Set up your products</a> then update GUMROAD_PRODUCTS in the code.';
-        msg.style.color = '#b45309';
-      }
-      return;
-    }
+    if (p.id.startsWith('YOUR_')) continue; // skip unconfigured products
     try {
       const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
         method: 'POST',
