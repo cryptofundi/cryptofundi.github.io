@@ -390,6 +390,40 @@ select {
 .btn-teal { background: linear-gradient(135deg, var(--teal), #0e7490); color: #fff; box-shadow: 0 4px 16px rgba(8,145,178,.28); }
 .btn-teal:hover { transform: translateY(-2px); }
 
+/* ── PLAN BADGE ── */
+.plan-badge {
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  cursor: pointer; transition: all .2s; user-select: none; white-space: nowrap;
+}
+.plan-free  { background: rgba(100,116,139,.12); color: #475569; border: 1.5px solid #cbd5e1; }
+.plan-free:hover { border-color: #2563eb; color: #2563eb; }
+.plan-pro   { background: rgba(37,99,235,.12); color: #1d4ed8; border: 1.5px solid #93c5fd; }
+.plan-elite { background: rgba(124,58,237,.12); color: #6d28d9; border: 1.5px solid #a78bfa; }
+
+/* ── WATERMARK ── */
+.card-watermark {
+  position: absolute; bottom: 30px; right: 10px;
+  font-size: 8px; font-weight: 700; color: rgba(100,116,139,.45);
+  letter-spacing: .8px; text-transform: uppercase;
+  pointer-events: none; z-index: 10; font-family: monospace;
+}
+
+/* ── UPGRADE PROMPT (shown on locked download) ── */
+.upgrade-prompt {
+  background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+  border: 1.5px solid #c7d2fe; border-radius: var(--r-md);
+  padding: 12px 16px; font-size: 11px; color: #374151;
+  text-align: center; line-height: 1.7; cursor: pointer; width: 100%;
+}
+.upgrade-prompt:hover { border-color: #2563eb; }
+.upgrade-prompt strong { color: #2563eb; }
+
+/* Locked feature buttons */
+.layout-btn.locked-pro::after,
+.size-btn.locked-pro::after  { content: '🔒'; font-size: 10px; margin-left: 3px; }
+.id-type-btn.locked-elite .ib-lbl::after { content: ' 🔒'; font-size: 10px; }
+
 .btn-sm   { padding: 8px 14px; font-size: 11px; }
 .btn-xs   { padding: 6px 11px; font-size: 10px; }
 .btn-full { width: 100%; }
@@ -1242,10 +1276,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
         <div class="stat-v" id="stat-next">#001</div>
         <div class="stat-l">Next ID</div>
       </div>
-      <div class="stat">
-        <div class="stat-v" id="stat-links">0</div>
-        <div class="stat-l">Redirects</div>
-      </div>
+    </div>
+    <!-- Plan badge + upgrade button -->
+    <div id="plan-badge" class="plan-badge plan-free" onclick="openLicenseModal()" title="Click to upgrade">
+      <span id="plan-badge-label">FREE</span>
     </div>
   </div>
 </header>
@@ -2472,6 +2506,8 @@ function renderCard() {
   const card = document.getElementById('nft-card');
   card.innerHTML = innerHtml;
   generateQR(qrData);
+  // Re-apply watermark (innerHTML wipe removes it)
+  if (typeof applyWatermark === 'function') applyWatermark();
 }
 
 // ═══════════════════════════════════════════════
@@ -3457,12 +3493,280 @@ function syncMobileStats() {
 }
 
 // ═══════════════════════════════════════════════
+// LICENSE / PLAN SYSTEM
+// ═══════════════════════════════════════════════
+
+// Plans: 'free' | 'pro' | 'elite'
+// Gumroad product IDs — update these with your real IDs after creating products
+const GUMROAD_PRODUCTS = {
+  pro:   { id: 'YOUR_PRO_PRODUCT_ID',   name: 'PRO',   price: '$19' },
+  elite: { id: 'YOUR_ELITE_PRODUCT_ID', name: 'ELITE', price: '$49' },
+};
+
+let currentPlan = 'free';
+
+function initPlan() {
+  const saved = localStorage.getItem('uqnft_plan');
+  const key   = localStorage.getItem('uqnft_license_key');
+  if (saved === 'elite' && key) { currentPlan = 'elite'; }
+  else if (saved === 'pro' && key) { currentPlan = 'pro'; }
+  else { currentPlan = 'free'; }
+  applyPlan();
+}
+
+function applyPlan() {
+  const badge = document.getElementById('plan-badge');
+  const label = document.getElementById('plan-badge-label');
+  if (!badge || !label) return;
+
+  badge.className = 'plan-badge plan-' + currentPlan;
+  if (currentPlan === 'elite') {
+    label.textContent = '⭐ ELITE';
+  } else if (currentPlan === 'pro') {
+    label.textContent = '✦ PRO';
+  } else {
+    label.textContent = 'FREE — Upgrade';
+  }
+
+  // Apply watermark to card
+  applyWatermark();
+
+  // Lock/unlock layout and size buttons
+  applyFeatureLocks();
+}
+
+function applyWatermark() {
+  // Remove existing watermark
+  const existing = document.getElementById('card-watermark-el');
+  if (existing) existing.remove();
+
+  if (currentPlan === 'free') {
+    const card = document.getElementById('nft-card');
+    if (!card) return;
+    const wm = document.createElement('div');
+    wm.id = 'card-watermark-el';
+    wm.className = 'card-watermark';
+    wm.textContent = 'cryptofundi.io';
+    card.appendChild(wm);
+  }
+}
+
+// Features locked on Free plan
+const PRO_LAYOUTS  = ['split', 'avatarfocus', 'minimal', 'assetshowcase'];
+const PRO_SIZES    = ['card', 'print', 'twitter'];
+const ELITE_LAYOUTS = ['assetshowcase'];
+const ELITE_TYPES   = ['asset'];
+
+function applyFeatureLocks() {
+  // Layout buttons
+  document.querySelectorAll('.layout-btn').forEach(btn => {
+    const layout = btn.dataset.layout;
+    btn.classList.remove('locked-pro', 'locked-elite');
+    if (currentPlan === 'free' && PRO_LAYOUTS.includes(layout)) {
+      btn.classList.add('locked-pro');
+    } else if (currentPlan === 'pro' && ELITE_LAYOUTS.includes(layout)) {
+      // Elite layouts available to pro too in this config — adjust as needed
+    }
+  });
+
+  // Size buttons
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    const size = btn.dataset.size;
+    btn.classList.remove('locked-pro');
+    if (currentPlan === 'free' && PRO_SIZES.includes(size)) {
+      btn.classList.add('locked-pro');
+    }
+  });
+
+  // Asset identity type locked on free
+  document.querySelectorAll('.id-type-btn').forEach((btn, i) => {
+    const types = ['human','agent','utility','asset'];
+    btn.classList.remove('locked-elite');
+    if (currentPlan === 'free' && ELITE_TYPES.includes(types[i])) {
+      btn.classList.add('locked-elite');
+    }
+  });
+}
+
+function checkFeatureAccess(feature, requiredPlan) {
+  if (requiredPlan === 'pro'   && currentPlan === 'free')  return false;
+  if (requiredPlan === 'elite' && currentPlan === 'free')  return false;
+  if (requiredPlan === 'elite' && currentPlan === 'pro')   return false;
+  return true;
+}
+
+// ── MODAL ──
+function openLicenseModal() {
+  const overlay = document.getElementById('license-overlay');
+  if (overlay) { overlay.style.display = 'flex'; }
+  const inp = document.getElementById('license-key-input');
+  if (inp) inp.focus();
+}
+
+function closeLicenseModal() {
+  const overlay = document.getElementById('license-overlay');
+  if (overlay) overlay.style.display = 'none';
+  const msg = document.getElementById('license-msg');
+  if (msg) msg.textContent = '';
+}
+
+// ── LICENSE VALIDATION (Gumroad API) ──
+async function activateLicense() {
+  const inp = document.getElementById('license-key-input');
+  const msg = document.getElementById('license-msg');
+  const key = inp ? inp.value.trim() : '';
+
+  if (!key) { if (msg) { msg.textContent = 'Please enter your license key'; msg.style.color = '#ef4444'; } return; }
+  if (msg) { msg.textContent = 'Validating...'; msg.style.color = '#64748b'; }
+
+  // Try Pro first, then Elite
+  const plans = [
+    { plan: 'elite', ...GUMROAD_PRODUCTS.elite },
+    { plan: 'pro',   ...GUMROAD_PRODUCTS.pro   },
+  ];
+
+  let activated = false;
+  for (const p of plans) {
+    if (p.id.startsWith('YOUR_')) {
+      // Gumroad not yet configured — show setup message
+      if (msg) {
+        msg.innerHTML = '⚙️ Gumroad not configured yet. <a href="https://gumroad.com" target="_blank" style="color:#2563eb">Set up your products</a> then update GUMROAD_PRODUCTS in the code.';
+        msg.style.color = '#b45309';
+      }
+      return;
+    }
+    try {
+      const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `product_id=${encodeURIComponent(p.id)}&license_key=${encodeURIComponent(key)}`,
+      });
+      const data = await res.json();
+      if (data.success) {
+        currentPlan = p.plan;
+        localStorage.setItem('uqnft_plan', p.plan);
+        localStorage.setItem('uqnft_license_key', key);
+        applyPlan();
+        if (msg) { msg.textContent = `✓ ${p.name} activated! Enjoy your unlock.`; msg.style.color = '#059669'; }
+        toast(`🎉 ${p.name} plan activated!`);
+        setTimeout(closeLicenseModal, 1800);
+        activated = true;
+        break;
+      }
+    } catch(e) { console.warn('Gumroad check error', e); }
+  }
+
+  if (!activated) {
+    if (msg) { msg.textContent = 'Invalid key — check and try again, or contact support.'; msg.style.color = '#ef4444'; }
+  }
+}
+
+// Override setLayout to check access
+const _origSetLayout = setLayout;
+function setLayout(layout, btn) {
+  if (currentPlan === 'free' && PRO_LAYOUTS.includes(layout)) {
+    toast('🔒 This layout requires PRO — click the FREE badge to upgrade');
+    openLicenseModal();
+    return;
+  }
+  _origSetLayout(layout, btn);
+}
+
+// Override setSize to check access
+const _origSetSize = setSize;
+function setSize(size, btn) {
+  if (currentPlan === 'free' && PRO_SIZES.includes(size)) {
+    toast('🔒 This output size requires PRO — click FREE to upgrade');
+    openLicenseModal();
+    return;
+  }
+  _origSetSize(size, btn);
+}
+
+// Override setType to check asset access
+const _origSetType = setType;
+function setType(type, btn) {
+  if (currentPlan === 'free' && ELITE_TYPES.includes(type)) {
+    toast('🔒 Asset / RWA NFT requires PRO — click FREE to upgrade');
+    openLicenseModal();
+    return;
+  }
+  _origSetType(type, btn);
+}
+
+// Close modal on overlay click
+const _licOverlay = document.getElementById('license-overlay');
+if (_licOverlay) {
+  _licOverlay.addEventListener('click', function(e) {
+    if (e.target === this) closeLicenseModal();
+  });
+}
+
+// ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 loadCollection();   // restore saved collection from previous session
+initPlan();         // restore plan from localStorage
 update();
 syncMobileStats();
 </script>
+
+<!-- ══════════════════════════════════════════════════
+     LICENSE / UPGRADE MODAL
+══════════════════════════════════════════════════ -->
+<div id="license-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:420px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.25);position:relative">
+    <button onclick="closeLicenseModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:32px;margin-bottom:8px">🔐</div>
+      <div style="font-family:'Outfit','Syne',sans-serif;font-size:20px;font-weight:800;color:#0f172a">Unlock Pro / Elite</div>
+      <div style="font-size:12px;color:#64748b;margin-top:4px">One-time payment — no subscription ever</div>
+    </div>
+
+    <!-- Plan comparison -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div style="border:2px solid #3b82f6;border-radius:14px;padding:14px;text-align:center">
+        <div style="font-weight:800;color:#1d4ed8;font-size:15px">PRO</div>
+        <div style="font-size:22px;font-weight:800;color:#0f172a;margin:4px 0">$19</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.6">All layouts<br/>All output sizes<br/>No watermark<br/>High-res 3× PNG</div>
+        <a href="https://cryptofundi.gumroad.com/l/pro" target="_blank" rel="noopener"
+           style="display:block;margin-top:10px;background:#2563eb;color:#fff;border-radius:8px;padding:7px;font-size:11px;font-weight:700;text-decoration:none">
+          Buy PRO →
+        </a>
+      </div>
+      <div style="border:2px solid #7c3aed;border-radius:14px;padding:14px;text-align:center;position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px">BEST VALUE</div>
+        <div style="font-weight:800;color:#7c3aed;font-size:15px">ELITE</div>
+        <div style="font-size:22px;font-weight:800;color:#0f172a;margin:4px 0">$49</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.6">Everything in Pro<br/>RWA / Asset layout<br/>Future updates<br/>Priority support</div>
+        <a href="https://cryptofundi.gumroad.com/l/elite" target="_blank" rel="noopener"
+           style="display:block;margin-top:10px;background:#7c3aed;color:#fff;border-radius:8px;padding:7px;font-size:11px;font-weight:700;text-decoration:none">
+          Buy ELITE →
+        </a>
+      </div>
+    </div>
+
+    <!-- License key input -->
+    <div style="border-top:1px solid #e2e8f0;padding-top:16px">
+      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px">Already have a license key?</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="license-key-input" placeholder="XXXX-XXXX-XXXX-XXXX"
+               style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:monospace;outline:none"
+               onkeydown="if(event.key==='Enter') activateLicense()"/>
+        <button onclick="activateLicense()"
+                style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
+          Activate
+        </button>
+      </div>
+      <div id="license-msg" style="font-size:11px;margin-top:6px;min-height:16px"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:#94a3b8">
+      After purchase, Gumroad emails you a license key instantly
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
