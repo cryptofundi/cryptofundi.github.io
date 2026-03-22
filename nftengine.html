@@ -1229,7 +1229,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
     <div class="logo-icon">◈</div>
     <div>
       <div class="logo-title">Universal QR NFT Creator</div>
-      <div class="logo-sub">Identity · Agent · Utility</div>
+      <div class="logo-sub">Identity · Agent · Utility · Asset</div>
     </div>
   </div>
   <div class="header-right">
@@ -1659,8 +1659,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <hr class="div"/>
       <div class="btn-row" style="margin-bottom:20px">
         <button class="btn btn-gold btn-sm" onclick="exportAll()">⬇ Export All Metadata</button>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('import-collection-file').click()">⬆ Import Collection</button>
         <button class="btn btn-danger btn-sm" onclick="clearCollection()">🗑 Clear All</button>
       </div>
+      <input type="file" id="import-collection-file" accept=".json" style="display:none" onchange="importCollection(event)"/>
       <div class="section-head"><span>Items in Collection (<span id="col-count">0</span>)</span></div>
       <div id="col-sidebar-list"></div>
     </div>
@@ -2997,12 +2999,52 @@ function exportAll() {
     collection: { name: colName, description: colDesc, symbol: 'UQNFT', total: collection.length, created: new Date().toISOString() },
     nfts: collection.map((s,i) => buildMeta(s,i)),
     redirects: redirects.map(r => ({ label: r.label, destination: r.dest, type: r.type })),
+    _raw: collection,   // full snapshots for re-import
   };
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(manifest,null,2)], {type:'application/json'}));
   a.download = `${colName.replace(/\s+/g,'-')}-manifest.json`;
   a.click();
   toast(`Exported ${collection.length} NFTs + ${redirects.length} redirects`);
+}
+
+function importCollection(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      // Support both formats: manifest with _raw, or plain array
+      const items = data._raw || (Array.isArray(data) ? data : null);
+      if (!items || !items.length) {
+        toast('No collection items found in this file');
+        return;
+      }
+      if (!confirm(`Import ${items.length} item${items.length!==1?'s':''} into your collection? This will ADD to existing items.`)) return;
+      // Renumber idNums to avoid conflicts
+      const startIdx = collection.length;
+      items.forEach((snap, i) => {
+        snap.idNum = startIdx + i + 1;
+        collection.push(snap);
+      });
+      saveCollection();
+      updateStats();
+      renderCollectionGallery();
+      // Restore collection name if present
+      if (data.collection && data.collection.name) {
+        const nameEl = document.getElementById('col-name2');
+        if (nameEl) nameEl.value = data.collection.name;
+      }
+      toast(`✓ Imported ${items.length} item${items.length!==1?'s':''} into collection`);
+    } catch(err) {
+      toast('Invalid JSON file — could not import');
+      console.error('Import error:', err);
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be re-imported if needed
+  e.target.value = '';
 }
 
 // ═══════════════════════════════════════════════
