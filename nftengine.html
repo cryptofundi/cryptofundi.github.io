@@ -728,11 +728,14 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 .card-wallet {
   padding: 6px 22px 14px;
   margin: 0 22px;
-  font-size: 8.5px; color: var(--cs); opacity: .45;
+  font-size: 8px; color: var(--ct); opacity: .55;
   font-family: monospace;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: normal;
   position: relative; z-index: 2;
   border-top: 1px solid var(--cb);
+  line-height: 1.4;
 }
 .card-bottom-bar {
   position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
@@ -1033,12 +1036,13 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   cursor: pointer; display: flex; align-items: center; justify-content: center;
 }
 .sheet-body {
-  padding: 16px 20px 0;
+  padding: 16px 0 0;
   display: flex; flex-direction: column; align-items: center; gap: 18px;
 }
 .sheet-actions {
   display: flex; gap: 10px; flex-wrap: wrap;
   justify-content: center; width: 100%;
+  padding: 0 16px;
   max-width: 400px;
 }
 
@@ -1771,12 +1775,11 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <!-- Action Buttons -->
       <div class="btn-row" style="justify-content:center;flex-wrap:wrap;max-width:360px;width:100%">
         <button class="btn btn-primary" onclick="downloadCard()">⬇ Download PNG</button>
+        <button class="btn btn-teal" onclick="testQR()">⊙ Test QR Link</button>
         <button class="btn btn-outline" onclick="switchTab('metadata')">{ } Metadata</button>
-        <button class="btn btn-gold" onclick="mintToCollection()">⬡ Add to Collection</button>
       </div>
       <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6">
-        Hover card for 3D effect · PNG exports at 3× resolution<br/>
-        <span style="color:var(--blue);font-weight:600">⬡ Add to Collection</span> saves locally — export to mint on-chain
+        Hover card for 3D effect · PNG exports at 3× resolution
       </div>
     </div>
 
@@ -1834,11 +1837,11 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
     <!-- NFT card clone injected here by JS -->
     <div class="sheet-actions">
       <button class="btn btn-primary" onclick="downloadCard()">⬇ Save Image</button>
-      <button class="btn btn-gold" onclick="mintToCollection();closeMobilePreview()">+ Collection</button>
+      <button class="btn btn-teal btn-sm" onclick="testQR();closeMobilePreview()" style="white-space:nowrap">⊙ Test QR</button>
       <button class="btn btn-outline" onclick="closeMobilePreview();switchTab('metadata')">JSON</button>
     </div>
-    <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6">
-      Tap <strong style="color:var(--blue)">Save Image</strong> → long-press image → Save to Photos
+    <div style="font-size:10px;color:var(--gray-400);text-align:center;line-height:1.6;padding:0 16px">
+      Android: saves to Downloads · iOS: long-press image → Save to Photos
     </div>
   </div>
 </div>
@@ -2216,7 +2219,7 @@ function renderCard() {
           </div>
           ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px">${tags.slice(0,3).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
           ${desc ? `<div style="font-size:11px;color:var(--cs);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
-          ${wallet ? `<div style="margin-top:4px;font-size:9px;color:var(--cs);opacity:.4;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">◈ ${esc(wallet.substring(0,30))}…</div>` : ''}
+          ${wallet ? `<div style="margin-top:4px;font-size:8px;color:var(--ct);opacity:.55;font-family:monospace;word-break:break-all;line-height:1.4">◈ ${esc(wallet)}</div>` : ''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 14px;gap:8px">
           ${qrContainerHtml}
@@ -2425,7 +2428,7 @@ function renderCard() {
           ${assetVal  ? `<span class="card-asset-data-chip">💰 ${esc(assetVal)}</span>` : ''}
           ${assetOwn  ? `<span class="card-asset-data-chip">📊 ${esc(assetOwn)}</span>` : ''}
         </div>
-        ${wallet ? `<div style="padding:4px 18px 14px;font-size:8.5px;color:var(--cs);opacity:.4;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-top:1px solid var(--cb);margin:0 18px">◈ ${esc(wallet.substring(0,34))}${wallet.length>34?'…':''}</div>` : `<div style="height:12px"></div>`}
+        ${wallet ? `<div style="padding:4px 18px 14px;font-size:8px;color:var(--ct);opacity:.55;font-family:monospace;word-break:break-all;line-height:1.4;border-top:1px solid var(--cb);margin:0 18px">◈ ${esc(wallet)}</div>` : `<div style="height:12px"></div>`}
         <div class="card-bottom-bar"></div>`;
     }
 
@@ -2444,7 +2447,7 @@ function renderCard() {
       <div class="card-cta">${esc(cta)}</div>
       ${tagsHtml}
       ${desc ? `<div style="padding:6px 22px 14px;font-size:10px;color:var(--cs);line-height:1.6;position:relative;z-index:2">${esc(desc)}</div>` : ''}
-      ${wallet ? `<div style="padding:6px 22px 16px;font-size:8.5px;color:var(--cs);opacity:.45;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative;z-index:2;border-top:1px solid var(--cb);margin:0 22px">◈ ${esc(wallet.substring(0,32))}${wallet.length>32?'…':''}</div>` : `<div style="height:16px"></div>`}
+      ${wallet ? `<div style="padding:6px 22px 14px;font-size:8px;color:var(--ct);opacity:.55;font-family:monospace;word-break:break-all;line-height:1.4;position:relative;z-index:2;border-top:1px solid var(--cb);margin:0 22px">◈ ${esc(wallet)}</div>` : `<div style="height:16px"></div>`}
       <div class="card-bottom-bar"></div>`;
   }
 
@@ -2982,40 +2985,45 @@ const THEME_BASE_COLORS = {
 function downloadCard() {
   const isMobile = window.innerWidth <= 700;
   const isIOS    = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-  // On mobile use the visible sheet clone; fall back to hidden original
-  const card = (isMobile && document.getElementById('nft-card-sheet-clone'))
-    ? document.getElementById('nft-card-sheet-clone')
-    : document.getElementById('nft-card');
-
   const name      = getTitle() || 'nft-card';
+  const filename  = name.replace(/\s+/g, '-') + '-NFT.png';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
 
-  toast('Rendering image...');
-  const prevTransform  = card.style.transform;
-  const prevTransition = card.style.transition;
-  card.style.transform  = 'none';
-  card.style.transition = 'none';
+  // Always render from the real hidden card (cloned off-screen for accurate capture)
+  const original = document.getElementById('nft-card');
 
-  html2canvas(card, {
+  // Clone card into a fixed off-screen container so html2canvas sees full dimensions
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;pointer-events:none;';
+  const clone = original.cloneNode(true);
+  clone.style.transform = 'none';
+  clone.style.transition = 'none';
+  // Reset size to natural — remove sz-twitter aspect-ratio override for capture
+  clone.style.width = original.offsetWidth + 'px';
+  clone.style.height = 'auto';
+  container.appendChild(clone);
+  document.body.appendChild(container);
+
+  toast('Rendering image...');
+
+  html2canvas(clone, {
     backgroundColor: baseColor,
-    scale: isMobile ? 2 : 3,
+    scale: 3,
     useCORS: true,
     allowTaint: true,
     logging: false,
-    windowWidth:  card.scrollWidth,
-    windowHeight: card.scrollHeight,
+    width:  original.offsetWidth,
+    height: original.offsetHeight,
   }).then(captured => {
-    const S = isMobile ? 2 : 3;
-    const W = card.offsetWidth  * S;
-    const H = card.offsetHeight * S;
+    const S = 3;
+    const W = clone.offsetWidth  * S;
+    const H = clone.offsetHeight * S;
     const R = 22 * S;
 
     const out = document.createElement('canvas');
     out.width  = W;
     out.height = H;
     const ctx  = out.getContext('2d');
-
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, W, H);
     ctx.beginPath();
@@ -3028,12 +3036,8 @@ function downloadCard() {
     ctx.clip();
     ctx.drawImage(captured, 0, 0, W, H);
 
-    const filename = name.replace(/\s+/g, '-') + '-NFT.png';
-
     if (isIOS) {
-      // ── iOS Safari / Chrome / Firefox ──────────────────────────────
-      // Programmatic anchor clicks are blocked after async — open a
-      // dedicated image page instead; user long-presses → Save to Photos
+      // iOS: open image page — user long-presses to save
       const dataUrl = out.toDataURL('image/png');
       const win = window.open('', '_blank');
       if (win) {
@@ -3048,7 +3052,7 @@ function downloadCard() {
             img{max-width:100%;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
             .tip{margin-top:20px;background:rgba(255,255,255,.07);border-radius:12px;
                  padding:14px 18px;color:#94a3b8;font-size:13px;line-height:1.7;text-align:center;width:100%;max-width:340px}
-            .tip strong{color:#60a5fa;display:block;margin-bottom:4px;font-size:14px}
+            .tip strong{color:#a78bfa;display:block;margin-bottom:4px;font-size:14px}
           </style></head><body>
           <img src="${dataUrl}" alt="${esc(name)} NFT"/>
           <div class="tip">
@@ -3062,10 +3066,8 @@ function downloadCard() {
       } else {
         toast('Allow pop-ups to save the image');
       }
-
     } else {
-      // ── Android Chrome / Desktop ────────────────────────────────────
-      // Blob URL + anchor click works reliably here
+      // Desktop + Android: Blob URL download (synchronous, works everywhere)
       out.toBlob(blob => {
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -3078,13 +3080,11 @@ function downloadCard() {
         toast(isMobile ? 'Saved to Downloads ✓' : 'Downloaded — 3× resolution ✓');
       }, 'image/png');
     }
-
   }).catch(err => {
     console.error('Export error:', err);
-    toast('Export failed — please try again');
+    toast('Export failed — try again');
   }).finally(() => {
-    card.style.transform  = prevTransform;
-    card.style.transition = prevTransition;
+    document.body.removeChild(container);
   });
 }
 
@@ -3266,21 +3266,20 @@ function _renderMobileSheet() {
   scaler.appendChild(clone);
   body.insertBefore(scaler, actions);
 
-  // Scale wide cards (Twitter 16:9 = 630px) to fit sheet
-  requestAnimationFrame(() => {
-    const sheetWidth = body.offsetWidth || (window.innerWidth - 40);
-    const cardNatural = clone.offsetWidth || 360;
-    if (cardNatural > sheetWidth) {
-      const scale = sheetWidth / cardNatural;
-      clone.style.transformOrigin = 'top center';
-      clone.style.transform = `scale(${scale})`;
-      // Correct the layout height since transform doesn't affect flow
-      scaler.style.height = Math.round(clone.offsetHeight * scale) + 'px';
-    } else {
-      clone.style.maxWidth = '100%';
-      clone.style.width = '100%';
-    }
-  });
+  // Always scale card to fit the sheet width (handles all sizes, not just Twitter)
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const sheetW = document.getElementById('mobile-sheet').offsetWidth || window.innerWidth;
+    const padding = 32; // 16px each side
+    const available = sheetW - padding;
+    const cardW = clone.offsetWidth || 360;
+    const scale = Math.min(1, available / cardW);
+    clone.style.transformOrigin = 'top left';
+    clone.style.transform = `translateX(${Math.round((available - cardW * scale) / 2)}px) scale(${scale})`;
+    scaler.style.height = Math.round(clone.offsetHeight * scale) + 'px';
+    scaler.style.width = available + 'px';
+    scaler.style.overflow = 'hidden';
+    scaler.style.flexShrink = '0';
+  }));
 
   // QR test status
   const srcStatus = document.getElementById('qr-test-status');
