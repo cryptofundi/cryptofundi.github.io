@@ -3107,27 +3107,47 @@ function downloadCard() {
     return;
   }
 
-  // FREE plan: show choice dialog (conversion trigger)
-  if (currentPlan === 'free') {
+  // FREE plan OR Pro+Asset: show choice dialog (conversion trigger)
+  const proWithAsset = (currentPlan === 'pro' && identityType === 'asset');
+  if (currentPlan === 'free' || proWithAsset) {
     const overlay = document.createElement('div');
     overlay.id = 'dl-choice-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9500;display:flex;align-items:center;justify-content:center;padding:16px';
+
+    const eliteBtn = `
+      <button onclick="document.getElementById('dl-choice-overlay').remove();openLicenseModal();"
+        style="background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:12px;padding:14px;cursor:pointer;text-align:left;width:100%">
+        <div style="font-size:13px;font-weight:700;color:#fff">⭐ Upgrade to ELITE — $49</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:2px">Asset / RWA layouts · No watermark · HD export · All features</div>
+      </button>`;
+
+    const proBtn = currentPlan === 'free' ? `
+      <button onclick="document.getElementById('dl-choice-overlay').remove();openLicenseModal();"
+        style="background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;border-radius:12px;padding:14px;cursor:pointer;text-align:left;width:100%">
+        <div style="font-size:13px;font-weight:700;color:#fff">✦ Upgrade to PRO — $19</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">No watermark · 3× HD resolution · All layouts (excl. Asset)</div>
+      </button>` : '';
+
+    const freeBtn = `
+      <button onclick="document.getElementById('dl-choice-overlay').remove();_startDownload();"
+        style="background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;cursor:pointer;text-align:left;width:100%">
+        <div style="font-size:13px;font-weight:700;color:#374151">⬇ Download with watermark</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px">Standard resolution · Includes cryptofundi.io watermark</div>
+      </button>`;
+
     overlay.innerHTML = `
-      <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.25);text-align:center">
-        <div style="font-size:32px;margin-bottom:8px">🎉</div>
-        <div style="font-family:'Outfit','Syne',sans-serif;font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px">Your NFT is ready!</div>
-        <div style="font-size:12px;color:#64748b;margin-bottom:20px;line-height:1.6">Choose your download option</div>
+      <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.25);text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">${proWithAsset ? '🔒' : '🎉'}</div>
+        <div style="font-family:'Outfit','Syne',sans-serif;font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px">
+          ${proWithAsset ? 'ELITE Required for Asset NFTs' : 'Your NFT is ready!'}
+        </div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:20px;line-height:1.6">
+          ${proWithAsset ? 'Asset / RWA layout requires ELITE plan. Upgrade to export without watermark.' : 'Choose your download option'}
+        </div>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button onclick="document.getElementById('dl-choice-overlay').remove();_startDownload();"
-            style="background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;cursor:pointer;text-align:left">
-            <div style="font-size:13px;font-weight:700;color:#374151">⬇ Free Download</div>
-            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Includes watermark · Standard resolution</div>
-          </button>
-          <button onclick="document.getElementById('dl-choice-overlay').remove();openLicenseModal();"
-            style="background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;border-radius:12px;padding:14px;cursor:pointer;text-align:left">
-            <div style="font-size:13px;font-weight:700;color:#fff">✦ Upgrade to PRO — $19</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">No watermark · 3× HD resolution · All layouts</div>
-          </button>
+          ${eliteBtn}
+          ${proBtn}
+          ${freeBtn}
         </div>
         <button onclick="document.getElementById('dl-choice-overlay').remove()"
           style="margin-top:14px;background:none;border:none;font-size:11px;color:#94a3b8;cursor:pointer">Cancel</button>
@@ -3200,14 +3220,14 @@ function _startDownload() {
   requestAnimationFrame(() => {
     html2canvas(clone, {
       backgroundColor: baseColor,
-      scale: currentPlan === 'free' ? 1.5 : 3,  // Layer 3: lower resolution for free
+      scale: needsWatermark() ? 1.5 : 3,  // lower res when watermarked
       useCORS: true,
       allowTaint: true,
       logging: false,
     }).then(captured => {
       document.body.removeChild(wrapper);
 
-      const S = currentPlan === 'free' ? 1.5 : 3;
+      const S = needsWatermark() ? 1.5 : 3;
       const W = cardW * S;
       const H = cardH * S;
       const R = 22 * S;
@@ -3230,7 +3250,7 @@ function _startDownload() {
       ctx.drawImage(captured, 0, 0, W, H);
 
       // ── WATERMARK LAYERS (free plan only) ──────────────
-      if (currentPlan === 'free') {
+      if (needsWatermark()) {
         const cx = W / 2;
         const cy = H / 2;
         const angle = -Math.PI / 6;  // -30° diagonal
@@ -3611,12 +3631,21 @@ function applyPlan() {
   applyFeatureLocks();
 }
 
+function needsWatermark() {
+  // Watermark applies when:
+  // 1. Free plan (always)
+  // 2. Pro plan but using Asset/RWA identity type (requires Elite)
+  if (currentPlan === 'free') return true;
+  if (currentPlan === 'pro' && identityType === 'asset') return true;
+  return false;
+}
+
 function applyWatermark() {
   // Remove existing watermark
   const existing = document.getElementById('card-watermark-el');
   if (existing) existing.remove();
 
-  if (currentPlan === 'free') {
+  if (needsWatermark()) {
     const card = document.getElementById('nft-card');
     if (!card) return;
     const wm = document.createElement('div');
@@ -3791,6 +3820,7 @@ const _baseSetType = setType;
 setType = function(type, btn) {
   // Allow switching to all types freely — Asset shows soft message
   _baseSetType(type, btn);
+  applyWatermark(); // re-evaluate watermark (pro+asset needs it)
   if (type === 'asset' && currentPlan !== 'elite') {
     toast('💡 Asset / RWA export requires ELITE — you can preview and fill the form freely');
   }
