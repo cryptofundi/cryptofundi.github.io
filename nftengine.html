@@ -421,7 +421,8 @@ select {
 
 /* Locked feature buttons */
 .layout-btn.locked-pro::after,
-.size-btn.locked-pro::after  { content: '🔒'; font-size: 10px; margin-left: 3px; }
+.size-btn.locked-pro::after,
+.theme-swatch.locked-pro::after  { content: '🔒'; font-size: 10px; margin-left: 3px; }
 .id-type-btn.locked-elite .ib-lbl::after { content: ' 🔒'; font-size: 10px; }
 
 .btn-sm   { padding: 8px 14px; font-size: 11px; }
@@ -3106,6 +3107,43 @@ function downloadCard() {
     return;
   }
 
+  // FREE plan: show choice dialog (conversion trigger)
+  if (currentPlan === 'free') {
+    const overlay = document.createElement('div');
+    overlay.id = 'dl-choice-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9500;display:flex;align-items:center;justify-content:center;padding:16px';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.25);text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">🎉</div>
+        <div style="font-family:'Outfit','Syne',sans-serif;font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px">Your NFT is ready!</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:20px;line-height:1.6">Choose your download option</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button onclick="document.getElementById('dl-choice-overlay').remove();_startDownload();"
+            style="background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;cursor:pointer;text-align:left">
+            <div style="font-size:13px;font-weight:700;color:#374151">⬇ Free Download</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Includes watermark · Standard resolution</div>
+          </button>
+          <button onclick="document.getElementById('dl-choice-overlay').remove();openLicenseModal();"
+            style="background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;border-radius:12px;padding:14px;cursor:pointer;text-align:left">
+            <div style="font-size:13px;font-weight:700;color:#fff">✦ Upgrade to PRO — $19</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">No watermark · 3× HD resolution · All layouts</div>
+          </button>
+        </div>
+        <button onclick="document.getElementById('dl-choice-overlay').remove()"
+          style="margin-top:14px;background:none;border:none;font-size:11px;color:#94a3b8;cursor:pointer">Cancel</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    return;
+  }
+
+  _startDownload();
+}
+
+function _startDownload() {
+  const isMobile   = window.innerWidth <= 700;
+  const original   = document.getElementById('nft-card');
+  const sheetClone = document.getElementById('nft-card-sheet-clone');
+
   const name      = getTitle() || 'nft-card';
   const baseColor = THEME_BASE_COLORS[currentTheme] || '#ffffff';
   const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -3589,34 +3627,50 @@ function applyWatermark() {
   }
 }
 
-// ── FEATURE TIERS ──────────────────────────────────────────
-// FREE:  All 4 types, all layouts preview, NFT 1:1 only export — watermarked 1.5x PNG
-// PRO:   All layouts (excl. Asset Showcase), all output sizes, no watermark, HD 3x export
-// ELITE: Everything — Asset/RWA + Asset Showcase layout, all features, HD export
+// ══════════════════════════════════════════════════════
+// PLAN FEATURE GATES
+// FREE:  All 4 types (preview), Classic layout, NFT 1:1, 3 themes, watermarked
+// PRO:   All themes, All layouts excl. Asset, All sizes, no watermark, HD 3x
+// ELITE: Everything + Asset/RWA layout
+// ══════════════════════════════════════════════════════
 
-const PRO_LAYOUTS   = ['split', 'avatarfocus', 'minimal', 'qrfocus'];
-const ELITE_LAYOUTS = ['assetshowcase'];
-const PRO_SIZES     = ['card', 'print', 'twitter'];
-const ELITE_TYPES   = ['asset'];
+const LOCKED_LAYOUTS_FREE  = ['qrfocus','avatarfocus','split','minimal','assetshowcase'];
+const LOCKED_LAYOUTS_PRO   = ['assetshowcase']; // still locked for pro
+const LOCKED_SIZES_FREE    = ['card','twitter','print'];
+const LOCKED_THEMES_FREE   = ['midnight'];
 
+// ── Apply visual lock indicators ──
 function applyFeatureLocks() {
-  // Show subtle lock icons on locked buttons — but never block clicking
+  // Layout buttons
   document.querySelectorAll('.layout-btn').forEach(btn => {
     const layout = btn.dataset.layout;
-    btn.classList.remove('locked-pro', 'locked-elite');
-    if (currentPlan === 'free' && (PRO_LAYOUTS.includes(layout) || ELITE_LAYOUTS.includes(layout))) {
+    btn.classList.remove('locked-pro','locked-elite');
+    if (currentPlan === 'free' && LOCKED_LAYOUTS_FREE.includes(layout)) {
       btn.classList.add('locked-pro');
-    } else if (currentPlan === 'pro' && ELITE_LAYOUTS.includes(layout)) {
+    } else if (currentPlan === 'pro' && LOCKED_LAYOUTS_PRO.includes(layout)) {
       btn.classList.add('locked-elite');
     }
   });
+
+  // Size buttons
   document.querySelectorAll('.size-btn').forEach(btn => {
     const size = btn.dataset.size;
     btn.classList.remove('locked-pro');
-    if (currentPlan === 'free' && PRO_SIZES.includes(size)) {
+    if (currentPlan === 'free' && LOCKED_SIZES_FREE.includes(size)) {
       btn.classList.add('locked-pro');
     }
   });
+
+  // Theme swatches
+  document.querySelectorAll('.theme-swatch').forEach(btn => {
+    const theme = btn.dataset.theme;
+    btn.classList.remove('locked-pro');
+    if (currentPlan === 'free' && LOCKED_THEMES_FREE.includes(theme)) {
+      btn.classList.add('locked-pro');
+    }
+  });
+
+  // Asset identity type — show 🔒 for non-elite
   document.querySelectorAll('.id-type-btn').forEach((btn, i) => {
     const types = ['human','agent','utility','asset'];
     btn.classList.remove('locked-elite');
@@ -3626,11 +3680,20 @@ function applyFeatureLocks() {
   });
 }
 
-function checkFeatureAccess(feature, requiredPlan) {
-  if (requiredPlan === 'pro'   && currentPlan === 'free')  return false;
-  if (requiredPlan === 'elite' && currentPlan === 'free')  return false;
-  if (requiredPlan === 'elite' && currentPlan === 'pro')   return false;
-  return true;
+// ── Show upgrade popup ──
+function showUpgradePopup(title, body) {
+  // Reuse license modal but show a targeted message first
+  const msg = document.getElementById('license-msg');
+  if (msg) { msg.textContent = ''; }
+  openLicenseModal();
+  // Show message after modal opens
+  setTimeout(() => {
+    const m = document.getElementById('license-msg');
+    if (m) {
+      m.innerHTML = `<strong>${title}</strong><br/><span style="color:#64748b">${body}</span>`;
+      m.style.color = '#2563eb';
+    }
+  }, 50);
 }
 
 // ── MODAL ──
@@ -3691,35 +3754,45 @@ async function activateLicense() {
   }
 }
 
-// ── NO OVERRIDES — all types, layouts, sizes freely selectable ──
-// Locks are enforced at download time only (in downloadCard)
-
-// ── SOFT HINTS on locked item selection (no blocking) ──
-// Store originals using variable assignment (not function declarations which hoist)
-const _planSetLayout = setLayout;
-const _planSetSize   = setSize;
-const _planSetType   = setType;
-
+// ── INTERCEPT LOCKED SELECTIONS ──
+// Use variable assignment (not function declarations) to avoid hoisting issue
+const _baseSetLayout = setLayout;
 setLayout = function(layout, btn) {
-  _planSetLayout(layout, btn);
-  if (currentPlan === 'free' && (PRO_LAYOUTS.includes(layout) || ELITE_LAYOUTS.includes(layout))) {
-    toast('💡 PRO layout — upgrade to export without watermark');
-  } else if (currentPlan === 'pro' && ELITE_LAYOUTS.includes(layout)) {
-    toast('💡 ELITE layout — upgrade to export without watermark');
+  if (currentPlan === 'free' && LOCKED_LAYOUTS_FREE.includes(layout)) {
+    showUpgradePopup('🔒 PRO Layout', 'Upgrade to PRO to unlock all layout styles and remove the watermark.');
+    return;
   }
+  if (currentPlan === 'pro' && LOCKED_LAYOUTS_PRO.includes(layout)) {
+    showUpgradePopup('🔒 ELITE Layout', 'Asset / RWA layout requires ELITE. Perfect for real estate, stocks, and portfolio NFTs.');
+    return;
+  }
+  _baseSetLayout(layout, btn);
 };
 
+const _baseSetSize = setSize;
 setSize = function(size, btn) {
-  _planSetSize(size, btn);
-  if (currentPlan === 'free' && PRO_SIZES.includes(size)) {
-    toast('💡 PRO output size — upgrade to export without watermark');
+  if (currentPlan === 'free' && LOCKED_SIZES_FREE.includes(size)) {
+    showUpgradePopup('🔒 PRO Output Size', 'Upgrade to PRO to unlock Card, Twitter, and Print output sizes.');
+    return;
   }
+  _baseSetSize(size, btn);
 };
 
+const _baseSetTheme = setTheme;
+setTheme = function(theme, el) {
+  if (currentPlan === 'free' && LOCKED_THEMES_FREE.includes(theme)) {
+    showUpgradePopup('🔒 PRO Theme', 'The Midnight theme is available on PRO and ELITE plans.');
+    return;
+  }
+  _baseSetTheme(theme, el);
+};
+
+const _baseSetType = setType;
 setType = function(type, btn) {
-  _planSetType(type, btn);
+  // Allow switching to all types freely — Asset shows soft message
+  _baseSetType(type, btn);
   if (type === 'asset' && currentPlan !== 'elite') {
-    toast('💡 Asset / RWA features require ELITE — upgrade to export without watermark');
+    toast('💡 Asset / RWA export requires ELITE — you can preview and fill the form freely');
   }
 };
 
