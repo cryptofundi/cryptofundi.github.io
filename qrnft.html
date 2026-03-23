@@ -164,6 +164,18 @@ section{padding:80px 24px}
 .center{text-align:center;margin-left:auto;margin-right:auto}
 .container{max-width:1080px;margin:0 auto}
 
+/* ── WHO IS THIS FOR ── */
+.who-section{background:#fff}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:40px}
+.who-card{
+  border-radius:16px;padding:24px 20px;border:1.5px solid var(--gray-200);
+  background:#fff;transition:.25s;text-align:center
+}
+.who-card:hover{border-color:var(--blue-lt);transform:translateY(-3px);box-shadow:0 12px 32px rgba(37,99,235,.08)}
+.who-emoji{font-size:32px;margin-bottom:10px}
+.who-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+.who-desc{font-size:12px;color:var(--gray-500);line-height:1.6}
+
 /* ── WHAT YOU CAN CREATE ── */
 .use-cases{background:var(--gray-50)}
 .use-grid{
@@ -322,6 +334,24 @@ footer{
 .footer-link{font-size:12px;color:#475569;text-decoration:none;transition:.2s}
 .footer-link:hover{color:#94a3b8}
 .footer-copy{font-size:11px;color:#334155}
+/* ── MOBILE TIGHTENING ── */
+@media(max-width:768px){
+  section{padding:52px 20px}
+  .use-grid{gap:12px}
+  .use-card{padding:18px}
+  .who-grid{gap:12px}
+  .who-card{padding:18px 16px}
+  .usp-grid{gap:12px}
+  .usp-item{padding:16px}
+  .pricing-grid{gap:16px}
+  .price-card{padding:22px 18px}
+  .steps{gap:20px}
+  .trust-grid{gap:0}
+  .trust-item{padding:20px 16px}
+  .demo-card{width:160px;padding:16px}
+  .hero{padding:88px 20px 48px}
+  h1{letter-spacing:-1.5px}
+}
 </style>
 </head>
 <body>
@@ -351,8 +381,9 @@ footer{
     </div>
     <h1>Create <span>QR Code NFTs</span><br/>in Seconds</h1>
     <p class="hero-sub">
-      Identity · Affiliate · AI Agent · Real-World Assets<br/>
-      No login. No tracking. No data storage.
+      Design QR NFT cards for identity, affiliate links, AI agents, and real-world assets.<br/>
+      Export PNG + metadata. Mint anywhere.<br/>
+      <strong style="color:#0f172a">No login. No tracking. No storage.</strong>
     </p>
     <div class="hero-pills">
       <span class="hero-pill">💼 Identity NFTs</span>
@@ -434,6 +465,37 @@ footer{
         </div>
         <span class="demo-card-tag teal">Asset / RWA NFT</span>
         <div class="demo-card-accent teal"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHO IS THIS FOR ══ -->
+<section class="who-section">
+  <div class="container">
+    <div class="section-label center">Who is this for</div>
+    <h2 class="section-title center">Built for Web3 creators,<br/>builders, and investors.</h2>
+    <p class="section-sub center">Think of it as Canva for NFT-ready QR cards — design here, export, and mint anywhere you want.</p>
+    <div class="who-grid">
+      <div class="who-card">
+        <div class="who-emoji">👤</div>
+        <div class="who-title">Creators &amp; Freelancers</div>
+        <div class="who-desc">Turn your identity into a scannable NFT card. Share your name, role, links, and wallet in one elegant QR.</div>
+      </div>
+      <div class="who-card">
+        <div class="who-emoji">🤖</div>
+        <div class="who-title">AI Builders</div>
+        <div class="who-desc">Give your bots, agents, and automations an on-chain identity with a QR that links to their endpoint or wallet.</div>
+      </div>
+      <div class="who-card">
+        <div class="who-emoji">💰</div>
+        <div class="who-title">Affiliate Marketers</div>
+        <div class="who-desc">Create trackable QR access cards for your affiliate links. Update the destination anytime without changing the QR.</div>
+      </div>
+      <div class="who-card">
+        <div class="who-emoji">🏠</div>
+        <div class="who-title">RWA Investors</div>
+        <div class="who-desc">Showcase real estate, stocks, and tokenized portfolios with a scannable proof card — ready for minting.</div>
       </div>
     </div>
   </div>
@@ -702,8 +764,10 @@ footer{
     <a href="https://cryptofundi.gumroad.com/l/vsplbn" class="footer-link" target="_blank">Buy PRO</a>
     <a href="https://cryptofundi.gumroad.com/l/otaowh" class="footer-link" target="_blank">Buy ELITE</a>
     <a href="https://x.com/cryptofundix" class="footer-link" target="_blank">@cryptofundix</a>
+    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+    <a href="terms.html" class="footer-link">Terms of Use</a>
   </div>
-  <div class="footer-copy">© 2026 CryptoFundi · No login · No tracking · Privacy-first</div>
+  <div class="footer-copy">© 2026 CryptoFundi · No login · No tracking · Privacy-first · <a href="privacy.html" style="color:#475569;text-decoration:none">Privacy</a> · <a href="terms.html" style="color:#475569;text-decoration:none">Terms</a></div>
 </footer>
 
 </body>
