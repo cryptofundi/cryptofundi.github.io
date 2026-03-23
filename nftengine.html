@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Universal QR NFT Identity & Access Creator</title>
+<title>QR NFT Creator</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1269,7 +1269,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
   <div class="logo-wrap">
     <div class="logo-icon">◈</div>
     <div>
-      <div class="logo-title">Universal QR NFT Creator</div>
+      <div class="logo-title">QR NFT Creator</div>
       <div class="logo-sub">Identity · Agent · Utility · Asset</div>
     </div>
   </div>
@@ -2179,6 +2179,7 @@ function update() {
   renderCard();
   updateMetaJson();
   setQrStatus('idle', getQrData() ? 'Click "Test QR Link" to verify' : 'Enter a URL to validate QR link');
+  applyWatermark(); // re-evaluate watermark on every update (catches pro+asset changes)
   // Auto-refresh mobile sheet if it's currently open
   if (typeof mobileSheetOpen !== 'undefined' && mobileSheetOpen) {
     requestAnimationFrame(_renderMobileSheet);
@@ -3792,7 +3793,7 @@ async function activateLicense() {
         localStorage.setItem('uqnft_plan', p.plan);
         localStorage.setItem('uqnft_license_key', key);
         applyPlan();
-        if (msg) { msg.textContent = `✓ ${p.name} activated! Enjoy your unlock.`; msg.style.color = '#059669'; }
+        if (msg) { msg.innerHTML = `✓ ${p.name} activated! Enjoy your unlock.<br/><span style="color:#64748b;font-size:10px">💾 Save your key — enter it again on any device to unlock features</span>`; msg.style.color = '#059669'; }
         toast(`🎉 ${p.name} plan activated!`);
         setTimeout(closeLicenseModal, 1800);
         activated = true;
@@ -3904,7 +3905,11 @@ syncMobileStats();
 
     <!-- License key input -->
     <div style="border-top:1px solid #e2e8f0;padding-top:16px">
-      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px">Already have a license key?</div>
+      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">🔑 Already have a license key?</div>
+      <div style="font-size:10px;color:#64748b;margin-bottom:10px;line-height:1.6">
+        One-time license — works across all devices and browsers.<br/>
+        Just enter your key again to unlock features on any device.
+      </div>
       <div style="display:flex;gap:8px">
         <input type="text" id="license-key-input" placeholder="XXXX-XXXX-XXXX-XXXX"
                style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:monospace;outline:none"
@@ -3917,8 +3922,9 @@ syncMobileStats();
       <div id="license-msg" style="font-size:11px;margin-top:6px;min-height:16px"></div>
     </div>
 
-    <div style="text-align:center;margin-top:12px;font-size:10px;color:#94a3b8">
-      After purchase, Gumroad emails you a license key instantly
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:#94a3b8;line-height:1.7">
+      After purchase, Gumroad emails your key instantly<br/>
+      <span style="color:#ef4444;font-weight:600">⚠ We don't store your license — keep it safe to reuse anytime</span>
     </div>
   </div>
 </div>
