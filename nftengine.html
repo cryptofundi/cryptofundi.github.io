@@ -402,11 +402,17 @@ select {
 .plan-elite { background: rgba(124,58,237,.12); color: #6d28d9; border: 1.5px solid #a78bfa; }
 
 /* ── WATERMARK ── */
-.card-watermark {
-  position: absolute; bottom: 30px; right: 10px;
-  font-size: 8px; font-weight: 700; color: rgba(100,116,139,.45);
-  letter-spacing: .8px; text-transform: uppercase;
+.card-watermark-x {
+  position: absolute; bottom: 10px; right: 10px;
+  font-size: 8px; font-weight: 700; color: rgba(100,116,139,.5);
+  letter-spacing: .5px; pointer-events: none; z-index: 10; font-family: monospace;
+}
+.card-watermark-free {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 7px; font-weight: 700; color: rgba(100,116,139,.45);
+  letter-spacing: 1px; text-transform: uppercase;
   pointer-events: none; z-index: 10; font-family: monospace;
+  background: rgba(100,116,139,.08); border-radius: 4px; padding: 2px 5px;
 }
 
 /* ── UPGRADE PROMPT (shown on locked download) ── */
@@ -3132,7 +3138,7 @@ function downloadCard() {
       <button onclick="document.getElementById('dl-choice-overlay').remove();_startDownload();"
         style="background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;cursor:pointer;text-align:left;width:100%">
         <div style="font-size:13px;font-weight:700;color:#374151">⬇ Download with watermark</div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:2px">Standard resolution · Includes cryptofundi.io watermark</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px">Standard resolution · Includes @cryptofundix watermark</div>
       </button>`;
 
     overlay.innerHTML = `
@@ -3209,9 +3215,8 @@ function _startDownload() {
     } catch(e) {}
   });
 
-  // Remove DOM watermark from clone — canvas layers handle watermarking instead
-  const cloneWm = clone.querySelector('#card-watermark-el, .card-watermark');
-  if (cloneWm) cloneWm.remove();
+  // Remove DOM watermarks from clone — canvas layers handle watermarking instead
+  clone.querySelectorAll('#card-watermark-el, #card-watermark-free-el, .card-watermark, .card-watermark-x, .card-watermark-free').forEach(el => el.remove());
 
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
@@ -3253,9 +3258,9 @@ function _startDownload() {
       if (needsWatermark()) {
         const cx = W / 2;
         const cy = H / 2;
-        const angle = -Math.PI / 6;  // -30° diagonal
+        const angle = -Math.PI / 6;
 
-        // Layer 1a: Main diagonal "cryptofundi.io"
+        // Layer 1a: Diagonal center — @cryptofundix
         ctx.save();
         ctx.globalAlpha = 0.25;
         ctx.fillStyle = '#1e293b';
@@ -3265,10 +3270,10 @@ function _startDownload() {
         ctx.textBaseline = 'middle';
         ctx.translate(cx, cy);
         ctx.rotate(angle);
-        ctx.fillText('cryptofundi.io', 0, 0);
+        ctx.fillText('@cryptofundix', 0, 0);
         ctx.restore();
 
-        // Layer 1b: "FREE VERSION" below it
+        // Layer 1b: Diagonal sub-text — FREE VERSION
         ctx.save();
         ctx.globalAlpha = 0.18;
         ctx.fillStyle = '#1e293b';
@@ -3281,14 +3286,25 @@ function _startDownload() {
         ctx.fillText('FREE VERSION', 0, 0);
         ctx.restore();
 
-        // Layer 2: Corner branding bottom-right
+        // Layer 2a: Bottom-right corner — @cryptofundix
         ctx.save();
-        ctx.globalAlpha = 0.45;
+        ctx.globalAlpha = 0.5;
         ctx.fillStyle = '#475569';
         ctx.font = `700 ${Math.max(12, Math.round(S * 9))}px monospace`;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'bottom';
-        ctx.fillText('CRYPTOFUNDI.IO', W - Math.round(S * 14), H - Math.round(S * 12));
+        ctx.fillText('@cryptofundix', W - Math.round(S * 12), H - Math.round(S * 10));
+        ctx.restore();
+
+        // Layer 2b: Top-right corner — FREE VERSION badge
+        ctx.save();
+        ctx.globalAlpha = 0.45;
+        const badgeFs = Math.max(10, Math.round(S * 7.5));
+        ctx.font = `700 ${badgeFs}px monospace`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#475569';
+        ctx.fillText('FREE VERSION', W - Math.round(S * 12), Math.round(S * 10));
         ctx.restore();
       }
       // ────────────────────────────────────────────────────
@@ -3648,11 +3664,18 @@ function applyWatermark() {
   if (needsWatermark()) {
     const card = document.getElementById('nft-card');
     if (!card) return;
-    const wm = document.createElement('div');
-    wm.id = 'card-watermark-el';
-    wm.className = 'card-watermark';
-    wm.textContent = 'cryptofundi.io';
-    card.appendChild(wm);
+    // Bottom-right: X handle
+    const wmX = document.createElement('div');
+    wmX.id = 'card-watermark-el';
+    wmX.className = 'card-watermark-x';
+    wmX.textContent = '@cryptofundix';
+    card.appendChild(wmX);
+    // Top-right: FREE VERSION badge
+    const wmFree = document.createElement('div');
+    wmFree.id = 'card-watermark-free-el';
+    wmFree.className = 'card-watermark-free';
+    wmFree.textContent = 'FREE VERSION';
+    card.appendChild(wmFree);
   }
 }
 
