@@ -323,7 +323,7 @@ select {
 /* ═══════════════════════════════════════════════════
    TIER SELECTOR
    ═══════════════════════════════════════════════════ */
-.tier-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.tier-row { display: none; } /* Tier selector hidden — plan managed via license key */
 .tier-btn {
   flex: 1; padding: 10px 8px;
   border: 1.5px solid var(--gray-200);
@@ -1607,16 +1607,6 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           <button class="stog-btn" id="avs-sm" onclick="setAvatarSize('sm',this)">Small</button>
           <button class="stog-btn active" id="avs-md" onclick="setAvatarSize('md',this)">Medium</button>
           <button class="stog-btn" id="avs-lg" onclick="setAvatarSize('lg',this)">Large</button>
-        </div>
-      </div>
-
-      <!-- Tier -->
-      <div class="form-group">
-        <label>Tier</label>
-        <div class="tier-row">
-          <button class="tier-btn t-basic" id="tier-basic" onclick="setTier('Basic',this)">Basic</button>
-          <button class="tier-btn" id="tier-pro" onclick="setTier('Pro',this)">Pro</button>
-          <button class="tier-btn" id="tier-elite" onclick="setTier('Elite',this)">Elite</button>
         </div>
       </div>
 
@@ -3599,25 +3589,27 @@ function applyWatermark() {
   }
 }
 
-// Features locked on Free plan
-const PRO_LAYOUTS  = ['split', 'avatarfocus', 'minimal', 'assetshowcase'];
-const PRO_SIZES    = ['card', 'print', 'twitter'];
+// ── FEATURE TIERS ──────────────────────────────────────────
+// FREE:  All 4 types, all layouts preview, NFT 1:1 only export — watermarked 1.5x PNG
+// PRO:   All layouts (excl. Asset Showcase), all output sizes, no watermark, HD 3x export
+// ELITE: Everything — Asset/RWA + Asset Showcase layout, all features, HD export
+
+const PRO_LAYOUTS   = ['split', 'avatarfocus', 'minimal', 'qrfocus'];
 const ELITE_LAYOUTS = ['assetshowcase'];
+const PRO_SIZES     = ['card', 'print', 'twitter'];
 const ELITE_TYPES   = ['asset'];
 
 function applyFeatureLocks() {
-  // Layout buttons
+  // Show subtle lock icons on locked buttons — but never block clicking
   document.querySelectorAll('.layout-btn').forEach(btn => {
     const layout = btn.dataset.layout;
     btn.classList.remove('locked-pro', 'locked-elite');
-    if (currentPlan === 'free' && PRO_LAYOUTS.includes(layout)) {
+    if (currentPlan === 'free' && (PRO_LAYOUTS.includes(layout) || ELITE_LAYOUTS.includes(layout))) {
       btn.classList.add('locked-pro');
     } else if (currentPlan === 'pro' && ELITE_LAYOUTS.includes(layout)) {
-      // Elite layouts available to pro too in this config — adjust as needed
+      btn.classList.add('locked-elite');
     }
   });
-
-  // Size buttons
   document.querySelectorAll('.size-btn').forEach(btn => {
     const size = btn.dataset.size;
     btn.classList.remove('locked-pro');
@@ -3625,12 +3617,10 @@ function applyFeatureLocks() {
       btn.classList.add('locked-pro');
     }
   });
-
-  // Asset identity type locked on free
   document.querySelectorAll('.id-type-btn').forEach((btn, i) => {
     const types = ['human','agent','utility','asset'];
     btn.classList.remove('locked-elite');
-    if (currentPlan === 'free' && ELITE_TYPES.includes(types[i])) {
+    if (currentPlan !== 'elite' && types[i] === 'asset') {
       btn.classList.add('locked-elite');
     }
   });
@@ -3667,7 +3657,6 @@ async function activateLicense() {
   if (!key) { if (msg) { msg.textContent = 'Please enter your license key'; msg.style.color = '#ef4444'; } return; }
   if (msg) { msg.textContent = 'Validating...'; msg.style.color = '#64748b'; }
 
-  // Try Pro first, then Elite
   const plans = [
     { plan: 'elite', ...GUMROAD_PRODUCTS.elite },
     { plan: 'pro',   ...GUMROAD_PRODUCTS.pro   },
@@ -3675,7 +3664,7 @@ async function activateLicense() {
 
   let activated = false;
   for (const p of plans) {
-    if (p.id.startsWith('YOUR_')) continue; // skip unconfigured products
+    if (p.id.startsWith('YOUR_')) continue;
     try {
       const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
         method: 'POST',
@@ -3702,38 +3691,37 @@ async function activateLicense() {
   }
 }
 
-// Override setLayout to check access
-const _origSetLayout = setLayout;
-function setLayout(layout, btn) {
-  if (currentPlan === 'free' && PRO_LAYOUTS.includes(layout)) {
-    toast('🔒 This layout requires PRO — click the FREE badge to upgrade');
-    openLicenseModal();
-    return;
-  }
-  _origSetLayout(layout, btn);
-}
+// ── NO OVERRIDES — all types, layouts, sizes freely selectable ──
+// Locks are enforced at download time only (in downloadCard)
 
-// Override setSize to check access
-const _origSetSize = setSize;
-function setSize(size, btn) {
+// ── SOFT HINTS on locked item selection (no blocking) ──
+// Store originals using variable assignment (not function declarations which hoist)
+const _planSetLayout = setLayout;
+const _planSetSize   = setSize;
+const _planSetType   = setType;
+
+setLayout = function(layout, btn) {
+  _planSetLayout(layout, btn);
+  if (currentPlan === 'free' && (PRO_LAYOUTS.includes(layout) || ELITE_LAYOUTS.includes(layout))) {
+    toast('💡 PRO layout — upgrade to export without watermark');
+  } else if (currentPlan === 'pro' && ELITE_LAYOUTS.includes(layout)) {
+    toast('💡 ELITE layout — upgrade to export without watermark');
+  }
+};
+
+setSize = function(size, btn) {
+  _planSetSize(size, btn);
   if (currentPlan === 'free' && PRO_SIZES.includes(size)) {
-    toast('🔒 This output size requires PRO — click FREE to upgrade');
-    openLicenseModal();
-    return;
+    toast('💡 PRO output size — upgrade to export without watermark');
   }
-  _origSetSize(size, btn);
-}
+};
 
-// Override setType to check asset access
-const _origSetType = setType;
-function setType(type, btn) {
-  if (currentPlan === 'free' && ELITE_TYPES.includes(type)) {
-    toast('🔒 Asset / RWA NFT requires PRO — click FREE to upgrade');
-    openLicenseModal();
-    return;
+setType = function(type, btn) {
+  _planSetType(type, btn);
+  if (type === 'asset' && currentPlan !== 'elite') {
+    toast('💡 Asset / RWA features require ELITE — upgrade to export without watermark');
   }
-  _origSetType(type, btn);
-}
+};
 
 // Close modal on overlay click
 const _licOverlay = document.getElementById('license-overlay');
@@ -3770,7 +3758,7 @@ syncMobileStats();
       <div style="border:2px solid #3b82f6;border-radius:14px;padding:14px;text-align:center">
         <div style="font-weight:800;color:#1d4ed8;font-size:15px">PRO</div>
         <div style="font-size:22px;font-weight:800;color:#0f172a;margin:4px 0">$19</div>
-        <div style="font-size:10px;color:#64748b;line-height:1.6">All layouts<br/>All output sizes<br/>No watermark<br/>High-res 3× PNG</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.7">✔ Remove watermark from exports<br/>✔ High-resolution PNG (3× quality)<br/>✔ All card layout styles (excl. Asset)<br/>✔ All output sizes (NFT, Twitter, Card, Print)<br/>✔ Clean, professional designs ready to mint</div>
         <a href="https://cryptofundi.gumroad.com/l/vsplbn" target="_blank" rel="noopener"
            style="display:block;margin-top:10px;background:#2563eb;color:#fff;border-radius:8px;padding:7px;font-size:11px;font-weight:700;text-decoration:none">
           Buy PRO →
@@ -3780,7 +3768,7 @@ syncMobileStats();
         <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px">BEST VALUE</div>
         <div style="font-weight:800;color:#7c3aed;font-size:15px">ELITE</div>
         <div style="font-size:22px;font-weight:800;color:#0f172a;margin:4px 0">$49</div>
-        <div style="font-size:10px;color:#64748b;line-height:1.6">Everything in Pro<br/>RWA / Asset layout<br/>Future updates<br/>Priority support</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.7">✔ RWA / Asset NFT layout styles<br/>✔ Real estate, stocks, portfolio cards<br/>✔ Premium design presets<br/>✔ All future updates included<br/>✔ Priority support</div>
         <a href="https://cryptofundi.gumroad.com/l/otaowh" target="_blank" rel="noopener"
            style="display:block;margin-top:10px;background:#7c3aed;color:#fff;border-radius:8px;padding:7px;font-size:11px;font-weight:700;text-decoration:none">
           Buy ELITE →
