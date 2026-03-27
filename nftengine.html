@@ -415,7 +415,102 @@ select {
   background: rgba(100,116,139,.08); border-radius: 4px; padding: 2px 5px;
 }
 
-/* ── UPGRADE PROMPT (shown on locked download) ── */
+/* ══ QR COLOUR SWATCHES ══ */
+.qr-color-swatch{
+  width:24px;height:24px;border-radius:6px;border:2px solid transparent;
+  cursor:pointer;transition:.15s;padding:0;flex-shrink:0
+}
+.qr-color-swatch:hover{transform:scale(1.15);border-color:var(--gray-400)}
+.qr-color-swatch.active{border-color:var(--gray-900);box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+#qr-color-group{position:relative}
+
+/* ══ HOW IT WORKS BUTTON ══ */
+.how-btn{
+  background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-b);
+  border-radius:8px;padding:5px 11px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap
+}
+.how-btn:hover{background:var(--blue);color:#fff}
+@media(max-width:900px){.how-btn{display:none}}
+
+/* ══ TOOLTIP SYSTEM ══ */
+.info-btn {
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border-radius:50%;background:var(--gray-200);
+  color:var(--gray-500);font-size:10px;font-weight:700;cursor:pointer;
+  border:none;flex-shrink:0;line-height:1;margin-left:5px;
+  transition:.15s;vertical-align:middle;
+}
+.info-btn:hover{background:var(--blue);color:#fff;}
+.tooltip-wrap{position:relative;display:inline-flex;align-items:center}
+.tooltip-box{
+  position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
+  background:#1e293b;color:#f1f5f9;font-size:11px;line-height:1.5;
+  padding:8px 12px;border-radius:8px;width:200px;z-index:500;
+  pointer-events:none;opacity:0;transition:opacity .15s;white-space:normal;
+  box-shadow:0 4px 16px rgba(0,0,0,.25)
+}
+.tooltip-box::before{
+  content:'';position:absolute;right:100%;top:50%;transform:translateY(-50%);
+  border:5px solid transparent;border-right-color:#1e293b
+}
+.info-btn:hover + .tooltip-box,
+.tooltip-wrap:hover .tooltip-box{opacity:1}
+@media(max-width:700px){
+  .tooltip-box{left:auto;right:0;top:calc(100% + 6px);transform:none;}
+  .tooltip-box::before{display:none}
+}
+
+/* ══ TRUST BADGE ══ */
+.trust-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.2);
+  border-radius:100px;padding:4px 10px;font-size:10px;font-weight:700;
+  color:#065f46;letter-spacing:.3px;white-space:nowrap
+}
+@media(max-width:700px){.trust-badge{display:none}}
+
+/* ══ WELCOME POPUP ══ */
+.welcome-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9800;
+  display:flex;align-items:center;justify-content:center;padding:16px
+}
+.welcome-box{
+  background:#fff;border-radius:22px;padding:32px 28px;max-width:440px;width:100%;
+  box-shadow:0 24px 80px rgba(0,0,0,.25);position:relative
+}
+.welcome-logo{
+  width:48px;height:48px;background:linear-gradient(135deg,#7c3aed,#2563eb);
+  border-radius:13px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;color:#fff;margin:0 auto 16px
+}
+.welcome-title{font-family:'Outfit','Syne',sans-serif;font-size:20px;font-weight:800;color:#0f172a;text-align:center;margin-bottom:6px}
+.welcome-sub{font-size:13px;color:#64748b;text-align:center;margin-bottom:20px;line-height:1.6}
+.welcome-badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.welcome-badge{
+  display:flex;align-items:center;gap:5px;background:#f8fafc;
+  border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 12px;
+  font-size:12px;font-weight:600;color:#374151
+}
+.welcome-steps{background:#f8fafc;border-radius:12px;padding:14px 16px;margin-bottom:20px}
+.welcome-step{display:flex;align-items:flex-start;gap:10px;padding:5px 0}
+.welcome-step:not(:last-child){border-bottom:1px solid #e2e8f0;margin-bottom:5px}
+.welcome-step-num{
+  width:20px;height:20px;background:linear-gradient(135deg,#7c3aed,#2563eb);
+  border-radius:50%;font-size:10px;font-weight:800;color:#fff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px
+}
+.welcome-step-text{font-size:12px;color:#374151;line-height:1.5}
+.welcome-warning{
+  background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;
+  padding:10px 14px;font-size:11px;color:#92400e;margin-bottom:20px;line-height:1.6
+}
+.welcome-btn{
+  display:block;width:100%;background:linear-gradient(135deg,#7c3aed,#2563eb);
+  color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;
+  font-weight:700;cursor:pointer;font-family:inherit;transition:.2s
+}
+.welcome-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.35)}
 .upgrade-prompt {
   background: linear-gradient(135deg, #eff6ff, #f5f3ff);
   border: 1.5px solid #c7d2fe; border-radius: var(--r-md);
@@ -1274,6 +1369,8 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
     </div>
   </div>
   <div class="header-right">
+    <div class="trust-badge">🔐 100% Local · No Tracking</div>
+    <button class="how-btn" onclick="showWelcome(true)" title="How to use this tool">⚡ How it works</button>
     <div class="header-stats">
       <div class="stat">
         <div class="stat-v" id="stat-count">0</div>
@@ -1312,24 +1409,30 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
     <div class="panel active fadein" id="panel-create">
 
       <!-- Identity Type -->
-      <div class="section-head"><span>Identity Type</span></div>
+      <div class="section-head">
+        <span>Identity Type</span>
+        <span class="tooltip-wrap">
+          <button class="info-btn" aria-label="About identity types">ⓘ</button>
+          <div class="tooltip-box">Choose what kind of NFT card to create. Each type has different fields and a purpose-built layout.</div>
+        </span>
+      </div>
       <!-- Identity Type — Card grid (desktop) -->
       <div class="id-type-grid">
         <button class="id-type-btn active" onclick="setType('human',this)">
           <div class="ib-icon">👤</div>
-          <div><div class="ib-lbl">Human Identity</div><div class="ib-sub">Digital business card NFT</div></div>
+          <div><div class="ib-lbl">Human Identity</div><div class="ib-sub">Best for creators, freelancers, Web3 profiles</div></div>
         </button>
         <button class="id-type-btn" onclick="setType('agent',this)">
           <div class="ib-icon">🤖</div>
-          <div><div class="ib-lbl">AI Agent Identity</div><div class="ib-sub">Agent interaction NFT</div></div>
+          <div><div class="ib-lbl">AI Agent Identity</div><div class="ib-sub">Give bots, APIs & automations an on-chain identity</div></div>
         </button>
         <button class="id-type-btn" onclick="setType('utility',this)">
           <div class="ib-icon">🔑</div>
-          <div><div class="ib-lbl">Access / Utility NFT</div><div class="ib-sub">Affiliate, access, or pass NFT</div></div>
+          <div><div class="ib-lbl">Access / Utility NFT</div><div class="ib-sub">Share affiliate links or gated access QRs</div></div>
         </button>
         <button class="id-type-btn" onclick="setType('asset',this)">
           <div class="ib-icon">📊</div>
-          <div><div class="ib-lbl">Asset / RWA NFT</div><div class="ib-sub">Stocks, real estate, portfolio</div></div>
+          <div><div class="ib-lbl">Asset / RWA NFT</div><div class="ib-sub">Showcase real estate, stocks & tokenized assets</div></div>
         </button>
       </div>
 
@@ -1532,7 +1635,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       </div>
       <div class="design-toggle-spacer" style="height:14px"></div>      <div class="design-options-body" id="design-options-body">
       <div class="form-group">
-        <label>Theme</label>
+        <label>Theme <span class="tooltip-wrap"><button class="info-btn" aria-label="About themes">ⓘ</button><div class="tooltip-box">Divine & Business are light themes. Crypto, Futuristic & Midnight are dark. Midnight requires PRO.</div></span></label>
         <div class="theme-grid" style="grid-template-columns:repeat(3,1fr);gap:7px">
           <div class="theme-swatch active" data-theme="divine" onclick="setTheme('divine',this)" style="background:linear-gradient(160deg,#fff,#f5f3ff,#eff6ff)">
             <div class="sw-name" style="color:#0f172a">Divine</div>
@@ -1559,7 +1662,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 
       <!-- Smart Layout Mode -->
       <div class="form-group">
-        <label>Layout Mode</label>
+        <label>Layout Mode <span class="tooltip-wrap"><button class="info-btn" aria-label="About layout mode">ⓘ</button><div class="tooltip-box">Auto picks the best layout for your identity type. Switch to Manual to choose your own layout style.</div></span></label>
         <div class="size-toggle" style="margin-bottom:8px">
           <button class="stog-btn active" id="layout-mode-auto" onclick="setLayoutMode('auto',this)">⚡ Auto</button>
           <button class="stog-btn" id="layout-mode-manual" onclick="setLayoutMode('manual',this)">✎ Manual</button>
@@ -1571,7 +1674,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 
       <!-- Layout Presets (manual mode only) -->
       <div class="form-group" id="manual-layout-group" style="display:none">
-        <label>Layout Style</label>
+        <label>Layout Style <span class="tooltip-wrap"><button class="info-btn" aria-label="About layouts">ⓘ</button><div class="tooltip-box">Classic: name+QR. QR Focus: large QR (affiliate). Avatar: photo-first. Split: side-by-side. Minimal: QR only. Asset: RWA showcase (ELITE).</div></span></label>
         <div class="layout-grid">
           <button class="layout-btn active" data-layout="classic" onclick="setLayout('classic',this)">
             <span class="lb-icon">🟦</span>Classic
@@ -1599,7 +1702,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 
       <!-- QR Size -->
       <div class="form-group">
-        <label>QR Size</label>
+        <label>QR Size <span class="tooltip-wrap"><button class="info-btn" aria-label="About QR size">ⓘ</button><div class="tooltip-box">Controls how large the QR code appears on the card. Larger QR = easier to scan from a distance.</div></span></label>
         <div class="size-toggle">
           <button class="stog-btn" id="qrs-sm" onclick="setQrSize('sm',this)">Small</button>
           <button class="stog-btn active" id="qrs-md" onclick="setQrSize('md',this)">Medium</button>
@@ -1607,9 +1710,54 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
         </div>
       </div>
 
+      <!-- QR Colour (PRO) -->
+      <div class="form-group" id="qr-color-group">
+        <label style="display:flex;align-items:center;gap:6px">
+          QR Colour
+          <span style="font-size:9px;font-weight:700;background:var(--blue);color:#fff;padding:1px 6px;border-radius:4px;letter-spacing:.5px">PRO</span>
+          <span class="tooltip-wrap"><button class="info-btn" aria-label="About QR colour">ⓘ</button><div class="tooltip-box">Customise the QR dot colour to match your brand. Auto uses the theme colour. PRO required.</div></span>
+        </label>
+        <div id="qr-color-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <!-- Preset swatches -->
+          <div id="qr-color-presets" style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="qr-color-swatch active" data-fg="#2563eb" data-bg="#ffffff" onclick="setQrColor('#2563eb','#ffffff',this)" style="background:#2563eb" title="Blue"></button>
+            <button class="qr-color-swatch" data-fg="#7c3aed" data-bg="#ffffff" onclick="setQrColor('#7c3aed','#ffffff',this)" style="background:#7c3aed" title="Violet"></button>
+            <button class="qr-color-swatch" data-fg="#059669" data-bg="#ffffff" onclick="setQrColor('#059669','#ffffff',this)" style="background:#059669" title="Green"></button>
+            <button class="qr-color-swatch" data-fg="#dc2626" data-bg="#ffffff" onclick="setQrColor('#dc2626','#ffffff',this)" style="background:#dc2626" title="Red"></button>
+            <button class="qr-color-swatch" data-fg="#ea580c" data-bg="#ffffff" onclick="setQrColor('#ea580c','#ffffff',this)" style="background:#ea580c" title="Orange"></button>
+            <button class="qr-color-swatch" data-fg="#0f172a" data-bg="#ffffff" onclick="setQrColor('#0f172a','#ffffff',this)" style="background:#0f172a" title="Black"></button>
+            <button class="qr-color-swatch" data-fg="#ffffff" data-bg="#0f172a" onclick="setQrColor('#ffffff','#0f172a',this)" style="background:linear-gradient(135deg,#0f172a 50%,#fff 50%)" title="Inverted"></button>
+          </div>
+          <!-- Custom colour input -->
+          <div style="display:flex;align-items:center;gap:5px;margin-left:4px">
+            <input type="color" id="qr-fg-color" value="#2563eb" title="QR dot colour"
+              style="width:28px;height:28px;border:2px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:1px"
+              onchange="setQrColor(this.value, document.getElementById('qr-bg-color').value, null)"/>
+            <span style="font-size:10px;color:var(--gray-400)">on</span>
+            <input type="color" id="qr-bg-color" value="#ffffff" title="QR background colour"
+              style="width:28px;height:28px;border:2px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:1px"
+              onchange="setQrColor(document.getElementById('qr-fg-color').value, this.value, null)"/>
+          </div>
+          <!-- Reset to theme -->
+          <button onclick="resetQrColor()" style="font-size:10px;color:var(--gray-400);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;white-space:nowrap">↺ theme default</button>
+        </div>
+        <!-- Logo in QR toggle (shows only when logo uploaded + PRO) -->
+        <div id="qr-logo-toggle-wrap" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--gray-600)">
+            <input type="checkbox" id="qr-logo-toggle" checked onchange="update()" style="cursor:pointer"/>
+            Show logo inside QR code
+          </label>
+          <span style="font-size:9px;color:var(--gray-400)">(22% size, scannable)</span>
+        </div>
+        <!-- Locked overlay for free users -->
+        <div id="qr-color-lock" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,.85);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5" onclick="showUpgradePopup('🔒 PRO Feature — QR Colour','Customise your QR dot colour to match your brand identity. Available on PRO and ELITE plans.')">
+          <span style="font-size:12px;font-weight:700;color:var(--blue)">🔒 PRO — Click to unlock</span>
+        </div>
+      </div>
+
       <!-- Avatar Size -->
       <div class="form-group" id="avatar-size-group">
-        <label>Avatar Size</label>
+        <label>Avatar Size <span class="tooltip-wrap"><button class="info-btn" aria-label="About avatar size">ⓘ</button><div class="tooltip-box">Controls the size of your profile photo or logo on the card. Larger avatar works best for personal identity NFTs.</div></span></label>
         <div class="size-toggle">
           <button class="stog-btn" id="avs-sm" onclick="setAvatarSize('sm',this)">Small</button>
           <button class="stog-btn active" id="avs-md" onclick="setAvatarSize('md',this)">Medium</button>
@@ -1619,7 +1767,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 
       <!-- Output Size -->
       <div class="form-group">
-        <label>Output Size</label>
+        <label>Output Size <span class="tooltip-wrap"><button class="info-btn" aria-label="About output sizes">ⓘ</button><div class="tooltip-box">NFT 1:1 → OpenSea/Magic Eden. Card → business card format. Twitter → 16:9 social sharing. Print → high-res printable. (PRO required for Card, Twitter, Print)</div></span></label>
         <div class="size-grid">
           <button class="size-btn active" data-size="nft" onclick="setSize('nft',this)">
             <span class="sb-icon">◻</span>NFT 1:1
@@ -1664,9 +1812,10 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       <div class="btn-row">
         <button class="btn btn-primary btn-full" onclick="mintToCollection()">⬡ Add to Collection</button>
       </div>
-      <div style="text-align:center;font-size:10px;color:var(--gray-400);margin-top:7px;line-height:1.6;padding:0 4px">
-        🔒 Privacy-first: your data stays on your device.<br/>
-        Export your collection JSON to back it up safely.
+      <div style="text-align:center;font-size:10px;color:var(--gray-400);margin-top:7px;line-height:1.7;padding:0 4px">
+        🔐 <strong style="color:var(--gray-500)">Privacy-first:</strong> your data stays on your device.<br/>
+        📦 <span style="color:var(--blue);font-weight:600;cursor:pointer" onclick="switchTab('collection')">Export your collection JSON</span> to back it up safely.<br/>
+        <span style="font-size:9px;color:var(--gray-300)">We don't store anything — keep your backup file safe.</span>
       </div>
       <div style="height:6px"></div>
       <div class="btn-row">
@@ -1940,11 +2089,11 @@ const SIZE_CLASSES   = ['sz-nft','sz-card','sz-twitter','sz-print'];
 const LAYOUT_CLASSES = ['layout-qrfocus','layout-avatarfocus','layout-split','layout-minimal'];
 
 const QR_COLORS = {
-  divine:     { fg: '#2563eb', bg: 'rgba(0,0,0,0)' },
-  crypto:     { fg: '#38bdf8', bg: 'rgba(0,0,0,0)' },
-  futuristic: { fg: '#38bdf8', bg: 'rgba(0,0,0,0)' },
-  business:   { fg: '#4338ca', bg: 'rgba(0,0,0,0)' },
-  midnight:   { fg: '#ffffff', bg: 'rgba(0,0,0,0)' },
+  divine:     { fg: '#2563eb', bg: '#ffffff' },   // blue on white
+  crypto:     { fg: '#38bdf8', bg: '#050d1f' },   // cyan on deep navy
+  futuristic: { fg: '#38bdf8', bg: '#020b18' },   // cyan on near-black
+  business:   { fg: '#4338ca', bg: '#f8faff' },   // indigo on off-white
+  midnight:   { fg: '#a78bfa', bg: '#000000' },   // violet on black
 };
 
 // ═══════════════════════════════════════════════
@@ -2105,6 +2254,42 @@ function setQrSize(sz, btn) {
   document.querySelectorAll('[id^="qrs-"]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   update();
+}
+
+// ── QR COLOUR CUSTOMIZATION (PRO) ──
+let customQrFg = null;  // null = use theme default
+let customQrBg = null;
+
+function setQrColor(fg, bg, swatchBtn) {
+  if (currentPlan === 'free') {
+    showUpgradePopup('🔒 PRO Feature — QR Colour', 'Customise your QR dot colour to match your brand identity. Available on PRO and ELITE plans.');
+    return;
+  }
+  customQrFg = fg;
+  customQrBg = bg;
+  // Update colour inputs to match
+  const fgEl = document.getElementById('qr-fg-color');
+  const bgEl = document.getElementById('qr-bg-color');
+  if (fgEl) fgEl.value = fg;
+  if (bgEl) bgEl.value = bg;
+  // Update active swatch
+  document.querySelectorAll('.qr-color-swatch').forEach(s => s.classList.remove('active'));
+  if (swatchBtn) swatchBtn.classList.add('active');
+  update();
+}
+
+function resetQrColor() {
+  customQrFg = null;
+  customQrBg = null;
+  // Reset active swatch to first one
+  document.querySelectorAll('.qr-color-swatch').forEach((s,i) => s.classList.toggle('active', i===0));
+  update();
+}
+
+function applyQrColorLock() {
+  const lockEl = document.getElementById('qr-color-lock');
+  if (!lockEl) return;
+  lockEl.style.display = currentPlan === 'free' ? 'flex' : 'none';
 }
 
 // ═══════════════════════════════════════════════
@@ -2608,17 +2793,80 @@ function _buildQR(data) {
   }
   if (placeholder) placeholder.style.display = 'none';
 
-  const colors = QR_COLORS[currentTheme] || QR_COLORS.divine;
-  // vCards are long text — use Level M (15% EC) to reduce density
-  // URLs are short — use Level H (30% EC) for better logo compatibility
+  const themeColors = QR_COLORS[currentTheme] || QR_COLORS.divine;
+  const colors = {
+    fg: customQrFg || themeColors.fg,
+    bg: customQrBg || themeColors.bg,
+  };
   const isVcard = data.startsWith('BEGIN:VCARD');
   const corrLevel = isVcard ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H;
+
   try {
     new QRCode(container, {
       text: data, width: sz, height: sz,
       colorDark: colors.fg, colorLight: colors.bg,
       correctLevel: corrLevel,
     });
+
+    // ── Logo overlay on QR (auto, uses uploaded logo/avatar) ──
+    // Only overlay if PRO/ELITE, logo uploaded, and toggle is on
+    const logoToggle = document.getElementById('qr-logo-toggle');
+    const logoToggleWrap = document.getElementById('qr-logo-toggle-wrap');
+    const showLogoInQr = currentPlan !== 'free' && logoDataUrl && logoToggle && logoToggle.checked;
+
+    // Show/hide toggle based on eligibility
+    if (logoToggleWrap) {
+      logoToggleWrap.style.display = (currentPlan !== 'free' && logoDataUrl) ? 'flex' : 'none';
+    }
+
+    if (showLogoInQr) {
+      // Wait for QRCode.js to finish rendering its canvas
+      requestAnimationFrame(() => {
+        const qrCanvas = container.querySelector('canvas');
+        if (!qrCanvas) return;
+
+        const logoImg = new Image();
+        logoImg.onload = () => {
+          const ctx = qrCanvas.getContext('2d');
+          const qw = qrCanvas.width;
+          const qh = qrCanvas.height;
+
+          // Logo size = 22% of QR (big enough to see, small enough to scan)
+          const logoSz = Math.round(qw * 0.22);
+          const logoX  = Math.round((qw - logoSz) / 2);
+          const logoY  = Math.round((qh - logoSz) / 2);
+          const radius = Math.round(logoSz * 0.2);
+
+          // White rounded-rect background behind logo
+          ctx.fillStyle = colors.bg || '#ffffff';
+          const pad = Math.round(logoSz * 0.12);
+          const bx = logoX - pad, by = logoY - pad;
+          const bs = logoSz + pad * 2;
+          ctx.beginPath();
+          ctx.moveTo(bx + radius, by);
+          ctx.lineTo(bx + bs - radius, by); ctx.arcTo(bx+bs, by,    bx+bs, by+radius,    radius);
+          ctx.lineTo(bx + bs, by + bs - radius); ctx.arcTo(bx+bs, by+bs, bx+bs-radius, by+bs, radius);
+          ctx.lineTo(bx + radius, by + bs); ctx.arcTo(bx, by+bs, bx, by+bs-radius, radius);
+          ctx.lineTo(bx, by + radius); ctx.arcTo(bx, by, bx+radius, by, radius);
+          ctx.closePath();
+          ctx.fill();
+
+          // Draw logo clipped to rounded rect
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(logoX + radius, logoY);
+          ctx.lineTo(logoX + logoSz - radius, logoY); ctx.arcTo(logoX+logoSz, logoY, logoX+logoSz, logoY+radius, radius);
+          ctx.lineTo(logoX+logoSz, logoY+logoSz-radius); ctx.arcTo(logoX+logoSz, logoY+logoSz, logoX+logoSz-radius, logoY+logoSz, radius);
+          ctx.lineTo(logoX+radius, logoY+logoSz); ctx.arcTo(logoX, logoY+logoSz, logoX, logoY+logoSz-radius, radius);
+          ctx.lineTo(logoX, logoY+radius); ctx.arcTo(logoX, logoY, logoX+radius, logoY, radius);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(logoImg, logoX, logoY, logoSz, logoSz);
+          ctx.restore();
+        };
+        logoImg.src = logoDataUrl;
+      });
+    }
   } catch(e) {
     container.innerHTML = `<div style="width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--red);text-align:center;padding:10px">Invalid URL</div>`;
   }
@@ -2711,6 +2959,7 @@ function snapshotCurrent() {
     tier: currentTier, theme: currentTheme,
     layout: currentLayout, layoutMode,
     qrSize: currentQrSize, avatarSize: currentAvatarSize,
+    customQrFg, customQrBg,  // custom QR colours
     collectionName: v('col-name-create'),
     title:   getTitle(), desc: getDesc(),
     role:    v('h-role'), email: v('h-email'), phone: v('h-phone'),
@@ -2850,6 +3099,13 @@ function loadSnap(i) {
   layoutMode    = s.layoutMode || 'auto';
   currentQrSize = s.qrSize || 'md';
   currentAvatarSize = s.avatarSize || 'md';
+  customQrFg = s.customQrFg || null;
+  customQrBg = s.customQrBg || null;
+  // Restore QR colour picker UI
+  const fgEl = document.getElementById('qr-fg-color');
+  const bgEl = document.getElementById('qr-bg-color');
+  if (fgEl) fgEl.value = customQrFg || '#2563eb';
+  if (bgEl) bgEl.value = customQrBg || '#ffffff';
   logoDataUrl       = s.logo;
   assetImageDataUrl = s.assetImage || null;
   caps         = [...(s.caps||[])];
@@ -3644,6 +3900,9 @@ function applyPlan() {
   // Apply watermark to card
   applyWatermark();
 
+  // Lock/unlock QR colour picker
+  applyQrColorLock();
+
   // Lock/unlock layout and size buttons
   applyFeatureLocks();
 }
@@ -3733,18 +3992,19 @@ function applyFeatureLocks() {
   });
 }
 
-// ── Show upgrade popup ──
+// ── Show upgrade popup with context ──
 function showUpgradePopup(title, body) {
-  // Reuse license modal but show a targeted message first
   const msg = document.getElementById('license-msg');
   if (msg) { msg.textContent = ''; }
   openLicenseModal();
-  // Show message after modal opens
   setTimeout(() => {
     const m = document.getElementById('license-msg');
     if (m) {
-      m.innerHTML = `<strong>${title}</strong><br/><span style="color:#64748b">${body}</span>`;
-      m.style.color = '#2563eb';
+      m.innerHTML = `<div style="background:var(--blue-bg);border:1.5px solid var(--blue-b);border-radius:8px;padding:10px 12px;margin-bottom:4px">
+        <div style="font-weight:700;color:var(--blue);font-size:12px;margin-bottom:4px">${title}</div>
+        <div style="color:var(--gray-600);font-size:11px;line-height:1.6">${body}</div>
+      </div>`;
+      m.style.color = '';
     }
   }, 50);
 }
@@ -3808,15 +4068,22 @@ async function activateLicense() {
 }
 
 // ── INTERCEPT LOCKED SELECTIONS ──
-// Use variable assignment (not function declarations) to avoid hoisting issue
 const _baseSetLayout = setLayout;
 setLayout = function(layout, btn) {
+  const layoutInfo = {
+    qrfocus:      'QR Focus — puts your QR code front and centre. Perfect for affiliate links and access passes.',
+    avatarfocus:  'Avatar Focus — photo-first layout for personal branding and creator identity cards.',
+    split:        'Split — content on the left, QR on the right. Clean professional look for business cards.',
+    minimal:      'Minimal — just the QR and your name. Ultra-clean for access passes and invites.',
+    assetshowcase:'Asset Showcase — hero image + data chips for real estate, stocks, and tokenized portfolios.',
+  };
   if (currentPlan === 'free' && LOCKED_LAYOUTS_FREE.includes(layout)) {
-    showUpgradePopup('🔒 PRO Layout', 'Upgrade to PRO to unlock all layout styles and remove the watermark.');
+    const info = layoutInfo[layout] || 'This layout is available on PRO.';
+    showUpgradePopup('🔒 PRO Layout — ' + (btn.textContent.trim().replace('🔒','')), info + '<br/><br/>Upgrade to PRO ($19) to unlock all layouts and remove the watermark.');
     return;
   }
   if (currentPlan === 'pro' && LOCKED_LAYOUTS_PRO.includes(layout)) {
-    showUpgradePopup('🔒 ELITE Layout', 'Asset / RWA layout requires ELITE. Perfect for real estate, stocks, and portfolio NFTs.');
+    showUpgradePopup('🔒 ELITE Layout — Asset Showcase', 'Showcase real-world assets with a hero image, data chips, and scannable QR.<br/>Used for real estate, stocks, and tokenized portfolio cards.<br/><br/>Upgrade to ELITE ($49) to unlock.');
     return;
   }
   _baseSetLayout(layout, btn);
@@ -3824,8 +4091,14 @@ setLayout = function(layout, btn) {
 
 const _baseSetSize = setSize;
 setSize = function(size, btn) {
+  const sizeInfo = {
+    card:    'Card format — portrait business card, perfect for printing and sharing professionally.',
+    twitter: 'Twitter / X — 16:9 landscape format ideal for posting on social media.',
+    print:   'Print — high-res format designed for physical printing and merchandise.',
+  };
   if (currentPlan === 'free' && LOCKED_SIZES_FREE.includes(size)) {
-    showUpgradePopup('🔒 PRO Output Size', 'Upgrade to PRO to unlock Card, Twitter, and Print output sizes.');
+    const info = sizeInfo[size] || 'This output size is available on PRO.';
+    showUpgradePopup('🔒 PRO Output Size — ' + (btn.textContent.trim().replace('🔒','')), info + '<br/><br/>Upgrade to PRO ($19) to unlock all output sizes.');
     return;
   }
   _baseSetSize(size, btn);
@@ -3834,7 +4107,7 @@ setSize = function(size, btn) {
 const _baseSetTheme = setTheme;
 setTheme = function(theme, el) {
   if (currentPlan === 'free' && LOCKED_THEMES_FREE.includes(theme)) {
-    showUpgradePopup('🔒 PRO Theme', 'The Midnight theme is available on PRO and ELITE plans.');
+    showUpgradePopup('🔒 PRO Theme — Midnight', 'Deep black + violet glow. The most premium-looking theme in the collection.<br/>Ideal for crypto, DeFi, and Web3 identity NFTs.<br/><br/>Upgrade to PRO ($19) to unlock all themes.');
     return;
   }
   _baseSetTheme(theme, el);
@@ -3842,11 +4115,10 @@ setTheme = function(theme, el) {
 
 const _baseSetType = setType;
 setType = function(type, btn) {
-  // Allow switching to all types freely — Asset shows soft message
   _baseSetType(type, btn);
-  applyWatermark(); // re-evaluate watermark (pro+asset needs it)
+  applyWatermark();
   if (type === 'asset' && currentPlan !== 'elite') {
-    toast('💡 Asset / RWA export requires ELITE — you can preview and fill the form freely');
+    toast('💡 Asset / RWA export requires ELITE — preview freely, upgrade to export clean');
   }
 };
 
@@ -3858,6 +4130,19 @@ if (_licOverlay) {
   });
 }
 
+function showWelcome(force) {
+  const seen = localStorage.getItem('uqnft_welcomed');
+  if (seen && !force) return; // already seen — only skip if not forced
+  const overlay = document.getElementById('welcome-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function closeWelcome() {
+  const overlay = document.getElementById('welcome-overlay');
+  if (overlay) overlay.style.display = 'none';
+  localStorage.setItem('uqnft_welcomed', '1');
+}
+
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
@@ -3865,6 +4150,7 @@ loadCollection();   // restore saved collection from previous session
 initPlan();         // restore plan from localStorage
 update();
 syncMobileStats();
+showWelcome();      // show first-visit popup (once only)
 </script>
 
 <!-- ══════════════════════════════════════════════════
@@ -3926,6 +4212,44 @@ syncMobileStats();
       After purchase, Gumroad emails your key instantly<br/>
       <span style="color:#ef4444;font-weight:600">⚠ We don't store your license — keep it safe to reuse anytime</span>
     </div>
+  </div>
+</div>
+
+<!-- ══ WELCOME POPUP ══ -->
+<div id="welcome-overlay" class="welcome-overlay" style="display:none">
+  <div class="welcome-box">
+    <div class="welcome-logo">◈</div>
+    <div class="welcome-title">Welcome to QR NFT Creator 👋</div>
+    <div class="welcome-sub">The Canva for NFT-ready QR cards.<br/>Design here, export, and mint anywhere.</div>
+    <div class="welcome-badges">
+      <div class="welcome-badge">⚡ No login required</div>
+      <div class="welcome-badge">🔐 No data stored</div>
+      <div class="welcome-badge">💾 Works offline</div>
+    </div>
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="welcome-step-num">1</div>
+        <div class="welcome-step-text"><strong>Choose identity type</strong> — Human, AI Agent, Utility, or Asset NFT</div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-num">2</div>
+        <div class="welcome-step-text"><strong>Enter your details</strong> — name, bio, link (becomes your QR code)</div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-num">3</div>
+        <div class="welcome-step-text"><strong>Customize design</strong> — layout, theme, QR size, output format</div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step-num">4</div>
+        <div class="welcome-step-text"><strong>Download &amp; mint</strong> — export PNG + metadata JSON, mint anywhere</div>
+      </div>
+    </div>
+    <div class="welcome-warning">
+      ⚠️ <strong>Important:</strong> Your designs are saved only in this browser.<br/>
+      Go to <strong>Collection → Export All Metadata</strong> to back up your work.<br/>
+      We don't store any data on servers — keep your backup safe!
+    </div>
+    <button class="welcome-btn" onclick="closeWelcome()">⚡ Start Creating — it's free</button>
   </div>
 </div>
 
