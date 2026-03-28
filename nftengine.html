@@ -469,6 +469,9 @@ select {
   }
 }
 
+/* QR logo overlay — absolute positioned over QR canvas */
+.qr-logo-overlay { pointer-events:none; }
+
 /* ══ TRUST BADGE ══ */
 .trust-badge{
   display:inline-flex;align-items:center;gap:5px;
@@ -2830,52 +2833,68 @@ function _buildQR(data) {
     }
 
     if (showLogoInQr) {
-      // Wait for QRCode.js to finish rendering its canvas
-      requestAnimationFrame(() => {
-        const qrCanvas = container.querySelector('canvas');
-        if (!qrCanvas) return;
+      // Use absolute-positioned img overlay on the qr-wrap — survives re-renders
+      // Drawing on QRCode.js canvas fails because renderCard() replaces innerHTML
+      const qrWrap = container.closest('.card-qr-wrap') || container.parentElement;
+      if (qrWrap) {
+        // Ensure wrap has position:relative
+        qrWrap.style.position = 'relative';
 
-        const logoImg = new Image();
-        logoImg.onload = () => {
-          const ctx = qrCanvas.getContext('2d');
-          const qw = qrCanvas.width;
-          const qh = qrCanvas.height;
+        // Remove any existing logo overlay
+        const existing = qrWrap.querySelector('.qr-logo-overlay');
+        if (existing) existing.remove();
 
-          // Logo size = 22% of QR (big enough to see, small enough to scan)
-          const logoSz = Math.round(qw * 0.22);
-          const logoX  = Math.round((qw - logoSz) / 2);
-          const logoY  = Math.round((qh - logoSz) / 2);
-          const radius = Math.round(logoSz * 0.2);
+        const logoSize = Math.round(sz * 0.22);
+        const pad      = Math.round(logoSize * 0.12);
+        const totalSz  = logoSize + pad * 2;
+        const offset   = Math.round((sz - totalSz) / 2);
 
-          // White rounded-rect background behind logo
-          ctx.fillStyle = colors.bg || '#ffffff';
-          const pad = Math.round(logoSz * 0.12);
-          const bx = logoX - pad, by = logoY - pad;
-          const bs = logoSz + pad * 2;
-          ctx.beginPath();
-          ctx.moveTo(bx + radius, by);
-          ctx.lineTo(bx + bs - radius, by); ctx.arcTo(bx+bs, by,    bx+bs, by+radius,    radius);
-          ctx.lineTo(bx + bs, by + bs - radius); ctx.arcTo(bx+bs, by+bs, bx+bs-radius, by+bs, radius);
-          ctx.lineTo(bx + radius, by + bs); ctx.arcTo(bx, by+bs, bx, by+bs-radius, radius);
-          ctx.lineTo(bx, by + radius); ctx.arcTo(bx, by, bx+radius, by, radius);
-          ctx.closePath();
-          ctx.fill();
+        const overlay = document.createElement('div');
+        overlay.className = 'qr-logo-overlay';
+        overlay.style.cssText = [
+          'position:absolute',
+          `left:${offset}px`,
+          `top:${offset}px`,
+          `width:${totalSz}px`,
+          `height:${totalSz}px`,
+          `background:${colors.bg || '#ffffff'}`,
+          `border-radius:${Math.round(logoSize * 0.2)}px`,
+          'display:flex',
+          'align-items:center',
+          'justify-content:center',
+          'pointer-events:none',
+          'z-index:5',
+          'overflow:hidden',
+        ].join(';');
 
-          // Draw logo clipped to rounded rect
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(logoX + radius, logoY);
-          ctx.lineTo(logoX + logoSz - radius, logoY); ctx.arcTo(logoX+logoSz, logoY, logoX+logoSz, logoY+radius, radius);
-          ctx.lineTo(logoX+logoSz, logoY+logoSz-radius); ctx.arcTo(logoX+logoSz, logoY+logoSz, logoX+logoSz-radius, logoY+logoSz, radius);
-          ctx.lineTo(logoX+radius, logoY+logoSz); ctx.arcTo(logoX, logoY+logoSz, logoX, logoY+logoSz-radius, radius);
-          ctx.lineTo(logoX, logoY+radius); ctx.arcTo(logoX, logoY, logoX+radius, logoY, radius);
-          ctx.closePath();
-          ctx.clip();
-          ctx.drawImage(logoImg, logoX, logoY, logoSz, logoSz);
-          ctx.restore();
+        const img = document.createElement('img');
+        img.src = logoDataUrl;
+        img.style.cssText = `width:${logoSize}px;height:${logoSize}px;object-fit:cover;border-radius:${Math.round(logoSize * 0.18)}px;display:block`;
+
+        overlay.appendChild(img);
+
+        // Wait for QRCode.js canvas to appear then insert overlay
+        const insertOverlay = () => {
+          const qrCanvas = container.querySelector('canvas');
+          if (qrCanvas) {
+            // Position relative to the canvas inside the wrap
+            const wrapRect   = qrWrap.getBoundingClientRect();
+            const canvasRect = qrCanvas.getBoundingClientRect();
+            const relLeft = Math.round(canvasRect.left - wrapRect.left + offset);
+            const relTop  = Math.round(canvasRect.top  - wrapRect.top  + offset);
+            overlay.style.left = relLeft + 'px';
+            overlay.style.top  = relTop  + 'px';
+            qrWrap.appendChild(overlay);
+          }
         };
-        logoImg.src = logoDataUrl;
-      });
+
+        const obs = new MutationObserver(() => {
+          if (container.querySelector('canvas')) { obs.disconnect(); setTimeout(insertOverlay, 60); }
+        });
+        obs.observe(container, { childList: true, subtree: true });
+        // Fallback for already-rendered canvas
+        setTimeout(insertOverlay, 100);
+      }
     }
   } catch(e) {
     container.innerHTML = `<div style="width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--red);text-align:center;padding:10px">Invalid URL</div>`;
