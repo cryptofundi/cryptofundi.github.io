@@ -432,6 +432,8 @@ select {
 }
 .how-btn:hover{background:var(--blue);color:#fff}
 @media(max-width:900px){.how-btn{display:none}}
+.how-btn-mobile{display:none}
+@media(max-width:700px){.how-btn-mobile{display:block !important}}
 
 /* ══ TOOLTIP SYSTEM ══ */
 .info-btn {
@@ -446,7 +448,7 @@ select {
 .tooltip-box{
   position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
   background:#1e293b;color:#f1f5f9;font-size:11px;line-height:1.5;
-  padding:8px 12px;border-radius:8px;width:200px;z-index:500;
+  padding:8px 12px;border-radius:8px;width:210px;z-index:500;
   pointer-events:none;opacity:0;transition:opacity .15s;white-space:normal;
   box-shadow:0 4px 16px rgba(0,0,0,.25)
 }
@@ -456,9 +458,15 @@ select {
 }
 .info-btn:hover + .tooltip-box,
 .tooltip-wrap:hover .tooltip-box{opacity:1}
-@media(max-width:700px){
-  .tooltip-box{left:auto;right:0;top:calc(100% + 6px);transform:none;}
-  .tooltip-box::before{display:none}
+@media(max-width:900px){
+  .tooltip-box{
+    left:0;right:auto;top:calc(100% + 8px);
+    transform:none;width:220px;max-width:calc(100vw - 48px)
+  }
+  .tooltip-box::before{
+    right:auto;left:10px;top:auto;bottom:100%;transform:none;
+    border:5px solid transparent;border-bottom-color:#1e293b;border-right-color:transparent
+  }
 }
 
 /* ══ TRUST BADGE ══ */
@@ -1715,7 +1723,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
         <label style="display:flex;align-items:center;gap:6px">
           QR Colour
           <span style="font-size:9px;font-weight:700;background:var(--blue);color:#fff;padding:1px 6px;border-radius:4px;letter-spacing:.5px">PRO</span>
-          <span class="tooltip-wrap"><button class="info-btn" aria-label="About QR colour">ⓘ</button><div class="tooltip-box">Customise the QR dot colour to match your brand. Auto uses the theme colour. PRO required.</div></span>
+          <span class="tooltip-wrap"><button class="info-btn" aria-label="About QR colour">ⓘ</button><div class="tooltip-box">Customise QR dot colour to match your brand. Use light/medium colours — very dark colours may cause scanning issues. Auto uses the theme colour. PRO required.</div></span>
         </label>
         <div id="qr-color-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <!-- Preset swatches -->
@@ -1747,7 +1755,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
             <input type="checkbox" id="qr-logo-toggle" checked onchange="update()" style="cursor:pointer"/>
             Show logo inside QR code
           </label>
-          <span style="font-size:9px;color:var(--gray-400)">(22% size, scannable)</span>
+          <span style="font-size:9px;color:var(--gray-400)">(Minimal layout only · 22% · scannable)</span>
         </div>
         <!-- Locked overlay for free users -->
         <div id="qr-color-lock" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,.85);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5" onclick="showUpgradePopup('🔒 PRO Feature — QR Colour','Customise your QR dot colour to match your brand identity. Available on PRO and ELITE plans.')">
@@ -1819,7 +1827,8 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
       </div>
       <div style="height:6px"></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm btn-full" onclick="resetForm()">✕ Clear Form</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="resetForm()">✕ Clear Form</button>
+        <button class="btn btn-sm how-btn-mobile" onclick="showWelcome(true)" style="flex:1;background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-b);border-radius:var(--r-md);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">⚡ How it works</button>
       </div>
 
     </div><!-- /panel-create -->
@@ -2808,15 +2817,16 @@ function _buildQR(data) {
       correctLevel: corrLevel,
     });
 
-    // ── Logo overlay on QR (auto, uses uploaded logo/avatar) ──
-    // Only overlay if PRO/ELITE, logo uploaded, and toggle is on
+    // ── Logo overlay on QR — Minimal layout only ──
+    // Minimal shows no avatar on card, so logo in QR is the only branding
     const logoToggle = document.getElementById('qr-logo-toggle');
     const logoToggleWrap = document.getElementById('qr-logo-toggle-wrap');
-    const showLogoInQr = currentPlan !== 'free' && logoDataUrl && logoToggle && logoToggle.checked;
+    const isMinimalLayout = currentLayout === 'minimal';
+    const showLogoInQr = currentPlan !== 'free' && logoDataUrl && isMinimalLayout && logoToggle && logoToggle.checked;
 
-    // Show/hide toggle based on eligibility
+    // Show toggle only when: PRO/ELITE + logo uploaded + Minimal layout
     if (logoToggleWrap) {
-      logoToggleWrap.style.display = (currentPlan !== 'free' && logoDataUrl) ? 'flex' : 'none';
+      logoToggleWrap.style.display = (currentPlan !== 'free' && logoDataUrl && isMinimalLayout) ? 'flex' : 'none';
     }
 
     if (showLogoInQr) {
