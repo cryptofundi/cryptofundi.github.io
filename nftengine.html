@@ -1838,7 +1838,13 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 
     <!-- ── COLLECTION PANEL ── -->
     <div class="panel fadein" id="panel-collection">
-      <div class="section-head"><span>Collection Settings</span></div>
+      <div class="section-head">
+        <span>Collection Settings</span>
+        <span class="tooltip-wrap">
+          <button class="info-btn" aria-label="About collections">ⓘ</button>
+          <div class="tooltip-box">Your collection is saved locally in this browser only — we store nothing on servers. Use Export to back up your work as a JSON file. Use Import to restore it on any device or browser.</div>
+        </span>
+      </div>
       <div class="form-group">
         <label>Collection Name</label>
         <input type="text" id="col-name2" value="My NFT Collection"/>
@@ -1854,7 +1860,13 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
         <button class="btn btn-danger btn-sm" onclick="clearCollection()">🗑 Clear All</button>
       </div>
       <input type="file" id="import-collection-file" accept=".json" style="display:none" onchange="importCollection(event)"/>
-      <div class="section-head"><span>Items in Collection (<span id="col-count">0</span>)</span></div>
+      <div class="section-head">
+        <span>Items in Collection (<span id="col-count">0</span>)</span>
+        <span class="tooltip-wrap">
+          <button class="info-btn" aria-label="About items">ⓘ</button>
+          <div class="tooltip-box">Click any item to load it back into the editor. Export All Metadata to save — Import Collection to restore on another device.</div>
+        </span>
+      </div>
       <div id="col-sidebar-list"></div>
     </div>
 
@@ -2833,68 +2845,47 @@ function _buildQR(data) {
     }
 
     if (showLogoInQr) {
-      // Use absolute-positioned img overlay on the qr-wrap — survives re-renders
-      // Drawing on QRCode.js canvas fails because renderCard() replaces innerHTML
-      const qrWrap = container.closest('.card-qr-wrap') || container.parentElement;
-      if (qrWrap) {
-        // Ensure wrap has position:relative
-        qrWrap.style.position = 'relative';
+      // Inject overlay directly into the card element after QR renders
+      // This avoids all timing/re-render issues with innerHTML replacement
+      setTimeout(() => {
+        const card = document.getElementById('nft-card');
+        if (!card) return;
 
-        // Remove any existing logo overlay
-        const existing = qrWrap.querySelector('.qr-logo-overlay');
-        if (existing) existing.remove();
+        // Remove existing overlay
+        card.querySelectorAll('.qr-logo-overlay').forEach(el => el.remove());
 
-        const logoSize = Math.round(sz * 0.22);
+        // Find the actual QR canvas in the card
+        const qrCanvas = card.querySelector('#c-qr-render canvas');
+        if (!qrCanvas) return;
+
+        const rect     = qrCanvas.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        if (!rect.width) return;
+
+        const logoSize = Math.round(rect.width * 0.22);
         const pad      = Math.round(logoSize * 0.12);
         const totalSz  = logoSize + pad * 2;
-        const offset   = Math.round((sz - totalSz) / 2);
+        const left     = Math.round(rect.left - cardRect.left + (rect.width - totalSz) / 2);
+        const top      = Math.round(rect.top  - cardRect.top  + (rect.height - totalSz) / 2);
 
         const overlay = document.createElement('div');
         overlay.className = 'qr-logo-overlay';
         overlay.style.cssText = [
           'position:absolute',
-          `left:${offset}px`,
-          `top:${offset}px`,
-          `width:${totalSz}px`,
-          `height:${totalSz}px`,
+          `left:${left}px`, `top:${top}px`,
+          `width:${totalSz}px`, `height:${totalSz}px`,
           `background:${colors.bg || '#ffffff'}`,
-          `border-radius:${Math.round(logoSize * 0.2)}px`,
-          'display:flex',
-          'align-items:center',
-          'justify-content:center',
-          'pointer-events:none',
-          'z-index:5',
-          'overflow:hidden',
+          `border-radius:${Math.round(logoSize * 0.22)}px`,
+          'display:flex', 'align-items:center', 'justify-content:center',
+          'pointer-events:none', 'z-index:10', 'overflow:hidden',
         ].join(';');
 
         const img = document.createElement('img');
         img.src = logoDataUrl;
         img.style.cssText = `width:${logoSize}px;height:${logoSize}px;object-fit:cover;border-radius:${Math.round(logoSize * 0.18)}px;display:block`;
-
         overlay.appendChild(img);
-
-        // Wait for QRCode.js canvas to appear then insert overlay
-        const insertOverlay = () => {
-          const qrCanvas = container.querySelector('canvas');
-          if (qrCanvas) {
-            // Position relative to the canvas inside the wrap
-            const wrapRect   = qrWrap.getBoundingClientRect();
-            const canvasRect = qrCanvas.getBoundingClientRect();
-            const relLeft = Math.round(canvasRect.left - wrapRect.left + offset);
-            const relTop  = Math.round(canvasRect.top  - wrapRect.top  + offset);
-            overlay.style.left = relLeft + 'px';
-            overlay.style.top  = relTop  + 'px';
-            qrWrap.appendChild(overlay);
-          }
-        };
-
-        const obs = new MutationObserver(() => {
-          if (container.querySelector('canvas')) { obs.disconnect(); setTimeout(insertOverlay, 60); }
-        });
-        obs.observe(container, { childList: true, subtree: true });
-        // Fallback for already-rendered canvas
-        setTimeout(insertOverlay, 100);
-      }
+        card.appendChild(overlay);
+      }, 200);
     }
   } catch(e) {
     container.innerHTML = `<div style="width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--red);text-align:center;padding:10px">Invalid URL</div>`;
@@ -4276,7 +4267,8 @@ showWelcome();      // show first-visit popup (once only)
     <div class="welcome-warning">
       ⚠️ <strong>Important:</strong> Your designs are saved only in this browser.<br/>
       Go to <strong>Collection → Export All Metadata</strong> to back up your work.<br/>
-      We don't store any data on servers — keep your backup safe!
+      To continue on another device, import that file back via <strong>Import Collection</strong>.<br/>
+      <span style="font-size:10px;color:#b45309">We don't store any data on servers — keep your backup file safe!</span>
     </div>
     <button class="welcome-btn" onclick="closeWelcome()">⚡ Start Creating — it's free</button>
   </div>
