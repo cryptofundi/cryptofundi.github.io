@@ -2633,12 +2633,18 @@ function renderCard() {
             </div>
             <div style="flex:1;overflow:hidden;min-height:0">
               <div style="font-family:'Outfit','Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ct);line-height:1.2;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name||'Asset Name')}</div>
-              <div style="font-size:10px;color:var(--cs);margin-bottom:4px">${esc(role||'Asset Type')}</div>
-              ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+              <div style="font-size:10px;color:var(--cs);margin-bottom:4px">${esc(role||'')}</div>
+              ${(() => {
+                const asType = isAssetType ? v('as-type') : '';
+                const asDesc = isAssetType ? v('as-desc') : desc;
+                const showType = asType && asType !== 'Other';
+                let h = '';
+                if (showType) h += `<div style="font-size:9px;font-weight:700;color:var(--ca);margin-bottom:2px">${esc(asType)}</div>`;
+                if (asDesc) h += `<div style="font-size:9px;color:var(--cs);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(asDesc)}</div>`;
+                return h;
+              })()}
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0">
-              ${assetType && assetType !== 'Other' ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">${esc(assetType)}</span>` : ''}
-              ${ticker    ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">◈ ${esc(ticker)}</span>` : ''}
               ${assetVal  ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">💰 ${esc(assetVal)}</span>` : ''}
               ${assetOwn  ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">📊 ${esc(assetOwn)}</span>` : ''}
             </div>
@@ -2674,17 +2680,23 @@ function renderCard() {
         <div style="padding:0 18px 10px;position:relative;min-height:${smallQrSz + 20}px">
           <div style="padding-right:${smallQrSz + 28}px">
             <div style="font-family:'Outfit','Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:2px;word-break:break-word">${esc(name||'Asset Name')}</div>
-            <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'5px':'0'}">${esc(role||'Asset Type')}</div>
-            ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+            <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'5px':'0'}">${esc(role||'')}</div>
+            ${(() => {
+              const asType = isAssetType ? v('as-type') : '';
+              const asDesc = isAssetType ? v('as-desc') : desc;
+              const showType = asType && asType !== 'Other';
+              let html = '';
+              if (showType) html += `<div style="font-size:10px;font-weight:700;color:var(--ca);margin-bottom:3px">${esc(asType)}</div>`;
+              if (asDesc) html += `<div style="font-size:10px;color:var(--cs);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical">${esc(asDesc)}</div>`;
+              return html;
+            })()}
           </div>
           <div style="position:absolute;top:0;right:18px;display:flex;flex-direction:column;align-items:center;gap:3px">
             ${smallQrHtml}
             <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ca);text-align:center;white-space:nowrap;max-width:${smallQrSz+14}px">${esc(cta)}</div>
           </div>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 8px">
-          ${assetType && assetType !== 'Other' ? `<span class="card-asset-data-chip">${esc(assetType)}</span>` : ''}
-          ${ticker    ? `<span class="card-asset-data-chip">◈ ${esc(ticker)}</span>` : ''}
+          <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 8px">
           ${assetVal  ? `<span class="card-asset-data-chip">💰 ${esc(assetVal)}</span>` : ''}
           ${assetOwn  ? `<span class="card-asset-data-chip">📊 ${esc(assetOwn)}</span>` : ''}
         </div>
@@ -2732,7 +2744,7 @@ function getTitle() {
 function getSubtitle() {
   if (identityType==='human')  return v('h-role');
   if (identityType==='agent')  return v('a-type');
-  if (identityType==='asset') { const t=v('as-type'),tk=v('as-ticker'); return t + (tk ? ' · ' + tk : ''); }
+  if (identityType==='asset')  return v('as-ticker') || '';  // ticker only in subtitle
   return v('u-cta') || 'Scan to Unlock';
 }
 function getCta() {
@@ -2757,7 +2769,7 @@ function getCta() {
 function getDesc() {
   if (identityType==='human')  return v('h-bio');
   if (identityType==='agent')  return v('a-desc');
-  if (identityType==='asset')  return v('as-desc'); // value/ownership shown as chips, not in bio
+  if (identityType==='asset')  return v('as-desc');
   return v('u-desc');
 }
 function getWallet() {
@@ -2788,7 +2800,13 @@ function getQrData() {
 function getTags() {
   if (identityType==='agent')  return caps.slice(0,3);
   if (identityType==='human')  return [v('h-email'), v('h-phone')].filter(Boolean).slice(0,2);
-  if (identityType==='asset') { const t=v('as-type'),tk=v('as-ticker'),val=v('as-value'),own=v('as-ownership'); const chips=[]; if(tk) chips.push('◈ '+tk); if(val) chips.push('💰 '+val); if(own) chips.push('📊 '+own); return chips.slice(0,3); }
+  if (identityType==='asset') {
+    const val=v('as-value'), own=v('as-ownership');
+    const chips=[];
+    if(val) chips.push('💰 '+val);
+    if(own) chips.push('📊 '+own);
+    return chips;
+  }
   return [];
 }
 
