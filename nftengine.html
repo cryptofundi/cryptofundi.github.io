@@ -670,7 +670,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 /* Split layout columns */
 .split-body {
   display: grid; grid-template-columns: 1fr 1fr;
-  flex: 1; padding: 0 16px 16px; gap: 14px; align-items: center;
+  flex: 1; padding: 0 16px 16px; gap: 14px; align-items: start;
 }
 .split-left {
   display: flex; flex-direction: column; gap: 8px;
@@ -688,7 +688,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
 .split-role { font-size: 10px; color: var(--cs); }
 .split-right {
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 8px;
+  align-items: center; justify-content: flex-start; gap: 8px; padding-top: 4px;
 }
 
 /* Landscape two-column (Card / Twitter sizes) */
@@ -1629,6 +1629,11 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           <div class="hint">QR opens this asset dashboard or proof link</div>
         </div>
         <div class="form-group">
+          <label>CTA Text (below QR)</label>
+          <input type="text" id="as-cta" placeholder="Scan to View Asset" oninput="update()"/>
+          <div class="hint">Text shown under the QR code on the card</div>
+        </div>
+        <div class="form-group">
           <label>Wallet / Custodian Address (optional)</label>
           <input type="text" id="as-wallet" placeholder="0x... or sol..." oninput="update()"/>
         </div>
@@ -2499,7 +2504,8 @@ function renderCard() {
             <div class="split-role">${esc(role||'Role / Type')}</div>
           </div>
           ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px">${tags.map(t=>`<span class="card-tag" style="font-size:9px">${esc(t)}</span>`).join('')}</div>` : ''}
-          ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.4;overflow:hidden;max-height:40px">${esc(desc)}</div>` : ''}
+          ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+          ${wallet ? `<div style="font-size:8px;color:var(--ct);opacity:.55;font-family:monospace;word-break:break-all;line-height:1.4;border-top:1px solid var(--cb);padding-top:5px;margin-top:4px">◈ ${esc(wallet)}</div>` : ''}
         </div>
         <div class="split-right">
           ${qrContainerHtml}
@@ -2759,6 +2765,8 @@ function getCta() {
     return 'Scan to Interact';
   }
   if (identityType === 'asset') {
+    const customCta = v('as-cta');
+    if (customCta) return customCta;
     if (currentTier === 'Elite') return '⭐ View Asset Dashboard';
     return 'Scan to View Asset';
   }
@@ -3658,7 +3666,7 @@ function resetForm() {
   ['h-name','h-role','h-bio','h-phone','h-email','h-socials','h-wallet','h-website',
    'a-name','a-desc','a-url','a-wallet',
    'u-title','u-desc','u-link','u-expiry',
-   'as-name','as-ticker','as-desc','as-value','as-ownership','as-url','as-wallet',
+   'as-name','as-ticker','as-desc','as-value','as-ownership','as-url','as-wallet','as-cta',
   ].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   setId('u-cta', 'Scan to Unlock');
   caps = []; renderCaps();
