@@ -1602,6 +1602,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
             <option value="Business">🏢 Business Asset</option>
             <option value="Crypto">₿ Crypto Asset</option>
             <option value="Other RWA">🌐 Other RWA</option>
+            <option value="Other">🔹 Other</option>
           </select>
         </div>
         <div class="form-group">
@@ -1753,7 +1754,7 @@ hr.div { border: none; border-top: 1.5px solid var(--blue-b); margin: 20px 0; }
           <button onclick="resetQrColor()" style="font-size:10px;color:var(--gray-400);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;white-space:nowrap">↺ theme default</button>
         </div>
         <!-- Logo in QR toggle (shows only when logo uploaded + PRO) -->
-        <div id="qr-logo-toggle-wrap" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px">
+        <div id="qr-logo-toggle-wrap" style="display:none !important;margin-top:8px;align-items:center;gap:8px">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--gray-600)">
             <input type="checkbox" id="qr-logo-toggle" checked onchange="update()" style="cursor:pointer"/>
             Show logo inside QR code
@@ -2636,7 +2637,7 @@ function renderCard() {
               ${desc ? `<div style="font-size:9px;color:var(--cs);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0">
-              ${assetType ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">${esc(assetType)}</span>` : ''}
+              ${assetType && assetType !== 'Other' ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">${esc(assetType)}</span>` : ''}
               ${ticker    ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">◈ ${esc(ticker)}</span>` : ''}
               ${assetVal  ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">💰 ${esc(assetVal)}</span>` : ''}
               ${assetOwn  ? `<span class="card-asset-data-chip" style="font-size:9px;padding:3px 8px">📊 ${esc(assetOwn)}</span>` : ''}
@@ -2670,11 +2671,11 @@ function renderCard() {
           <span class="card-id">${esc(idStr)}</span>
           ${tierHtml}
         </div>
-        <div style="padding:0 18px 8px;position:relative;min-height:${smallQrSz + 20}px">
+        <div style="padding:0 18px 10px;position:relative;min-height:${smallQrSz + 20}px">
           <div style="padding-right:${smallQrSz + 28}px">
-            <div style="font-family:'Outfit','Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:3px;word-break:break-word">${esc(name||'Asset Name')}</div>
-            <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'6px':'0'}">${esc(role||'Asset Type')}</div>
-            ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
+            <div style="font-family:'Outfit','Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ct);line-height:1.25;margin-bottom:2px;word-break:break-word">${esc(name||'Asset Name')}</div>
+            <div style="font-size:11px;color:var(--cs);margin-bottom:${desc?'5px':'0'}">${esc(role||'Asset Type')}</div>
+            ${desc ? `<div style="font-size:10px;color:var(--cs);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical">${esc(desc)}</div>` : ''}
           </div>
           <div style="position:absolute;top:0;right:18px;display:flex;flex-direction:column;align-items:center;gap:3px">
             ${smallQrHtml}
@@ -2682,7 +2683,7 @@ function renderCard() {
           </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 8px">
-          ${assetType ? `<span class="card-asset-data-chip">${esc(assetType)}</span>` : ''}
+          ${assetType && assetType !== 'Other' ? `<span class="card-asset-data-chip">${esc(assetType)}</span>` : ''}
           ${ticker    ? `<span class="card-asset-data-chip">◈ ${esc(ticker)}</span>` : ''}
           ${assetVal  ? `<span class="card-asset-data-chip">💰 ${esc(assetVal)}</span>` : ''}
           ${assetOwn  ? `<span class="card-asset-data-chip">📊 ${esc(assetOwn)}</span>` : ''}
@@ -2731,7 +2732,7 @@ function getTitle() {
 function getSubtitle() {
   if (identityType==='human')  return v('h-role');
   if (identityType==='agent')  return v('a-type');
-  if (identityType==='asset')  return v('as-type') + (v('as-ticker') ? ' · ' + v('as-ticker') : '');
+  if (identityType==='asset') { const t=v('as-type'),tk=v('as-ticker'); return t + (tk ? ' · ' + tk : ''); }
   return v('u-cta') || 'Scan to Unlock';
 }
 function getCta() {
@@ -2787,7 +2788,7 @@ function getQrData() {
 function getTags() {
   if (identityType==='agent')  return caps.slice(0,3);
   if (identityType==='human')  return [v('h-email'), v('h-phone')].filter(Boolean).slice(0,2);
-  if (identityType==='asset')  return [v('as-type'), v('as-ticker'), v('as-value')].filter(Boolean).slice(0,3);
+  if (identityType==='asset') { const t=v('as-type'),tk=v('as-ticker'),val=v('as-value'),own=v('as-ownership'); const chips=[]; if(tk) chips.push('◈ '+tk); if(val) chips.push('💰 '+val); if(own) chips.push('📊 '+own); return chips.slice(0,3); }
   return [];
 }
 
