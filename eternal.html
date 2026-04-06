@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -88,6 +88,41 @@
 
 ---
 
+<h3>🪙 Token Contributions & Dust Tokens</h3>
+
+<p>In addition to ETH, users can also send <strong>any ERC-20 tokens</strong> to the ETERNAL contract.</p>
+
+<p>This opens an interesting use case:</p>
+
+<ul>
+  <li>Send unused or dust tokens sitting in your wallet</li>
+  <li>Donate random or experimental tokens</li>
+  <li>Even send tokens “just for fun” — similar to how people send tokens to public wallets</li>
+</ul>
+
+<p>These tokens can then be converted into useful on-chain liquidity.</p>
+
+---
+
+<h3>🔄 How Token Processing Works</h3>
+
+<p>Unlike ETH, ERC-20 tokens are not automatically processed.</p>
+
+<p>Anyone can trigger the conversion by calling the function:</p>
+
+<p><code>processExternalToken(tokenAddress)</code></p>
+
+<ul>
+  <li>This function is available under the <strong>“Write Contract”</strong> section on the block explorer</li>
+  <li>Any user can call it (no permissions required)</li>
+  <li>The contract will swap the token into ETH</li>
+  <li>The ETH is then used in the liquidity engine</li>
+</ul>
+
+<p><strong>Result:</strong> Random tokens → converted → turned into permanent liquidity.</p>
+
+---
+
 <h3>🔗 ETERNAL Contract</h3>
 
 <p><strong>Contract Address:</strong></p>
@@ -136,8 +171,8 @@
 
 <ul>
   <li>Anyone may interact with the contract</li>
-  <li>ETH or supported tokens can be sent</li>
-  <li>The contract will process them automatically</li>
+  <li>ETH or tokens can be sent voluntarily</li>
+  <li>Anyone can trigger token processing</li>
 </ul>
 
 <p>All interactions are visible on-chain and can be independently verified.</p>
@@ -148,7 +183,7 @@
 
 <ul>
   <li>This is experimental technology.</li>
-  <li>Only tokens with valid liquidity can be processed.</li>
+  <li>Not all tokens may successfully swap (depends on liquidity).</li>
   <li>All actions are irreversible.</li>
 </ul>
 
@@ -167,7 +202,7 @@
 </main>
 
 <footer>
-  <p>Follow us on <a href="https://x.com/cryptoFundix" target="_blank">X</a></p>
+  <p>Follow us on <a href="https://x.com/cryptofundix" target="_blank">X</a></p>
 </footer>
 
 </body>
