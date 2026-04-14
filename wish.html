@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eternal Wish — Sealed on the Blockchain</title>
+
+<!-- Dynamic OG tags — filled by JS after loading wish data -->
+<meta property="og:title" content="An eternal wish, sealed forever on the blockchain" id="ogTitle">
+<meta property="og:description" content="Someone sent you a wish that can never be deleted." id="ogDesc">
+<meta property="og:image" content="https://eternalwishes.xyz/og-default.png" id="ogImage">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1410;
+    --parchment: #faf7f2;
+    --cream: #f4efe6;
+    --gold: #c9973a;
+    --gold-light: #e8c97a;
+    --gold-pale: #f7edcd;
+    --chain: #8a7560;
+    --chain-light: #b5a48a;
+    --muted: #7a6e62;
+    --border: rgba(201,151,58,0.22);
+    --radius: 20px;
+    --radius-sm: 12px;
+    --green: #22c55e;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Noise texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── LOADING STATE ── */
+  #loadingState {
+    position: fixed;
+    inset: 0;
+    background: var(--parchment);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 100;
+    transition: opacity 0.4s ease;
+  }
+
+  #loadingState.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-spinner {
+    width: 36px; height: 36px;
+    border: 2px solid rgba(201,151,58,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--chain);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── NOT FOUND STATE ── */
+  #notFoundState {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  #notFoundState.visible { display: flex; }
+
+  /* ── MAIN CONTENT ── */
+  #wishContent {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+
+  #wishContent.visible { display: flex; }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .brand-chain {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .chain-link-sm {
+    width: 14px; height: 8px;
+    border: 1.5px solid var(--gold);
+    border-radius: 20px;
+    opacity: 0.7;
+  }
+
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .token-badge {
+    font-size: 11px;
+    padding: 4px 12px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--chain);
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  /* ── HERO BAND ── */
+  .hero-band {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .proof-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+  }
+
+  .hero-band-text {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .hero-band-text strong { color: var(--ink); font-weight: 500; }
+
+  .hero-band-right {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--chain-light);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .page-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 0;
+    flex: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 40px 24px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 780px) {
+    .page-grid {
+      grid-template-columns: 1fr;
+      padding: 24px 16px;
+    }
+  }
+
+  /* ── WISH CARD ── */
+  .wish-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    animation: cardReveal 0.7s cubic-bezier(0.34,1.2,0.64,1) both;
+  }
+
+  @keyframes cardReveal {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .card-occasion-band {
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--parchment);
+  }
+
+  .occasion-icon-lg {
+    font-size: 22px;
+  }
+
+  .occasion-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* ── FIRST TO WISH BADGE ── */
+  .first-badge {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 3px 10px;
+    background: var(--gold-pale);
+    border: 1px solid rgba(201,151,58,0.4);
+    border-radius: 20px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+
+  .first-badge.visible { display: inline-block; }
+
+  /* ── CARD BODY ── */
+  .card-body {
+    padding: 36px 36px 28px;
+  }
+
+  @media (max-width: 500px) { .card-body { padding: 24px 20px 20px; } }
+
+  .to-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--chain-light);
+    margin-bottom: 6px;
+  }
+
+  .to-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 28px;
+    color: var(--ink);
+  }
+
+  .message-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .message-divider::before,
+  .message-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .message-divider-ornament {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  .wish-message {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 3.5vw, 28px);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 28px;
+    position: relative;
+    padding-left: 24px;
+  }
+
+  .wish-message::before {
+    content: '"';
+    position: absolute;
+    left: 0; top: -6px;
+    font-size: 52px;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+    font-style: normal;
+  }
+
+  .from-line {
+    font-size: 14px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .from-dash {
+    width: 20px;
+    height: 1px;
+    background: var(--chain-light);
+  }
+
+  .from-name { color: var(--ink); font-weight: 500; }
+
+  /* ── DATE STAMP ── */
+  .date-stamp {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--chain-light);
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── BLOCKCHAIN PROOF PANEL ── */
+  .proof-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: cardReveal 0.7s cubic-bezier(0.34,1.2,0.64,1) 0.15s both;
+  }
+
+  .proof-header {
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .proof-header-icon { font-size: 16px; }
+
+  .proof-header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .proof-header-sub {
+    font-size: 10px;
+    color: var(--chain-light);
+    margin-top: 1px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .proof-body {
+    background: var(--cream);
+    padding: 20px;
+  }
+
+  .proof-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .proof-row:last-child { border-bottom: none; }
+
+  .proof-row-icon {
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .proof-row-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--chain-light);
+    margin-bottom: 3px;
+  }
+
+  .proof-row-value {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 400;
+    word-break: break-all;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .proof-row-value.mono {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .proof-row-value.gold { color: var(--gold); }
+
+  .polygonscan-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--chain);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 12px;
+    transition: all 0.2s;
+    text-decoration: none;
+    justify-content: center;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .polygonscan-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-pale);
+  }
+
+  /* ── IMMUTABILITY BADGE ── */
+  .immutable-badge {
+    background: var(--ink);
+    color: var(--gold-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 11px;
+    text-align: center;
+    letter-spacing: 0.06em;
+    line-height: 1.6;
+  }
+
+  /* ── SHARE PANEL ── */
+  .share-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 16px;
+    animation: cardReveal 0.7s cubic-bezier(0.34,1.2,0.64,1) 0.25s both;
+  }
+
+  .share-header {
+    background: var(--cream);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--chain);
+    font-weight: 500;
+  }
+
+  .share-body { padding: 16px; }
+
+  .share-link-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .share-link-input {
+    flex: 1;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--muted);
+    outline: none;
+  }
+
+  .copy-btn {
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .copy-btn:hover { background: #2d2520; }
+  .copy-btn.copied { background: #15803d; }
+
+  .share-btns-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .share-btn-sm {
+    padding: 10px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--cream);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-weight: 400;
+  }
+
+  .share-btn-sm:hover {
+    border-color: var(--gold);
+    background: var(--gold-pale);
+  }
+
+  /* ── BIG CTA ── */
+  .cta-panel {
+    margin-top: 16px;
+    animation: cardReveal 0.7s cubic-bezier(0.34,1.2,0.64,1) 0.35s both;
+  }
+
+  .cta-btn {
+    display: block;
+    width: 100%;
+    padding: 18px 20px;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(201,151,58,0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  .cta-btn:hover::before { transform: translateX(100%); }
+  .cta-btn:hover { background: #2d2520; transform: translateY(-2px); }
+
+  .cta-sub {
+    text-align: center;
+    font-size: 11px;
+    color: var(--chain-light);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 28px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--chain-light);
+    letter-spacing: 0.06em;
+    position: relative;
+    z-index: 1;
+  }
+
+  footer a { color: var(--gold); text-decoration: none; }
+
+  /* ── CONFETTI ── */
+  .confetti-piece {
+    position: fixed;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 200;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading State -->
+<div id="loadingState">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Reading from blockchain…</div>
+</div>
+
+<!-- Not Found State -->
+<div id="notFoundState">
+  <div style="font-size:48px;margin-bottom:8px;">🔍</div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;">Wish not found</div>
+  <p style="font-size:14px;color:var(--muted);margin-top:8px;max-width:320px;text-align:center;line-height:1.6;">This token doesn't exist on the blockchain yet, or the ID is incorrect.</p>
+  <a href="index.html" style="margin-top:24px;padding:14px 28px;background:var(--ink);color:var(--parchment);border-radius:var(--radius);font-size:14px;text-decoration:none;font-family:'Cormorant Garamond',serif;font-size:18px;transition:background 0.2s;" onmouseover="this.style.background='#2d2520'" onmouseout="this.style.background='var(--ink)'">Send an eternal wish →</a>
+</div>
+
+<!-- Main Wish Content -->
+<div id="wishContent">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="index.html" class="brand">
+      <div class="brand-chain">
+        <div class="chain-link-sm"></div>
+        <div style="width:5px;height:5px;background:var(--gold);border-radius:50%;opacity:0.7;"></div>
+        <div class="chain-link-sm"></div>
+      </div>
+      <span class="brand-name">Eternal Wishes</span>
+    </a>
+    <span class="token-badge" id="topTokenBadge">Token #—</span>
+  </div>
+
+  <!-- Hero Band -->
+  <div class="hero-band">
+    <div class="proof-dot"></div>
+    <span class="hero-band-text"><strong>Sealed forever</strong> on the Polygon blockchain · Cannot be deleted or edited · Ever</span>
+    <span class="hero-band-right" id="heroTime">—</span>
+  </div>
+
+  <!-- Page Grid -->
+  <div class="page-grid">
+
+    <!-- LEFT: Wish Card -->
+    <div>
+      <div class="wish-card">
+        <div class="card-occasion-band">
+          <span class="occasion-icon-lg" id="occasionIcon">✨</span>
+          <span class="occasion-label" id="occasionLabel">Eternal Wish</span>
+          <span class="first-badge" id="firstBadge">✦ First wish of the day</span>
+        </div>
+        <div class="card-body">
+          <div class="to-label">To</div>
+          <div class="to-name" id="wishTo">—</div>
+
+          <div class="message-divider">
+            <span class="message-divider-ornament">✦</span>
+          </div>
+
+          <div class="wish-message" id="wishMessage">
+            Loading…
+          </div>
+
+          <div class="from-line">
+            <div class="from-dash"></div>
+            <span>from </span>
+            <span class="from-name" id="wishFrom">—</span>
+          </div>
+
+          <div class="date-stamp">
+            <span>🕐</span>
+            <span id="wishTimestamp">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile: show sidebar panels below card on small screens -->
+      <div id="mobileSidebar" style="display:none;margin-top:20px;"></div>
+    </div>
+
+    <!-- RIGHT: Proof + Share + CTA -->
+    <div id="desktopSidebar">
+
+      <!-- Blockchain Proof -->
+      <div class="proof-panel">
+        <div class="proof-header">
+          <span class="proof-header-icon">⛓</span>
+          <div>
+            <div class="proof-header-title">Blockchain proof</div>
+            <div class="proof-header-sub">Polygon network · Immutable</div>
+          </div>
+        </div>
+        <div class="proof-body">
+          <div class="proof-row">
+            <span class="proof-row-icon">🪙</span>
+            <div>
+              <div class="proof-row-label">Token ID</div>
+              <div class="proof-row-value gold" id="proofTokenId">#—</div>
+            </div>
+          </div>
+          <div class="proof-row">
+            <span class="proof-row-icon">⏱</span>
+            <div>
+              <div class="proof-row-label">Minted at (block time)</div>
+              <div class="proof-row-value" id="proofTimestamp">—</div>
+            </div>
+          </div>
+          <div class="proof-row">
+            <span class="proof-row-icon">🌐</span>
+            <div>
+              <div class="proof-row-label">Network</div>
+              <div class="proof-row-value">Polygon Mainnet (Chain ID: 137)</div>
+            </div>
+          </div>
+          <div class="proof-row">
+            <span class="proof-row-icon">📄</span>
+            <div>
+              <div class="proof-row-label">Contract address</div>
+              <!-- PLACEHOLDER: Replace with actual deployed contract address -->
+              <div class="proof-row-value mono" id="proofContract">0x0000…0000</div>
+            </div>
+          </div>
+          <div class="proof-row">
+            <span class="proof-row-icon">🔗</span>
+            <div>
+              <div class="proof-row-label">Transaction hash</div>
+              <div class="proof-row-value mono" id="proofTxHash">—</div>
+            </div>
+          </div>
+          <div class="proof-row">
+            <span class="proof-row-icon">💳</span>
+            <div>
+              <div class="proof-row-label">Tier</div>
+              <div class="proof-row-value" id="proofTier">Basic</div>
+            </div>
+          </div>
+
+          <!-- PLACEHOLDER: Replace href with actual PolygonScan URL -->
+          <a id="polygonscanLink" href="#" target="_blank" class="polygonscan-btn" onclick="openPolygonscan()">
+            View on PolygonScan ↗
+          </a>
+
+          <div class="immutable-badge">
+            This wish is immutable.<br>
+            No one can edit, delete, or alter it.<br>
+            Not even us.
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Panel -->
+      <div class="share-panel">
+        <div class="share-header">Share this wish</div>
+        <div class="share-body">
+          <div class="share-link-row">
+            <input type="text" class="share-link-input" id="shareLink" readonly>
+            <button class="copy-btn" id="copyBtn" onclick="copyWishLink()">Copy</button>
+          </div>
+          <div class="share-btns-grid">
+            <button class="share-btn-sm" onclick="shareWhatsApp()">💬 WhatsApp</button>
+            <button class="share-btn-sm" onclick="shareTwitter()">𝕏 Share</button>
+            <button class="share-btn-sm" onclick="shareInstagram()">📸 Instagram</button>
+            <button class="share-btn-sm" onclick="shareGeneral()">📤 More</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Panel -->
+      <div class="cta-panel">
+        <a href="index.html" class="cta-btn">
+          💖 Send your own eternal wish →
+        </a>
+        <p class="cta-sub">₹19 onwards · No login · Forever on-chain</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">Eternal Wishes</a> · All wishes stored permanently on Polygon · No login · No tracking · No personal data stored
+</footer>
+
+<script>
+  // ── MOCK WISH DATA (for demo/testing before blockchain integration) ──
+  // PLACEHOLDER: Replace mockWishes with actual smart contract read
+  // i.e. const wishData = await contract.getWish(tokenId);
+  const mockWishes = {
+    '4271': {
+      tokenId: 4271,
+      occasion: 'birthday',
+      to: 'Ravi Kumar',
+      message: 'May every candle you blow out carry a wish straight to the universe. You have been a light in every room you have entered. Happy birthday — this moment is now sealed forever.',
+      from: 'Amit Sharma',
+      timestamp: new Date(Date.now() - 1000 * 60 * 14).toISOString(),
+      txHash: '0x7f3a9b2e4c1d8f5a0e6b3c7d9a2f4e8b1c5d7f9a2e4c6b8d0f2a4c6e8b0d2f4',
+      tier: 'Basic',
+      contract: '0xAbC1…9dEf',
+      isFirstOfDay: true,
+    },
+    '4270': {
+      tokenId: 4270,
+      occasion: 'anniversary',
+      to: 'Priya & Rahul',
+      message: 'Fifteen years of choosing each other every single morning. That is not love, that is a decision. The most beautiful one either of you ever made. Happy anniversary.',
+      from: 'The Mehta Family',
+      timestamp: new Date(Date.now() - 1000 * 60 * 67).toISOString(),
+      txHash: '0x1b4e9f2c5a7d3e8b0f6c2a4d7e9b1c3e5f7a9b0d2f4c6e8a0b2d4f6c8e0a2b4',
+      tier: 'Basic',
+      contract: '0xAbC1…9dEf',
+      isFirstOfDay: false,
+    },
+    '4269': {
+      tokenId: 4269,
+      occasion: 'graduation',
+      to: 'Arjun Khanna',
+      message: 'You stayed when everyone told you it was too hard. You pushed when you had every reason to quit. Today belongs entirely to you. Dr. Khanna has a wonderful ring to it.',
+      from: 'Amma',
+      timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+      txHash: '0x3c8f1a5e7b9d2f4c6a8e0b2d4f6a8c0e2b4d6f8a0c2e4f6b8d0a2c4e6f8b0d2',
+      tier: 'Basic',
+      contract: '0xAbC1…9dEf',
+      isFirstOfDay: false,
+    },
+  };
+
+  const OCCASION_MAP = {
+    birthday: { icon: '🎂', label: 'Birthday' },
+    anniversary: { icon: '💍', label: 'Anniversary' },
+    wedding: { icon: '💐', label: 'Wedding' },
+    newbaby: { icon: '👶', label: 'New Baby' },
+    graduation: { icon: '🎓', label: 'Graduation' },
+    promotion: { icon: '🚀', label: 'Promotion' },
+    newyear: { icon: '✨', label: 'New Year' },
+    memorial: { icon: '🕯️', label: 'In Memory' },
+    custom: { icon: '💫', label: 'Eternal Wish' },
+  };
+
+  // ── READ TOKEN ID FROM URL ──
+  // Supports: /wish.html?id=4271  OR  /wish/4271  OR  /wish.html#4271
+  function getTokenIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('id')) return params.get('id');
+    const hash = window.location.hash.replace('#', '');
+    if (hash) return hash;
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const last = parts[parts.length - 1];
+    if (last && last !== 'wish.html') return last;
+    return null;
+  }
+
+  // ── LOAD WISH ──
+  async function loadWish(tokenId) {
+    // PLACEHOLDER: Replace this block with actual blockchain read:
+    // const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+    // const contract = new ethers.Contract(CONTRACT_ADDRESS, WISH_ABI, provider);
+    // const wishData = await contract.getWish(tokenId);
+    // return { tokenId, ...wishData };
+
+    // For MVP demo — read from mock data
+    await new Promise(r => setTimeout(r, 900)); // simulate network delay
+    return mockWishes[tokenId] || null;
+  }
+
+  // ── FORMAT TIMESTAMP ──
+  function formatTimestamp(iso) {
+    const d = new Date(iso);
+    return d.toLocaleString('en-IN', {
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Asia/Kolkata'
+    }) + ' IST';
+  }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    if (d > 0) return `${d}d ago`;
+    if (h > 0) return `${h}h ago`;
+    if (m > 0) return `${m}m ago`;
+    return 'Just now';
+  }
+
+  // ── RENDER WISH ──
+  function renderWish(data) {
+    const occ = OCCASION_MAP[data.occasion] || OCCASION_MAP.custom;
+    const fullLink = `${window.location.origin}${window.location.pathname.replace('wish.html','')}wish.html?id=${data.tokenId}`;
+
+    // Top bar
+    document.getElementById('topTokenBadge').textContent = `Token #${data.tokenId}`;
+    document.title = `Eternal Wish to ${data.to} — Sealed on Blockchain`;
+
+    // Hero band
+    document.getElementById('heroTime').textContent = timeAgo(data.timestamp);
+
+    // Occasion
+    document.getElementById('occasionIcon').textContent = occ.icon;
+    document.getElementById('occasionLabel').textContent = occ.label;
+
+    // First wish badge
+    if (data.isFirstOfDay) {
+      document.getElementById('firstBadge').classList.add('visible');
+    }
+
+    // Main wish content
+    document.getElementById('wishTo').textContent = data.to;
+    document.getElementById('wishMessage').textContent = data.message;
+    document.getElementById('wishFrom').textContent = data.from;
+    document.getElementById('wishTimestamp').textContent = formatTimestamp(data.timestamp);
+
+    // Proof panel
+    document.getElementById('proofTokenId').textContent = `#${data.tokenId}`;
+    document.getElementById('proofTimestamp').textContent = formatTimestamp(data.timestamp);
+    document.getElementById('proofContract').textContent = data.contract;
+    document.getElementById('proofTxHash').textContent = data.txHash.slice(0,10) + '…' + data.txHash.slice(-8);
+    document.getElementById('proofTier').textContent = data.tier;
+
+    // PolygonScan link
+    // PLACEHOLDER: Replace with actual PolygonScan URL when contract deployed
+    document.getElementById('polygonscanLink').href =
+      `https://polygonscan.com/tx/${data.txHash}`;
+
+    // Share
+    document.getElementById('shareLink').value = fullLink;
+
+    // OG meta (for share previews)
+    document.getElementById('ogTitle').content = `${occ.icon} Eternal ${occ.label} wish for ${data.to}`;
+    document.getElementById('ogDesc').content = data.message.slice(0, 120) + '…';
+
+    // Launch confetti for birthday/wedding/newbaby
+    if (['birthday','wedding','newbaby','graduation'].includes(data.occasion)) {
+      setTimeout(launchConfetti, 400);
+    }
+  }
+
+  // ── MAIN INIT ──
+  async function init() {
+    const tokenId = getTokenIdFromURL();
+
+    if (!tokenId) {
+      // No token ID — show demo with first mock wish
+      await new Promise(r => setTimeout(r, 600));
+      document.getElementById('loadingState').classList.add('hidden');
+      renderWish(mockWishes['4271']);
+      document.getElementById('wishContent').classList.add('visible');
+      return;
+    }
+
+    try {
+      const data = await loadWish(tokenId);
+      document.getElementById('loadingState').classList.add('hidden');
+
+      if (!data) {
+        document.getElementById('notFoundState').classList.add('visible');
+        return;
+      }
+
+      renderWish(data);
+      document.getElementById('wishContent').classList.add('visible');
+
+    } catch (err) {
+      console.error('Error loading wish:', err);
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('notFoundState').classList.add('visible');
+    }
+  }
+
+  // ── SHARING ──
+  function copyWishLink() {
+    const val = document.getElementById('shareLink').value;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2500);
+    });
+  }
+
+  function getShareData() {
+    const to = document.getElementById('wishTo').textContent;
+    const link = document.getElementById('shareLink').value;
+    const occ = document.getElementById('occasionLabel').textContent;
+    return { to, link, occ };
+  }
+
+  function shareWhatsApp() {
+    const { to, link, occ } = getShareData();
+    const text = `✨ An eternal ${occ} wish for ${to} — sealed forever on the blockchain\n${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function shareTwitter() {
+    const { to, link, occ } = getShareData();
+    const text = `Just sealed an eternal ${occ} wish for ${to} on the blockchain. It can never be deleted. ✨`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`, '_blank');
+  }
+
+  function shareInstagram() {
+    copyWishLink();
+    alert('Link copied! Paste it in your Instagram story or bio.');
+  }
+
+  function shareGeneral() {
+    const { to, link, occ } = getShareData();
+    if (navigator.share) {
+      navigator.share({ title: `Eternal ${occ} wish for ${to}`, url: link });
+    } else {
+      copyWishLink();
+    }
+  }
+
+  function openPolygonscan() {
+    const link = document.getElementById('polygonscanLink').href;
+    if (link === '#') {
+      alert('PolygonScan link will be active after smart contract deployment.');
+      return false;
+    }
+  }
+
+  // ── CONFETTI ──
+  function launchConfetti() {
+    const colors = ['#c9973a','#e8c97a','#f7edcd','#1a1410','#b5a48a'];
+    for (let i = 0; i < 48; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        top: -10px;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        width: ${4 + Math.random() * 7}px;
+        height: ${4 + Math.random() * 7}px;
+        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+        animation-duration: ${1.5 + Math.random() * 2}s;
+        animation-delay: ${Math.random() * 0.8}s;
+        opacity: ${0.6 + Math.random() * 0.4};
+      `;
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+  }
+
+  // ── RESPONSIVE: move sidebar on mobile ──
+  function handleResize() {
+    const mobile = window.innerWidth <= 780;
+    const desktopSidebar = document.getElementById('desktopSidebar');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    if (mobile) {
+      mobileSidebar.style.display = 'block';
+      mobileSidebar.innerHTML = desktopSidebar.innerHTML;
+      desktopSidebar.style.display = 'none';
+    } else {
+      desktopSidebar.style.display = 'block';
+      mobileSidebar.style.display = 'none';
+      mobileSidebar.innerHTML = '';
+    }
+  }
+
+  window.addEventListener('resize', handleResize);
+
+  // ── BOOT ──
+  init().then(() => handleResize());
+</script>
+</body>
+</html>
