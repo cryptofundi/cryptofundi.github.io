@@ -9,877 +9,180 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --ink: #1a1410;
-    --parchment: #faf7f2;
-    --cream: #f4efe6;
-    --gold: #c9973a;
-    --gold-light: #e8c97a;
-    --gold-pale: #f7edcd;
-    --chain: #8a7560;
-    --chain-light: #b5a48a;
-    --muted: #7a6e62;
-    --border: rgba(201,151,58,0.2);
-    --radius: 16px;
-    --radius-sm: 10px;
+    --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
+    --gold: #c9973a; --gold-light: #e8c97a; --gold-pale: #f7edcd;
+    --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
+    --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
   }
-
   html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--parchment);
-    color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  /* HEADER */
+  header { position: relative; text-align: center; padding: 56px 24px 40px; border-bottom: 1px solid var(--border); }
+  .logo-chain { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 18px; }
+  .chain-link { width: 20px; height: 11px; border: 2px solid var(--gold); border-radius: 20px; position: relative; opacity: 0.7; }
+  .chain-link::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 8px; height: 8px; border-radius: 50%; background: var(--gold-light); opacity: 0.5; }
+  .logo-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 7vw, 68px); font-weight: 300; letter-spacing: -0.02em; line-height: 1.1; }
+  h1 em { font-style: italic; color: var(--gold); }
+  .tagline { font-size: 14px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 12px; font-weight: 300; }
+  .trust-pills { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .pill { font-size: 11px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px; color: var(--chain); background: var(--cream); letter-spacing: 0.05em; }
 
-  /* Subtle noise texture overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 48px 20px 80px; position: relative; z-index: 1; }
 
-  /* ── HEADER ── */
-  header {
-    position: relative;
-    text-align: center;
-    padding: 56px 24px 40px;
-    border-bottom: 1px solid var(--border);
-  }
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--chain); margin-bottom: 14px; font-weight: 500; }
 
-  .logo-chain {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-
-  .chain-link {
-    width: 20px; height: 11px;
-    border: 2px solid var(--gold);
-    border-radius: 20px;
-    position: relative;
-    opacity: 0.7;
-  }
-
-  .chain-link::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--gold-light);
-    opacity: 0.5;
-  }
-
-  .logo-dot {
-    width: 8px; height: 8px;
-    background: var(--gold);
-    border-radius: 50%;
-  }
-
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(40px, 7vw, 68px);
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    color: var(--ink);
-  }
-
-  h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
-  .tagline {
-    font-size: 14px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-top: 12px;
-    font-weight: 300;
-  }
-
-  .trust-pills {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-  }
-
-  .pill {
-    font-size: 11px;
-    padding: 4px 12px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--chain);
-    background: var(--cream);
-    letter-spacing: 0.05em;
-  }
-
-  /* ── MAIN LAYOUT ── */
-  main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 48px 20px 80px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── OCCASION SELECTOR ── */
-  .section-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--chain);
-    margin-bottom: 14px;
-    font-weight: 500;
-  }
-
-  .occasions {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
-    margin-bottom: 40px;
-  }
-
-  .occasion-btn {
-    background: var(--cream);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 10px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s ease;
-    font-family: 'DM Sans', sans-serif;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .occasion-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--gold-pale);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
+  /* OCCASIONS */
+  .occasions { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 40px; }
+  .occasion-btn { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 10px; cursor: pointer; text-align: center; transition: all 0.2s ease; font-family: 'DM Sans', sans-serif; position: relative; overflow: hidden; }
+  .occasion-btn::before { content: ''; position: absolute; inset: 0; background: var(--gold-pale); opacity: 0; transition: opacity 0.2s; }
   .occasion-btn:hover::before { opacity: 1; }
   .occasion-btn:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .occasion-btn.active { border-color: var(--gold); background: var(--gold-pale); }
+  .occasion-btn.active::after { content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+  .occasion-icon { font-size: 22px; display: block; margin-bottom: 6px; position: relative; z-index: 1; }
+  .occasion-name { font-size: 12px; color: var(--ink); font-weight: 400; position: relative; z-index: 1; }
 
-  .occasion-btn.active {
-    border-color: var(--gold);
-    background: var(--gold-pale);
-  }
-
-  .occasion-btn.active::after {
-    content: '';
-    position: absolute;
-    top: 6px; right: 6px;
-    width: 6px; height: 6px;
-    background: var(--gold);
-    border-radius: 50%;
-  }
-
-  .occasion-icon {
-    font-size: 22px;
-    display: block;
-    margin-bottom: 6px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .occasion-name {
-    font-size: 12px;
-    color: var(--ink);
-    font-weight: 400;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── FORM ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-
-  @media (max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
   .field.full { grid-column: 1 / -1; }
+  label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--chain); font-weight: 500; }
+  input, textarea, select { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); transition: border-color 0.2s; outline: none; resize: none; width: 100%; }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); background: var(--gold-pale); }
+  input::placeholder, textarea::placeholder { color: var(--chain-light); }
+  .char-count { text-align: right; font-size: 11px; color: var(--chain-light); margin-top: -4px; }
 
-  label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--chain);
-    font-weight: 500;
-  }
+  /* IMAGE UPLOAD (Premium) */
+  .image-upload-area { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--cream); position: relative; overflow: hidden; }
+  .image-upload-area:hover { border-color: var(--gold); background: var(--gold-pale); }
+  .image-upload-area.has-image { border-style: solid; border-color: var(--gold); }
+  .upload-preview { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; display: none; }
+  .upload-preview.visible { display: block; margin-bottom: 8px; }
+  .upload-placeholder { font-size: 13px; color: var(--chain); }
+  .upload-placeholder span { font-size: 24px; display: block; margin-bottom: 6px; }
+  #imageInput { display: none; }
 
-  input, textarea {
-    background: var(--cream);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    transition: border-color 0.2s;
-    outline: none;
-    resize: none;
-    width: 100%;
-  }
+  /* THEME SELECTOR (Premium) */
+  .themes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  @media (max-width: 480px) { .themes { grid-template-columns: repeat(2, 1fr); } }
+  .theme-btn { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; cursor: pointer; text-align: center; transition: all 0.2s; background: var(--cream); font-family: 'DM Sans', sans-serif; }
+  .theme-btn:hover, .theme-btn.active { border-color: var(--gold); }
+  .theme-btn.active { background: var(--gold-pale); }
+  .theme-swatch { width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 6px; border: 2px solid rgba(255,255,255,0.4); }
+  .theme-label { font-size: 11px; color: var(--ink); }
 
-  input:focus, textarea:focus {
-    border-color: var(--gold);
-    background: var(--gold-pale);
-  }
-
-  input::placeholder, textarea::placeholder {
-    color: var(--chain-light);
-  }
-
-  .char-count {
-    text-align: right;
-    font-size: 11px;
-    color: var(--chain-light);
-    margin-top: -4px;
-  }
-
-  /* ── TIER SELECTOR ── */
-  .tiers {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 32px;
-  }
-
-  @media (max-width: 480px) {
-    .tiers { grid-template-columns: 1fr; }
-  }
-
-  .tier-card {
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 16px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: var(--cream);
-    position: relative;
-    text-align: center;
-  }
-
-  .tier-card:hover {
-    border-color: var(--gold);
-    transform: translateY(-3px);
-  }
-
-  .tier-card.active {
-    border-color: var(--gold);
-    background: var(--gold-pale);
-  }
-
+  /* TIER CARDS */
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  @media (max-width: 480px) { .tiers { grid-template-columns: 1fr; } }
+  .tier-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px 16px; cursor: pointer; transition: all 0.2s ease; background: var(--cream); position: relative; text-align: center; }
+  .tier-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .tier-card.active { border-color: var(--gold); background: var(--gold-pale); }
   .tier-card.active .tier-price { color: var(--gold); }
+  .tier-popular { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #fff; font-size: 10px; padding: 2px 10px; border-radius: 20px; white-space: nowrap; font-weight: 500; }
+  .tier-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; margin-bottom: 4px; }
+  .tier-price { font-size: 24px; font-weight: 500; color: var(--chain); margin-bottom: 10px; transition: color 0.2s; }
+  .tier-price span { font-size: 13px; font-weight: 300; color: var(--muted); }
+  .tier-tagline { font-size: 11px; color: var(--gold); font-style: italic; margin-bottom: 10px; font-family: 'Cormorant Garamond', serif; font-size: 14px; }
+  .tier-features { list-style: none; font-size: 12px; color: var(--muted); line-height: 1.8; text-align: left; }
+  .tier-features li::before { content: '— '; color: var(--gold); }
 
-  .tier-popular {
-    position: absolute;
-    top: -10px; left: 50%;
-    transform: translateX(-50%);
-    background: var(--gold);
-    color: #fff;
-    font-size: 10px;
-    padding: 2px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-  }
+  /* PREMIUM FIELDS */
+  .premium-fields { display: none; border: 1px solid rgba(201,151,58,0.3); border-radius: var(--radius); padding: 20px; background: linear-gradient(135deg, var(--gold-pale) 0%, var(--cream) 100%); margin-bottom: 20px; }
+  .premium-fields.visible { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .premium-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
 
-  .tier-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 400;
-    margin-bottom: 4px;
-  }
-
-  .tier-price {
-    font-size: 24px;
-    font-weight: 500;
-    color: var(--chain);
-    margin-bottom: 10px;
-    transition: color 0.2s;
-  }
-
-  .tier-price span {
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--muted);
-  }
-
-  .tier-features {
-    list-style: none;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.8;
-    text-align: left;
-  }
-
-  .tier-features li::before {
-    content: '— ';
-    color: var(--gold);
-  }
-
-  /* ── PAYMENT SELECTOR ── */
-  .payment-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .pay-btn {
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    cursor: pointer;
-    background: var(--cream);
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-family: 'DM Sans', sans-serif;
-  }
-
+  /* PAYMENT */
+  .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .pay-btn { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px; cursor: pointer; background: var(--cream); transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-family: 'DM Sans', sans-serif; }
   .pay-btn:hover { border-color: var(--gold); }
   .pay-btn.active { border-color: var(--gold); background: var(--gold-pale); }
+  .pay-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--parchment); flex-shrink: 0; }
+  .pay-label { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .pay-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .payment-info { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px; display: none; font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .payment-info.visible { display: block; }
 
-  .pay-icon {
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    background: var(--parchment);
-    flex-shrink: 0;
-  }
-
-  .pay-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-  }
-
-  .pay-sub {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  /* ── UPI FLOW (shown when UPI selected) ── */
-  .upi-info {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    display: none;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .upi-info.visible { display: block; }
-
-  .upi-info strong { color: var(--ink); }
-
-  /* ── MINT BUTTON ── */
-  .mint-btn {
-    width: 100%;
-    padding: 18px;
-    background: var(--ink);
-    color: var(--parchment);
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .mint-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(201,151,58,0.15), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.5s;
-  }
-
+  /* MINT BTN */
+  .mint-btn { width: 100%; padding: 18px; background: var(--ink); color: var(--parchment); border: none; border-radius: var(--radius); font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; letter-spacing: 0.05em; cursor: pointer; transition: all 0.25s ease; position: relative; overflow: hidden; }
+  .mint-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(201,151,58,0.15), transparent); transform: translateX(-100%); transition: transform 0.5s; }
   .mint-btn:hover::before { transform: translateX(100%); }
   .mint-btn:hover { background: #2d2520; transform: translateY(-1px); }
-  .mint-btn:active { transform: translateY(0); }
+  .mint-note { text-align: center; font-size: 11px; color: var(--chain-light); margin-top: 10px; letter-spacing: 0.05em; }
 
-  .mint-btn.loading {
-    pointer-events: none;
-    opacity: 0.8;
-  }
+  /* DIVIDER */
+  .section-divider { display: flex; align-items: center; gap: 16px; margin: 32px 0; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider-ornament { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold); opacity: 0.6; }
 
-  .mint-note {
-    text-align: center;
-    font-size: 11px;
-    color: var(--chain-light);
-    margin-top: 10px;
-    letter-spacing: 0.05em;
-  }
+  /* FEED */
+  .feed-section { margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border); }
+  .feed-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+  .feed-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; }
+  .feed-count { font-size: 12px; color: var(--chain-light); letter-spacing: 0.08em; }
+  .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .feed-card { border-radius: var(--radius); padding: 18px; transition: transform 0.2s, border-color 0.2s; cursor: pointer; border: 1px solid var(--border); }
+  .feed-card:hover { transform: translateY(-2px); border-color: var(--gold); }
+  .feed-occasion { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 8px; }
+  .feed-message { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; line-height: 1.5; margin-bottom: 10px; }
+  .feed-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--chain-light); }
+  .feed-chain-badge { font-size: 10px; padding: 2px 7px; border: 1px solid var(--border); border-radius: 20px; color: var(--chain); }
+  .feed-avatar { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--gold); font-weight: 500; border: 1px solid var(--border); }
 
-  /* ── DIVIDER ── */
-  .section-divider {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 32px 0;
-  }
-
-  .section-divider::before,
-  .section-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .divider-ornament {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    color: var(--gold);
-    opacity: 0.6;
-  }
-
-  /* ── SUCCESS MODAL ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(26,20,16,0.7);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .modal-overlay.visible {
-    display: flex;
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  .modal {
-    background: var(--parchment);
-    border-radius: 24px;
-    padding: 40px 36px;
-    max-width: 480px;
-    width: 100%;
-    text-align: center;
-    border: 1px solid var(--border);
-    animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    position: relative;
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  .modal-close {
-    position: absolute;
-    top: 16px; right: 16px;
-    width: 32px; height: 32px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    background: var(--cream);
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    transition: all 0.2s;
-  }
-  .modal-close:hover { border-color: var(--gold); color: var(--gold); }
-
-  .modal-seal {
-    width: 64px; height: 64px;
-    background: var(--gold-pale);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin: 0 auto 20px;
-    border: 2px solid var(--gold);
-  }
-
-  .modal h2 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 32px;
-    font-weight: 300;
-    margin-bottom: 8px;
-  }
-
-  .modal p {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-
-  .wish-preview {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    margin-bottom: 20px;
-    text-align: left;
-  }
-
-  .wish-preview-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--chain);
-    margin-bottom: 6px;
-  }
-
-  .wish-preview-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    font-style: italic;
-    color: var(--ink);
-    line-height: 1.5;
-  }
-
-  .chain-proof {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--chain-light);
-    justify-content: center;
-    margin-top: 4px;
-    margin-bottom: 20px;
-  }
-
-  .chain-proof-dot {
-    width: 6px; height: 6px;
-    background: #22c55e;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  .share-link-box {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .share-link-box input {
-    flex: 1;
-    font-size: 12px;
-    padding: 10px 12px;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    font-family: monospace;
-  }
-
-  .copy-btn {
-    padding: 10px 16px;
-    background: var(--ink);
-    color: var(--parchment);
-    border: none;
-    border-radius: 8px;
-    font-size: 12px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
-    transition: background 0.2s;
-  }
-
-  .copy-btn:hover { background: #2d2520; }
-
-  .share-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .share-btn {
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--cream);
-    font-size: 12px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--ink);
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .share-btn:hover { border-color: var(--gold); background: var(--gold-pale); }
-
-  /* ── DEMO WISHES FEED ── */
-  .feed-section {
-    margin-top: 60px;
-    padding-top: 40px;
-    border-top: 1px solid var(--border);
-  }
-
-  .feed-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .feed-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 300;
-  }
-
-  .feed-count {
-    font-size: 12px;
-    color: var(--chain-light);
-    letter-spacing: 0.08em;
-  }
-
-  .feed-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
-  }
-
-  .feed-card {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px;
-    transition: transform 0.2s, border-color 0.2s;
-  }
-
-  .feed-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--gold);
-  }
-
-  .feed-occasion {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--gold);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .feed-message {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    font-style: italic;
-    color: var(--ink);
-    line-height: 1.5;
-    margin-bottom: 12px;
-  }
-
-  .feed-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-    color: var(--chain-light);
-  }
-
-  .feed-from {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .feed-avatar {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--gold-pale);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: var(--gold);
-    font-weight: 500;
-  }
-
-  .feed-chain-badge {
-    font-size: 10px;
-    padding: 2px 7px;
-    background: var(--parchment);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--chain);
-  }
-
-  /* ── SCROLL ANIMATIONS ── */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.6s ease forwards;
-  }
-
-  @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .fade-up:nth-child(1) { animation-delay: 0.1s; }
-  .fade-up:nth-child(2) { animation-delay: 0.2s; }
-  .fade-up:nth-child(3) { animation-delay: 0.3s; }
-  .fade-up:nth-child(4) { animation-delay: 0.4s; }
-  .fade-up:nth-child(5) { animation-delay: 0.5s; }
-
-  /* ── FOOTER ── */
-  footer {
-    text-align: center;
-    padding: 32px 20px;
-    border-top: 1px solid var(--border);
-    font-size: 12px;
-    color: var(--chain-light);
-    letter-spacing: 0.05em;
-  }
-
-  /* ── WALLET STATUS ── */
-  .wallet-bar {
-    position: fixed;
-    top: 16px; right: 16px;
-    z-index: 50;
-  }
-
-  .wallet-connect-btn {
-    background: var(--ink);
-    color: var(--parchment);
-    border: none;
-    border-radius: 20px;
-    padding: 8px 16px;
-    font-size: 12px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: all 0.2s;
-    letter-spacing: 0.03em;
-  }
-
+  /* WALLET */
+  .wallet-bar { position: fixed; top: 16px; right: 16px; z-index: 50; }
+  .wallet-connect-btn { background: var(--ink); color: var(--parchment); border: none; border-radius: 20px; padding: 8px 16px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 7px; transition: all 0.2s; }
   .wallet-connect-btn:hover { background: #2d2520; }
-
-  .wallet-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #ef4444;
-  }
-
+  .wallet-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
   .wallet-dot.connected { background: #22c55e; }
 
-  /* ── PROCESSING STATE ── */
-  .processing-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(26,20,16,0.85);
-    backdrop-filter: blur(8px);
-    z-index: 200;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-  }
-
+  /* PROCESSING */
+  .processing-overlay { position: fixed; inset: 0; background: rgba(26,20,16,0.85); backdrop-filter: blur(8px); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
   .processing-overlay.visible { display: flex; }
-
-  .spinner {
-    width: 48px; height: 48px;
-    border: 2px solid rgba(201,151,58,0.2);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
+  .spinner { width: 48px; height: 48px; border: 2px solid rgba(201,151,58,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .processing-text { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--parchment); font-weight: 300; letter-spacing: 0.05em; }
+  .processing-sub { font-size: 12px; color: var(--chain-light); letter-spacing: 0.1em; text-transform: uppercase; }
 
-  .processing-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    color: var(--parchment);
-    font-weight: 300;
-    letter-spacing: 0.05em;
-  }
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,20,16,0.7); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.visible { display: flex; animation: fadeIn 0.3s ease; }
+  .modal { background: var(--parchment); border-radius: 24px; padding: 40px 36px; max-width: 480px; width: 100%; text-align: center; border: 1px solid var(--border); animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1); position: relative; }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 50%; background: var(--cream); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all 0.2s; }
+  .modal-close:hover { border-color: var(--gold); color: var(--gold); }
+  .modal-seal { width: 64px; height: 64px; background: var(--gold-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; border: 2px solid var(--gold); }
+  .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .wish-preview { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; text-align: left; }
+  .wish-preview-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--chain); margin-bottom: 6px; }
+  .wish-preview-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: var(--ink); line-height: 1.5; }
+  .chain-proof { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--chain-light); justify-content: center; margin-bottom: 20px; }
+  .chain-proof-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .processing-sub {
-    font-size: 12px;
-    color: var(--chain-light);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+  /* MODAL ACTION BUTTONS */
+  .modal-view-btn { display: block; width: 100%; padding: 14px; background: var(--ink); color: var(--parchment); border: none; border-radius: var(--radius-sm); font-family: 'Cormorant Garamond', serif; font-size: 18px; cursor: pointer; text-decoration: none; text-align: center; margin-bottom: 10px; transition: background 0.2s; }
+  .modal-view-btn:hover { background: #2d2520; }
+  .share-link-box { display: flex; gap: 8px; margin-bottom: 10px; }
+  .share-link-box input { flex: 1; font-size: 12px; padding: 10px 12px; background: var(--cream); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: monospace; outline: none; }
+  .copy-btn { padding: 10px 16px; background: var(--ink); color: var(--parchment); border: none; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.2s; }
+  .copy-btn:hover { background: #2d2520; }
+  .share-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .share-btn { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--cream); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--ink); transition: all 0.2s; }
+  .share-btn:hover { border-color: var(--gold); background: var(--gold-pale); }
 
-  /* TX hash display */
-  .tx-hash {
-    font-size: 11px;
-    color: var(--chain-light);
-    font-family: monospace;
-    margin-top: 4px;
-    word-break: break-all;
-  }
+  footer { text-align: center; padding: 32px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--chain-light); letter-spacing: 0.05em; position: relative; z-index: 1; }
 </style>
 </head>
 <body>
 
-<!-- Wallet Status -->
 <div class="wallet-bar">
   <button class="wallet-connect-btn" id="walletBtn" onclick="toggleWallet()">
     <span class="wallet-dot" id="walletDot"></span>
@@ -887,78 +190,42 @@
   </button>
 </div>
 
-<!-- Header -->
 <header>
   <div class="logo-chain">
-    <div class="chain-link"></div>
-    <div class="logo-dot"></div>
-    <div class="chain-link"></div>
-    <div class="logo-dot"></div>
+    <div class="chain-link"></div><div class="logo-dot"></div>
+    <div class="chain-link"></div><div class="logo-dot"></div>
     <div class="chain-link"></div>
   </div>
   <h1>Eternal <em>Wishes</em></h1>
   <p class="tagline">Sealed on the blockchain · Remembered forever</p>
   <div class="trust-pills">
-    <span class="pill">No login</span>
-    <span class="pill">No tracking</span>
-    <span class="pill">No storage</span>
-    <span class="pill">Forever on-chain</span>
+    <span class="pill">No login</span><span class="pill">No tracking</span>
+    <span class="pill">No storage</span><span class="pill">Forever on-chain</span>
     <span class="pill">Polygon network</span>
   </div>
 </header>
 
-<!-- Main Form -->
 <main>
-
-  <!-- Step 1: Occasion -->
-  <div class="fade-up">
+  <!-- STEP 1: OCCASION -->
+  <div style="animation: fadeUp 0.5s 0.1s both;">
     <p class="section-label">Step 1 — Choose the occasion</p>
     <div class="occasions" id="occasionGrid">
-      <button class="occasion-btn active" data-occasion="birthday" onclick="selectOccasion(this)">
-        <span class="occasion-icon">🎂</span>
-        <span class="occasion-name">Birthday</span>
-      </button>
-      <button class="occasion-btn" data-occasion="anniversary" onclick="selectOccasion(this)">
-        <span class="occasion-icon">💍</span>
-        <span class="occasion-name">Anniversary</span>
-      </button>
-      <button class="occasion-btn" data-occasion="wedding" onclick="selectOccasion(this)">
-        <span class="occasion-icon">💐</span>
-        <span class="occasion-name">Wedding</span>
-      </button>
-      <button class="occasion-btn" data-occasion="newbaby" onclick="selectOccasion(this)">
-        <span class="occasion-icon">👶</span>
-        <span class="occasion-name">New Baby</span>
-      </button>
-      <button class="occasion-btn" data-occasion="graduation" onclick="selectOccasion(this)">
-        <span class="occasion-icon">🎓</span>
-        <span class="occasion-name">Graduation</span>
-      </button>
-      <button class="occasion-btn" data-occasion="promotion" onclick="selectOccasion(this)">
-        <span class="occasion-icon">🚀</span>
-        <span class="occasion-name">Promotion</span>
-      </button>
-      <button class="occasion-btn" data-occasion="newyear" onclick="selectOccasion(this)">
-        <span class="occasion-icon">✨</span>
-        <span class="occasion-name">New Year</span>
-      </button>
-      <button class="occasion-btn" data-occasion="memorial" onclick="selectOccasion(this)">
-        <span class="occasion-icon">🕯️</span>
-        <span class="occasion-name">In Memory</span>
-      </button>
-      <button class="occasion-btn" data-occasion="custom" onclick="selectOccasion(this)">
-        <span class="occasion-icon">💫</span>
-        <span class="occasion-name">Custom</span>
-      </button>
+      <button class="occasion-btn active" data-occasion="birthday" onclick="selectOccasion(this)"><span class="occasion-icon">🎂</span><span class="occasion-name">Birthday</span></button>
+      <button class="occasion-btn" data-occasion="anniversary" onclick="selectOccasion(this)"><span class="occasion-icon">💍</span><span class="occasion-name">Anniversary</span></button>
+      <button class="occasion-btn" data-occasion="wedding" onclick="selectOccasion(this)"><span class="occasion-icon">💐</span><span class="occasion-name">Wedding</span></button>
+      <button class="occasion-btn" data-occasion="newbaby" onclick="selectOccasion(this)"><span class="occasion-icon">👶</span><span class="occasion-name">New Baby</span></button>
+      <button class="occasion-btn" data-occasion="graduation" onclick="selectOccasion(this)"><span class="occasion-icon">🎓</span><span class="occasion-name">Graduation</span></button>
+      <button class="occasion-btn" data-occasion="promotion" onclick="selectOccasion(this)"><span class="occasion-icon">🚀</span><span class="occasion-name">Promotion</span></button>
+      <button class="occasion-btn" data-occasion="newyear" onclick="selectOccasion(this)"><span class="occasion-icon">✨</span><span class="occasion-name">New Year</span></button>
+      <button class="occasion-btn" data-occasion="memorial" onclick="selectOccasion(this)"><span class="occasion-icon">🕯️</span><span class="occasion-name">In Memory</span></button>
+      <button class="occasion-btn" data-occasion="custom" onclick="selectOccasion(this)"><span class="occasion-icon">💫</span><span class="occasion-name">Custom</span></button>
     </div>
   </div>
 
-  <div class="section-divider fade-up">
-    <span class="divider-ornament">✦</span>
-  </div>
+  <div class="section-divider" style="animation: fadeUp 0.5s 0.15s both;"><span class="divider-ornament">✦</span></div>
 
-  <!-- Step 2: Wish Details -->
-  <div class="fade-up">
+  <!-- STEP 2: WISH DETAILS -->
+  <div style="animation: fadeUp 0.5s 0.2s both;">
     <p class="section-label">Step 2 — Write the wish</p>
     <div class="form-grid">
       <div class="field">
@@ -967,13 +234,11 @@
       </div>
       <div class="field">
         <label for="recipientWallet">Recipient wallet (optional)</label>
-        <input type="text" id="recipientWallet" placeholder="0x1234...abcd or ENS name">
+        <input type="text" id="recipientWallet" placeholder="0x1234…abcd or ENS">
       </div>
       <div class="field full">
         <label for="wishMessage">Your eternal message</label>
-        <textarea id="wishMessage" rows="4" maxlength="280"
-          placeholder="Write something they will read forever…"
-          oninput="updateCharCount()"></textarea>
+        <textarea id="wishMessage" rows="4" maxlength="280" placeholder="Write something they will read forever…" oninput="updateCharCount()"></textarea>
         <div class="char-count"><span id="charCount">0</span> / 280</div>
       </div>
       <div class="field">
@@ -987,54 +252,106 @@
     </div>
   </div>
 
-  <div class="section-divider fade-up">
-    <span class="divider-ornament">✦</span>
-  </div>
+  <div class="section-divider" style="animation: fadeUp 0.5s 0.25s both;"><span class="divider-ornament">✦</span></div>
 
-  <!-- Step 3: Tier -->
-  <div class="fade-up">
+  <!-- STEP 3: TIER -->
+  <div style="animation: fadeUp 0.5s 0.3s both;">
     <p class="section-label">Step 3 — Choose your tier</p>
     <div class="tiers">
-      <div class="tier-card" data-tier="basic" data-price="19" onclick="selectTier(this)">
+
+      <!-- BASIC -->
+      <div class="tier-card active" data-tier="basic" data-price="19" onclick="selectTier(this)">
         <div class="tier-name">Basic</div>
         <div class="tier-price">₹19 <span>/ wish</span></div>
+        <div class="tier-tagline">Simple & permanent</div>
         <ul class="tier-features">
-          <li>Text wish on-chain</li>
-          <li>Permanent timestamp</li>
+          <li>Beautiful text wish card</li>
+          <li>Permanent on-chain</li>
+          <li>Timestamped forever</li>
           <li>Shareable link</li>
         </ul>
       </div>
-      <div class="tier-card active" data-tier="premium" data-price="49" onclick="selectTier(this)">
+
+      <!-- PREMIUM -->
+      <div class="tier-card" data-tier="premium" data-price="49" onclick="selectTier(this)">
         <div class="tier-popular">Most popular</div>
         <div class="tier-name">Premium</div>
         <div class="tier-price">₹49 <span>/ wish</span></div>
+        <div class="tier-tagline">Make it unforgettable</div>
         <ul class="tier-features">
-          <li>Text + image card</li>
-          <li>Custom design theme</li>
-          <li>Permanent timestamp</li>
+          <li>Add a photo</li>
+          <li>Choose a design theme</li>
+          <li>Animated card reveal</li>
+          <li>✦ Premium badge on wish</li>
+          <li>Permanent on-chain</li>
           <li>Shareable link</li>
         </ul>
       </div>
+
+      <!-- ETERNAL -->
       <div class="tier-card" data-tier="eternal" data-price="99" onclick="selectTier(this)">
         <div class="tier-name">Eternal</div>
         <div class="tier-price">₹99 <span>/ wish</span></div>
+        <div class="tier-tagline">The ultimate wish</div>
         <ul class="tier-features">
-          <li>Animated wish card</li>
-          <li>Voice note hash</li>
-          <li>Custom photo upload</li>
+          <li>Everything in Premium</li>
+          <li>Voice note sealed on-chain</li>
+          <li>Custom photo crop</li>
+          <li>✦✦ Eternal badge</li>
           <li>Priority minting</li>
-          <li>Shareable link</li>
+          <li>Permanent on-chain</li>
         </ul>
+      </div>
+
+    </div>
+
+    <!-- PREMIUM FIELDS (shown for premium + eternal) -->
+    <div class="premium-fields" id="premiumFields">
+      <div class="premium-label">✦ Premium features — make your wish unforgettable</div>
+
+      <!-- Image upload -->
+      <div class="field" style="margin-bottom: 16px;">
+        <label>Add a photo (optional)</label>
+        <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
+          <img id="uploadPreview" class="upload-preview" src="" alt="Preview">
+          <div class="upload-placeholder" id="uploadPlaceholder">
+            <span>📷</span>
+            Tap to upload a photo
+            <div style="font-size: 11px; color: var(--chain-light); margin-top: 4px;">JPG, PNG · max 2MB</div>
+          </div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+      </div>
+
+      <!-- Theme selector -->
+      <div class="field">
+        <label>Choose a design theme</label>
+        <div class="themes" id="themeSelector">
+          <button class="theme-btn active" data-theme="classic" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background: linear-gradient(135deg, #f4efe6, #c9973a);"></div>
+            <div class="theme-label">Classic Gold</div>
+          </button>
+          <button class="theme-btn" data-theme="romantic" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background: linear-gradient(135deg, #fce4ec, #c2185b);"></div>
+            <div class="theme-label">Romantic</div>
+          </button>
+          <button class="theme-btn" data-theme="dark" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background: linear-gradient(135deg, #1a1410, #c9973a);"></div>
+            <div class="theme-label">Dark Luxury</div>
+          </button>
+          <button class="theme-btn" data-theme="nature" onclick="selectTheme(this)">
+            <div class="theme-swatch" style="background: linear-gradient(135deg, #e8f5e9, #2e7d32);"></div>
+            <div class="theme-label">Nature</div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="section-divider fade-up">
-    <span class="divider-ornament">✦</span>
-  </div>
+  <div class="section-divider" style="animation: fadeUp 0.5s 0.35s both;"><span class="divider-ornament">✦</span></div>
 
-  <!-- Step 4: Payment -->
-  <div class="fade-up">
+  <!-- STEP 4: PAYMENT -->
+  <div style="animation: fadeUp 0.5s 0.4s both;">
     <p class="section-label">Step 4 — Pay & mint forever</p>
     <div class="payment-options">
       <button class="pay-btn active" data-method="upi" onclick="selectPayment(this)">
@@ -1053,38 +370,34 @@
       </button>
     </div>
 
-    <div class="upi-info visible" id="upiInfo">
-      <strong>UPI / Card flow:</strong> You pay ₹<span id="upiPrice">49</span> — we convert to MATIC and mint your wish on Polygon automatically. No wallet needed. Your wish data is temporarily held for ~2 minutes, then deleted. Only the on-chain NFT remains forever.
+    <div class="payment-info visible" id="upiInfo">
+      <strong>UPI / Card:</strong> Pay ₹<span id="upiPrice">19</span> — converted to MATIC and your wish is minted on Polygon automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
     </div>
-
-    <div class="upi-info" id="cryptoInfo">
-      <strong>Crypto wallet flow:</strong> Connect your wallet, approve the transaction in MetaMask. MATIC is sent directly to the smart contract. No backend involved — fully trustless. Wish mints instantly on confirmation.
+    <div class="payment-info" id="cryptoInfo">
+      <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved. Wish mints the moment the transaction confirms on-chain.
     </div>
 
     <button class="mint-btn" id="mintBtn" onclick="handleMint()">
       Seal this wish forever →
     </button>
-    <p class="mint-note">Gas fee ~₹0.50 · Stored on Polygon blockchain · Cannot be deleted · Ever</p>
+    <p class="mint-note">Gas ~₹0.50 · Polygon blockchain · Cannot be deleted · Ever</p>
   </div>
 
-  <!-- Recent Wishes Feed -->
-  <div class="feed-section fade-up">
+  <!-- FEED -->
+  <div class="feed-section" style="animation: fadeUp 0.5s 0.5s both;">
     <div class="feed-header">
       <h2 class="feed-title">Recently sealed wishes</h2>
-      <span class="feed-count" id="feedCount">— on-chain forever</span>
+      <span class="feed-count" id="feedCount">loading…</span>
     </div>
-    <div class="feed-grid" id="wishFeed">
-      <!-- Populated by JS -->
-    </div>
+    <div class="feed-grid" id="wishFeed"></div>
   </div>
-
 </main>
 
 <!-- Processing Overlay -->
 <div class="processing-overlay" id="processingOverlay">
   <div class="spinner"></div>
   <div class="processing-text" id="processingText">Sealing your wish…</div>
-  <div class="processing-sub" id="processingSub">Broadcasting to Polygon network</div>
+  <div class="processing-sub" id="processingSub">Broadcasting to Polygon</div>
 </div>
 
 <!-- Success Modal -->
@@ -1093,96 +406,94 @@
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-seal">✦</div>
     <h2>Wish sealed forever</h2>
-    <p>Your wish has been minted on the Polygon blockchain. It cannot be deleted, edited, or lost — ever.</p>
-
+    <p>Your wish is now on the Polygon blockchain. Permanent, immutable, eternal.</p>
     <div class="wish-preview">
       <div class="wish-preview-label">Your eternal message</div>
-      <div class="wish-preview-text" id="previewMessage">"Wishing you joy beyond measure…"</div>
+      <div class="wish-preview-text" id="previewMessage"></div>
     </div>
-
     <div class="chain-proof">
       <div class="chain-proof-dot"></div>
-      <span>Confirmed on Polygon · Token #<span id="tokenId">—</span></span>
+      <span>Confirmed · Token #<span id="tokenId">—</span> · Polygon</span>
     </div>
 
+    <!-- VIEW WISH — primary action -->
+    <a id="viewWishBtn" href="wish.html" class="modal-view-btn">
+      View your eternal wish →
+    </a>
+
+    <!-- SHARE LINK -->
     <div class="share-link-box">
-      <input type="text" id="wishLink" value="eternalwishes.xyz/wish/0x..." readonly>
-      <button class="copy-btn" onclick="copyLink()">Copy link</button>
+      <input type="text" id="wishLink" readonly>
+      <button class="copy-btn" onclick="copyLink()">Copy</button>
     </div>
-
-    <a id="viewWishBtn" href="wish.html" style="display:block;width:100%;padding:14px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:var(--radius-sm);text-align:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ink);text-decoration:none;margin-bottom:10px;transition:all 0.2s;" onmouseover="this.style.background='#f0e0a0'" onmouseout="this.style.background='var(--gold-pale)'">View your wish →</a>
     <div class="share-btns">
-      <button class="share-btn" onclick="shareWhatsApp()">
-        <span>💬</span> WhatsApp
-      </button>
-      <button class="share-btn" onclick="shareTwitter()">
-        <span>𝕏</span> Share
-      </button>
+      <button class="share-btn" onclick="shareWhatsApp()">💬 WhatsApp</button>
+      <button class="share-btn" onclick="shareTwitter()">𝕏 Share</button>
     </div>
   </div>
 </div>
 
-<footer>
-  Eternal Wishes · All wishes stored permanently on Polygon blockchain · No login · No tracking · No personal data stored
-</footer>
+<footer>Eternal Wishes · Polygon blockchain · No login · No tracking · No personal data stored</footer>
+
+<style>
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+</style>
 
 <script>
-  // ── STATE ──
   const state = {
-    occasion: 'birthday',
-    tier: 'premium',
-    tierPrice: 49,
-    paymentMethod: 'upi',
-    walletConnected: false,
-    walletAddress: null,
+    occasion: 'birthday', tier: 'basic', tierPrice: 19,
+    paymentMethod: 'upi', walletConnected: false, walletAddress: null,
+    theme: 'classic', imageData: null,
   };
 
-  // ── DEMO FEED DATA ──
-  const demoWishes = [
-    { occasion: '🎂 Birthday', to: 'Priya S.', message: 'May every year bring you closer to all your dreams. You deserve the world.', from: '0x8f2c…3a1d', time: '2 mins ago', token: '4271' },
-    { occasion: '💍 Anniversary', to: 'Ravi & Meera', message: 'Fifteen years of love that keeps growing. Here is to forever and beyond.', from: '0x1b4e…9f2c', time: '18 mins ago', token: '4270' },
-    { occasion: '🎓 Graduation', to: 'Arjun K.', message: 'You did it. All those late nights were worth every single moment.', from: 'Anonymous', time: '1 hr ago', token: '4269' },
-    { occasion: '👶 New Baby', to: 'Baby Kavya', message: 'Welcome to the world, little one. You are already so loved by everyone.', from: '0x7d3a…c821', time: '3 hrs ago', token: '4268' },
-    { occasion: '🚀 Promotion', to: 'Sunita R.', message: 'VP at 32. You have always been the hardest worker in every room.', from: 'The team', time: '5 hrs ago', token: '4267' },
-    { occasion: '✨ New Year', to: 'Amma & Appa', message: 'Thank you for everything. Every sacrifice you made is the reason I exist.', from: '0x4c9f…1e7b', time: '8 hrs ago', token: '4266' },
-  ];
-
-  // ── RENDER FEED ──
-  function renderFeed() {
-    const grid = document.getElementById('wishFeed');
-    document.getElementById('feedCount').textContent = `${4271 + Math.floor(Math.random()*10)} wishes sealed on-chain`;
-    grid.innerHTML = demoWishes.map(w => `
-      <div class="feed-card">
-        <div class="feed-occasion">${w.occasion}</div>
-        <div class="feed-message">"${w.message}"</div>
-        <div class="feed-meta">
-          <div class="feed-from">
-            <div class="feed-avatar">${w.from === 'Anonymous' ? '?' : w.from[2].toUpperCase()}</div>
-            <span>To ${w.to}</span>
-          </div>
-          <span class="feed-chain-badge">#${w.token}</span>
-        </div>
-      </div>
-    `).join('');
+  // Consistent URL format: wish.html?id=TOKEN
+  function buildWishURL(tokenId) {
+    const base = window.location.origin + window.location.pathname.replace('index.html','').replace('eternal-wishes.html','');
+    return `${base}wish.html?id=${tokenId}`;
   }
 
-  // ── OCCASION ──
+  // OCCASION
   function selectOccasion(el) {
     document.querySelectorAll('.occasion-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     state.occasion = el.dataset.occasion;
   }
 
-  // ── TIER ──
+  // TIER
   function selectTier(el) {
     document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     state.tier = el.dataset.tier;
     state.tierPrice = parseInt(el.dataset.price);
     document.getElementById('upiPrice').textContent = state.tierPrice;
+    const isPremium = ['premium','eternal'].includes(state.tier);
+    document.getElementById('premiumFields').classList.toggle('visible', isPremium);
   }
 
-  // ── PAYMENT METHOD ──
+  // THEME
+  function selectTheme(el) {
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    state.theme = el.dataset.theme;
+  }
+
+  // IMAGE UPLOAD
+  function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      state.imageData = ev.target.result;
+      document.getElementById('uploadPreview').src = ev.target.result;
+      document.getElementById('uploadPreview').classList.add('visible');
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('uploadArea').classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // PAYMENT
   function selectPayment(el) {
     document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
@@ -1190,140 +501,89 @@
     document.getElementById('upiInfo').classList.toggle('visible', state.paymentMethod === 'upi');
     document.getElementById('cryptoInfo').classList.toggle('visible', state.paymentMethod === 'crypto');
     const btn = document.getElementById('mintBtn');
-    if (state.paymentMethod === 'crypto' && !state.walletConnected) {
-      btn.textContent = 'Connect wallet to mint →';
-    } else {
-      btn.textContent = 'Seal this wish forever →';
-    }
+    btn.textContent = (state.paymentMethod === 'crypto' && !state.walletConnected)
+      ? 'Connect wallet to mint →' : 'Seal this wish forever →';
   }
 
-  // ── WALLET ──
+  // WALLET
   function toggleWallet() {
     if (state.walletConnected) {
-      state.walletConnected = false;
-      state.walletAddress = null;
+      state.walletConnected = false; state.walletAddress = null;
       document.getElementById('walletDot').classList.remove('connected');
       document.getElementById('walletLabel').textContent = 'Connect Wallet';
-      if (state.paymentMethod === 'crypto') {
-        document.getElementById('mintBtn').textContent = 'Connect wallet to mint →';
-      }
-    } else {
-      // Simulate wallet connection (replace with actual web3 call)
-      connectWallet();
-    }
+      if (state.paymentMethod === 'crypto') document.getElementById('mintBtn').textContent = 'Connect wallet to mint →';
+    } else { connectWallet(); }
   }
 
   async function connectWallet() {
-    // ── PLACEHOLDER: Replace with actual MetaMask connection ──
+    // PLACEHOLDER: Replace with actual MetaMask call
     // const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     // state.walletAddress = accounts[0];
-    const mockAddress = '0x' + Math.random().toString(16).substr(2, 8) + '…' + Math.random().toString(16).substr(2, 4);
-    state.walletConnected = true;
-    state.walletAddress = mockAddress;
+    const mock = '0x' + Math.random().toString(16).substr(2,6) + '…' + Math.random().toString(16).substr(2,4);
+    state.walletConnected = true; state.walletAddress = mock;
     document.getElementById('walletDot').classList.add('connected');
-    document.getElementById('walletLabel').textContent = mockAddress;
-    if (state.paymentMethod === 'crypto') {
-      document.getElementById('mintBtn').textContent = 'Seal this wish forever →';
-    }
+    document.getElementById('walletLabel').textContent = mock;
+    if (state.paymentMethod === 'crypto') document.getElementById('mintBtn').textContent = 'Seal this wish forever →';
   }
 
-  // ── CHAR COUNT ──
   function updateCharCount() {
-    const msg = document.getElementById('wishMessage').value;
-    document.getElementById('charCount').textContent = msg.length;
+    document.getElementById('charCount').textContent = document.getElementById('wishMessage').value.length;
   }
 
-  // ── VALIDATION ──
   function validate() {
     const name = document.getElementById('recipientName').value.trim();
     const msg = document.getElementById('wishMessage').value.trim();
     if (!name) { alert('Please enter the recipient\'s name.'); return false; }
-    if (msg.length < 10) { alert('Please write a message of at least 10 characters.'); return false; }
-    if (state.paymentMethod === 'crypto' && !state.walletConnected) {
-      connectWallet();
-      return false;
-    }
+    if (msg.length < 10) { alert('Please write at least 10 characters.'); return false; }
+    if (state.paymentMethod === 'crypto' && !state.walletConnected) { connectWallet(); return false; }
     return true;
   }
 
-  // ── MAIN MINT HANDLER ──
   async function handleMint() {
     if (!validate()) return;
-    if (state.paymentMethod === 'upi') {
-      await handleUPIFlow();
-    } else {
-      await handleCryptoFlow();
-    }
+    state.paymentMethod === 'upi' ? await handleUPIFlow() : await handleCryptoFlow();
   }
 
-  // ── UPI FLOW ──
   async function handleUPIFlow() {
-    const wishData = collectWishData();
-
-    // Step 1: Create Supabase record
+    const wish = collectWishData();
     showProcessing('Preparing your wish…', 'Creating session');
-    await simulateDelay(800);
-
-    // ── PLACEHOLDER: Replace with actual Supabase insert ──
-    // const { data } = await supabase.from('wish_sessions').insert({ uuid: wishData.uuid, wish_data: wishData, pay_status: 'pending', mint_status: 'pending' });
-
-    // Step 2: Open Onramp/Transak widget
+    await delay(800);
+    // PLACEHOLDER: await supabase.from('wish_sessions').insert({ uuid: wish.uuid, wish_data: wish, pay_status: 'pending', mint_status: 'pending' });
     showProcessing('Opening payment…', 'Redirecting to UPI gateway');
-    await simulateDelay(1000);
-
-    // ── PLACEHOLDER: Replace with actual Onramp.money widget call ──
-    // onramp.open({ partnerOrderId: wishData.uuid, cryptoCurrency: 'MATIC', fiatCurrency: 'INR', fiatAmount: state.tierPrice, walletAddress: RELAYER_WALLET });
-
-    // Step 3: Simulate payment confirmation (webhook in prod)
+    await delay(1000);
+    // PLACEHOLDER: onramp.open({ partnerOrderId: wish.uuid, cryptoCurrency: 'MATIC', fiatCurrency: 'INR', fiatAmount: state.tierPrice });
     showProcessing('Payment confirmed ✓', 'Minting on Polygon…');
-    await simulateDelay(1200);
-
-    // Step 4: Mint the NFT
-    // ── PLACEHOLDER: Replace with actual smart contract call via relayer ──
-    // const tokenId = await mintWish(wishData.occasion, wishData.message, wishData.recipient, wishData.tier);
-    const tokenId = Math.floor(4272 + Math.random() * 100);
-
-    // Step 5: Delete Supabase record
-    // ── PLACEHOLDER: Supabase auto-deletes via TTL or: ──
-    // await supabase.from('wish_sessions').delete().eq('uuid', wishData.uuid);
-
-    showProcessing('Wish sealed forever ✓', 'Removing temporary data…');
-    await simulateDelay(600);
-
+    await delay(1200);
+    // PLACEHOLDER: const tokenId = await mintWish(wish.occasion, wish.recipient, wish.message, wish.tier, wish.theme, wish.imageIPFSHash);
+    const tokenId = 4272 + Math.floor(Math.random() * 100);
+    // PLACEHOLDER: await supabase.from('wish_sessions').delete().eq('uuid', wish.uuid);
+    showProcessing('Wish sealed ✓', 'Cleaning up session…');
+    await delay(500);
     hideProcessing();
-    showSuccess(wishData, tokenId);
+    showSuccess(wish, tokenId);
   }
 
-  // ── CRYPTO FLOW ──
   async function handleCryptoFlow() {
-    const wishData = collectWishData();
-
+    const wish = collectWishData();
     showProcessing('Confirm in your wallet…', 'Waiting for signature');
-    await simulateDelay(1500);
-
-    // ── PLACEHOLDER: Replace with actual smart contract call ──
+    await delay(1500);
+    // PLACEHOLDER:
     // const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
     // const tx = await contract.mintWish(
-    //   wishData.occasion,
-    //   wishData.recipient,
-    //   wishData.message,
-    //   wishData.tier,
-    //   { value: ethers.utils.parseEther(TIER_PRICES[wishData.tier]) }
+    //   wish.occasion, wish.recipient, wish.message,
+    //   wish.tier, wish.theme,
+    //   { value: ethers.utils.parseEther(TIER_PRICES[wish.tier]) }
     // );
-    // await tx.wait();
-    // const tokenId = tx.events[0].args.tokenId.toNumber();
-
-    showProcessing('Transaction sent ✓', 'Confirming on blockchain…');
-    await simulateDelay(2000);
-
-    const tokenId = Math.floor(4272 + Math.random() * 100);
-    // No Supabase involved at all for crypto path
-
+    // const receipt = await tx.wait();
+    // const tokenId = receipt.events[0].args.tokenId.toNumber();
+    showProcessing('Transaction confirmed ✓', 'Reading event from chain…');
+    await delay(1500);
+    const tokenId = 4272 + Math.floor(Math.random() * 100);
     hideProcessing();
-    showSuccess(wishData, tokenId);
+    showSuccess(wish, tokenId);
+    // No Supabase for crypto path — blockchain events are the record
   }
 
-  // ── HELPERS ──
   function collectWishData() {
     return {
       uuid: crypto.randomUUID(),
@@ -1332,79 +592,78 @@
       recipientWallet: document.getElementById('recipientWallet').value.trim(),
       message: document.getElementById('wishMessage').value.trim(),
       sender: document.getElementById('senderName').value.trim() || 'Anonymous',
-      tier: state.tier,
-      price: state.tierPrice,
+      tier: state.tier, price: state.tierPrice,
+      theme: state.theme, imageData: state.imageData,
       paymentMethod: state.paymentMethod,
     };
   }
 
-  function showProcessing(text, sub) {
-    document.getElementById('processingText').textContent = text;
-    document.getElementById('processingSub').textContent = sub;
-    document.getElementById('processingOverlay').classList.add('visible');
-  }
-
-  function hideProcessing() {
-    document.getElementById('processingOverlay').classList.remove('visible');
-  }
-
-  function showSuccess(wishData, tokenId) {
-    document.getElementById('previewMessage').textContent = `"${wishData.message}"`;
+  function showSuccess(wish, tokenId) {
+    const url = buildWishURL(tokenId);
+    document.getElementById('previewMessage').textContent = `"${wish.message}"`;
     document.getElementById('tokenId').textContent = tokenId;
-    document.getElementById('wishLink').value = `${window.location.origin}${window.location.pathname.replace('index.html','')}wish.html?id=${tokenId}`;
-    document.getElementById('viewWishBtn').href = `wish.html?id=${tokenId}`;
+    // Both the view button and share link use the SAME URL format
+    document.getElementById('viewWishBtn').href = url;
+    document.getElementById('wishLink').value = url;
     document.getElementById('successModal').classList.add('visible');
-    // Add to demo feed
-    demoWishes.unshift({
-      occasion: getOccasionEmoji(wishData.occasion) + ' ' + capitalize(wishData.occasion),
-      to: wishData.recipient,
-      message: wishData.message,
-      from: wishData.sender,
-      time: 'Just now',
-      token: tokenId
-    });
+    // Add to feed
+    feedWishes.unshift({ occasion: wish.occasion, to: wish.recipient, message: wish.message, from: wish.sender, token: tokenId, tier: wish.tier });
     renderFeed();
   }
 
-  function closeModal() {
-    document.getElementById('successModal').classList.remove('visible');
-  }
-
-  function simulateDelay(ms) {
-    return new Promise(r => setTimeout(r, ms));
-  }
-
-  function getOccasionEmoji(o) {
-    const map = { birthday:'🎂', anniversary:'💍', wedding:'💐', newbaby:'👶', graduation:'🎓', promotion:'🚀', newyear:'✨', memorial:'🕯️', custom:'💫' };
-    return map[o] || '✨';
-  }
-
-  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function showProcessing(t, s) { document.getElementById('processingText').textContent = t; document.getElementById('processingSub').textContent = s; document.getElementById('processingOverlay').classList.add('visible'); }
+  function hideProcessing() { document.getElementById('processingOverlay').classList.remove('visible'); }
+  function closeModal() { document.getElementById('successModal').classList.remove('visible'); }
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   function copyLink() {
-    const val = document.getElementById('wishLink').value;
-    navigator.clipboard.writeText(val).then(() => {
-      const btn = document.querySelector('.copy-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy link', 2000);
+    navigator.clipboard.writeText(document.getElementById('wishLink').value).then(() => {
+      const b = document.querySelector('.copy-btn'); b.textContent = 'Copied!';
+      setTimeout(() => b.textContent = 'Copy', 2000);
     });
   }
 
   function shareWhatsApp() {
-    const link = document.getElementById('wishLink').value;
-    const msg = `I just sealed an eternal wish on the blockchain 🔗 ${link}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    const u = encodeURIComponent(document.getElementById('wishLink').value);
+    window.open(`https://wa.me/?text=${encodeURIComponent('✨ I just sealed an eternal wish on the blockchain — ')}${u}`, '_blank');
   }
 
   function shareTwitter() {
-    const link = document.getElementById('wishLink').value;
-    window.open(`https://twitter.com/intent/tweet?text=Just+minted+an+eternal+wish+on+the+blockchain+✨&url=${encodeURIComponent(link)}`, '_blank');
+    const u = encodeURIComponent(document.getElementById('wishLink').value);
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Just minted an eternal wish on the blockchain ✨')}&url=${u}`, '_blank');
   }
 
-  // Set default date to today
-  document.getElementById('wishDate').valueAsDate = new Date();
+  // FEED
+  const OCCASION_MAP = { birthday:{i:'🎂',l:'Birthday'}, anniversary:{i:'💍',l:'Anniversary'}, wedding:{i:'💐',l:'Wedding'}, newbaby:{i:'👶',l:'New Baby'}, graduation:{i:'🎓',l:'Graduation'}, promotion:{i:'🚀',l:'Promotion'}, newyear:{i:'✨',l:'New Year'}, memorial:{i:'🕯️',l:'In Memory'}, custom:{i:'💫',l:'Wish'} };
+  const THEME_COLORS = { classic:'var(--cream)', romantic:'#fce4ec', dark:'#1a1410', nature:'#e8f5e9' };
+  const THEME_TEXT = { classic:'var(--ink)', romantic:'#880e4f', dark:'var(--gold-light)', nature:'#1b5e20' };
 
-  // Init
+  const feedWishes = [
+    { occasion:'birthday', to:'Priya S.', message:'May every year bring you closer to all your dreams. You deserve the world.', from:'0x8f2c…', token:4271, tier:'premium' },
+    { occasion:'anniversary', to:'Ravi & Meera', message:'Fifteen years of love that keeps growing. Here is to forever and beyond.', from:'0x1b4e…', token:4270, tier:'basic' },
+    { occasion:'graduation', to:'Arjun K.', message:'You did it. All those late nights were worth every single moment.', from:'Amma', token:4269, tier:'basic' },
+    { occasion:'newbaby', to:'Baby Kavya', message:'Welcome to the world, little one. You are already so loved.', from:'0x7d3a…', token:4268, tier:'eternal' },
+    { occasion:'promotion', to:'Sunita R.', message:'VP at 32. You have always been the hardest worker in every room.', from:'The team', token:4267, tier:'premium' },
+  ];
+
+  function renderFeed() {
+    document.getElementById('feedCount').textContent = `${4271 + feedWishes.length} wishes sealed forever`;
+    document.getElementById('wishFeed').innerHTML = feedWishes.map(w => {
+      const occ = OCCASION_MAP[w.occasion] || OCCASION_MAP.custom;
+      const bg = w.tier !== 'basic' ? THEME_COLORS.classic : 'var(--cream)';
+      const tierBadge = w.tier !== 'basic' ? `<span style="font-size:10px;padding:1px 7px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">✦ ${w.tier}</span>` : '';
+      return `<div class="feed-card" style="background:${bg};" onclick="window.location='wish.html?id=${w.token}'">
+        <div class="feed-occasion">${occ.i} ${occ.l} ${tierBadge}</div>
+        <div class="feed-message">"${w.message}"</div>
+        <div class="feed-meta">
+          <span>To ${w.to}</span>
+          <span class="feed-chain-badge">#${w.token}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('wishDate').valueAsDate = new Date();
   renderFeed();
 </script>
 </body>
