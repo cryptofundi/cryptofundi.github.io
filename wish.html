@@ -348,12 +348,23 @@
   }
 
   async function loadWish(tokenId) {
-    await new Promise(r => setTimeout(r, 800));
-    // PLACEHOLDER: Replace with:
+    await new Promise(r => setTimeout(r, 600));
+
+    // 1. Check localStorage — catches freshly-minted wishes from same or other tab
+    try {
+      const cached = localStorage.getItem('ew_wish_' + tokenId);
+      if (cached) return JSON.parse(cached);
+    } catch(e) {}
+
+    // 2. Hardcoded demo wishes (for testing before blockchain integration)
+    if (MOCK[tokenId]) return MOCK[tokenId];
+
+    // 3. PLACEHOLDER: Replace with actual blockchain read after contract deployed:
     // const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
     // const contract = new ethers.Contract(CONTRACT_ADDRESS, WISH_ABI, provider);
     // return await contract.getWish(tokenId);
-    return MOCK[tokenId] || null;
+
+    return null;
   }
 
   function applyTheme(theme) {
@@ -381,8 +392,10 @@
   }
 
   function buildURL(tokenId) {
-    const base = window.location.origin + window.location.pathname;
-    return `${base}?id=${tokenId}`;
+    // Always build from origin + clean path — never inherit stale query strings
+    const origin = window.location.origin;
+    const path = window.location.pathname; // e.g. /wish.html or /subfolder/wish.html
+    return `${origin}${path}?id=${tokenId}`;
   }
 
   function renderWish(data) {
