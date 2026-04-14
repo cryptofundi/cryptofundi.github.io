@@ -447,9 +447,14 @@
   };
 
   // Consistent URL format: wish.html?id=TOKEN
+  // Works on GitHub Pages, local file, any subdirectory
   function buildWishURL(tokenId) {
-    const base = window.location.origin + window.location.pathname.replace('index.html','').replace('eternal-wishes.html','');
-    return `${base}wish.html?id=${tokenId}`;
+    // Safely build wish URL — works on GitHub Pages, localhost, any subdirectory
+    // e.g. https://cryptofundi.github.io/eternalwishes.html → https://cryptofundi.github.io/wish.html?id=4369
+    const origin = window.location.origin;                          // https://cryptofundi.github.io
+    const path = window.location.pathname;                          // /eternalwishes.html  or  /subfolder/eternalwishes.html
+    const dir = path.substring(0, path.lastIndexOf('/') + 1);       // /  or  /subfolder/
+    return `${origin}${dir}wish.html?id=${tokenId}`;
   }
 
   // OCCASION
@@ -600,13 +605,23 @@
 
   function showSuccess(wish, tokenId) {
     const url = buildWishURL(tokenId);
+
+    // Save to sessionStorage so wish.html can render newly-minted wishes immediately
+    const wishRecord = {
+      tokenId, occasion: wish.occasion, to: wish.recipient,
+      from: wish.sender || 'Anonymous', message: wish.message,
+      tier: wish.tier, theme: wish.theme, imageURL: wish.imageData || null,
+      timestamp: new Date().toISOString(), isFirstOfDay: false,
+      txHash: '0x' + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join(''),
+    };
+    // localStorage persists across tabs — so wish.html can render it even when opened from a shared link
+    try { localStorage.setItem('ew_wish_' + tokenId, JSON.stringify(wishRecord)); } catch(e) {}
+
     document.getElementById('previewMessage').textContent = `"${wish.message}"`;
     document.getElementById('tokenId').textContent = tokenId;
-    // Both the view button and share link use the SAME URL format
     document.getElementById('viewWishBtn').href = url;
     document.getElementById('wishLink').value = url;
     document.getElementById('successModal').classList.add('visible');
-    // Add to feed
     feedWishes.unshift({ occasion: wish.occasion, to: wish.recipient, message: wish.message, from: wish.sender, token: tokenId, tier: wish.tier });
     renderFeed();
   }
