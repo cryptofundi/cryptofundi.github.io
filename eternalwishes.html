@@ -786,6 +786,19 @@
   }
 
   function collectWishData(){
+    // Image handling for MVP (no IPFS yet):
+    // - Store full base64 image in localStorage under a UUID key
+    // - Pass only the short key reference as imageURL to the contract
+    // - wish.html reads the key → looks up localStorage → displays image
+    // Future: upload to Pinata → store ipfs://Qm... hash in contract instead
+    let imageURL = null;
+    const imageData = state.croppedImageData || state.imageData || null;
+    if(imageData && ['premium','eternal'].includes(state.tier)){
+      const imageKey = 'ew_img_' + crypto.randomUUID().slice(0,8);
+      try{ localStorage.setItem(imageKey, imageData); }catch(e){}
+      imageURL = imageKey;   // short key e.g. "ew_img_a1b2c3d4" — well under 200 chars
+    }
+
     return{
       uuid:crypto.randomUUID(),occasion:state.occasion,
       recipient:document.getElementById('recipientName').value.trim(),
@@ -793,8 +806,10 @@
       message:document.getElementById('wishMessage').value.trim(),
       sender:document.getElementById('senderName').value.trim()||'Anonymous',
       tier:state.tier,price:state.tierPrice,theme:state.theme,
-      imageData:state.croppedImageData||state.imageData||null,
-      audioHash:state.audioHash||null,audioURL:state.audioURL||null,
+      imageURL:imageURL,     // short key stored on-chain; actual image in localStorage
+      imageData:imageData,   // full base64 kept in memory for immediate display
+      audioHash:state.audioHash||null,
+      audioURL:state.audioURL||null,
       paymentMethod:state.paymentMethod,
     };
   }
@@ -805,7 +820,8 @@
       tokenId,occasion:wish.occasion,to:wish.recipient,
       from:wish.sender||'Anonymous',message:wish.message,
       tier:wish.tier,theme:wish.theme,
-      imageURL:wish.imageData||null,
+      imageURL:wish.imageURL||null,      // short key (e.g. ew_img_a1b2c3d4) — on-chain reference
+      imageData:wish.imageData||null,    // full base64 — for immediate display in wish.html
       audioHash:wish.audioHash||null,audioURL:wish.audioURL||null,
       timestamp:new Date().toISOString(),isFirstOfDay:false,
       txHash: txHash || ('0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('')),
