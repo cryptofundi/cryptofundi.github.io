@@ -188,6 +188,21 @@
     <span class="wallet-dot" id="walletDot"></span>
     <span id="walletLabel">Connect Wallet</span>
   </button>
+  <button class="wallet-connect-btn" id="myWishesBtn" onclick="openMyWishes()" style="display:none;margin-top:6px;background:var(--cream);color:var(--ink);border:1px solid var(--border);">
+    ✦ My Wishes
+  </button>
+</div>
+
+<!-- My Wishes Modal -->
+<div class="modal-overlay" id="myWishesModal">
+  <div class="modal" style="max-width:560px;max-height:80vh;overflow-y:auto;">
+    <button class="modal-close" onclick="document.getElementById('myWishesModal').classList.remove('visible')">✕</button>
+    <div class="modal-seal" style="font-size:20px;">✦</div>
+    <h2 style="margin-bottom:6px;">My Wishes</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Wishes minted from this wallet or this browser</p>
+    <div id="myWishesList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <p id="myWishesEmpty" style="display:none;font-size:13px;color:var(--muted);text-align:center;padding:20px 0;">No wishes found yet. Mint your first one!</p>
+  </div>
 </div>
 
 <header>
@@ -201,7 +216,7 @@
   <div class="trust-pills">
     <span class="pill">No login</span><span class="pill">No tracking</span>
     <span class="pill">No storage</span><span class="pill">Forever on-chain</span>
-    <span class="pill">Polygon network</span>
+    <span class="pill">Base network</span>
   </div>
 </header>
 
@@ -420,7 +435,7 @@
     </div>
 
     <div class="payment-info visible" id="upiInfo">
-      <strong>UPI / Card:</strong> Pay ₹<span id="upiPrice">19</span> — converted to MATIC and your wish is minted on Polygon automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
+      <strong>UPI / Card:</strong> Pay ₹<span id="upiPrice">19</span> — converted to ETH and your wish is minted on Base automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
     </div>
     <div class="payment-info" id="cryptoInfo">
       <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved. Wish mints the moment the transaction confirms on-chain.
@@ -429,7 +444,7 @@
     <button class="mint-btn" id="mintBtn" onclick="handleMint()">
       Seal this wish forever →
     </button>
-    <p class="mint-note">Gas ~₹0.50 · Polygon blockchain · Cannot be deleted · Ever</p>
+    <p class="mint-note">Gas ~₹0.50 · Base blockchain · Cannot be deleted · Ever</p>
   </div>
 
   <!-- FEED -->
@@ -446,7 +461,7 @@
 <div class="processing-overlay" id="processingOverlay">
   <div class="spinner"></div>
   <div class="processing-text" id="processingText">Sealing your wish…</div>
-  <div class="processing-sub" id="processingSub">Broadcasting to Polygon</div>
+  <div class="processing-sub" id="processingSub">Broadcasting to Base</div>
 </div>
 
 <!-- Success Modal -->
@@ -455,7 +470,7 @@
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-seal">✦</div>
     <h2>Wish sealed forever</h2>
-    <p>Your wish is now on the Polygon blockchain. Permanent, immutable, eternal.</p>
+    <p>Your wish is now on the Base blockchain. Permanent, immutable, eternal.</p>
     <div class="wish-preview">
       <div class="wish-preview-label">Your eternal message</div>
       <div class="wish-preview-text" id="previewMessage"></div>
@@ -463,7 +478,7 @@
     <div id="successAudioInfo" style="display:none;font-size:11px;color:var(--chain);background:var(--gold-pale);border:1px solid rgba(201,151,58,0.3);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:12px;"></div>
     <div class="chain-proof">
       <div class="chain-proof-dot"></div>
-      <span>Confirmed · Token #<span id="tokenId">—</span> · Polygon</span>
+      <span>Confirmed · Token #<span id="tokenId">—</span> · Base</span>
     </div>
 
     <!-- VIEW WISH — primary action -->
@@ -480,6 +495,23 @@
       <button class="share-btn" onclick="shareWhatsApp()">💬 WhatsApp</button>
       <button class="share-btn" onclick="shareTwitter()">𝕏 Share</button>
     </div>
+  </div>
+</div>
+
+<!-- UPI Coming Soon Modal -->
+<div class="modal-overlay" id="upiComingSoonModal">
+  <div class="modal" style="max-width:440px;text-align:center;">
+    <button class="modal-close" onclick="document.getElementById('upiComingSoonModal').classList.remove('visible')">✕</button>
+    <div class="modal-seal" style="font-size:24px;">🇮🇳</div>
+    <h2 style="margin-bottom:10px;">UPI / Card — Coming Soon</h2>
+    <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;">
+      We're integrating UPI, GPay, PhonePe and Credit Card payments via Onramp.money.<br><br>
+      <strong style="color:var(--ink);">For now, use Crypto Wallet payment</strong> — it takes just 2 seconds on Base and costs less than ₹1 in gas.
+    </p>
+    <button onclick="switchToCrypto()" style="width:100%;padding:14px;background:var(--ink);color:var(--parchment);border:none;border-radius:var(--radius-sm);font-family:'Cormorant Garamond',serif;font-size:18px;cursor:pointer;">
+      Switch to Crypto Wallet →
+    </button>
+    <p style="font-size:11px;color:var(--chain-light);margin-top:10px;">Need a wallet? Install MetaMask free at metamask.io</p>
   </div>
 </div>
 
@@ -693,6 +725,7 @@
       state.walletConnected=false;state.walletAddress=null;
       document.getElementById('walletDot').classList.remove('connected');
       document.getElementById('walletLabel').textContent='Connect Wallet';
+      document.getElementById('myWishesBtn').style.display='none';
       if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Connect wallet to mint →';
     }else{connectWallet();}
   }
@@ -703,6 +736,7 @@
       state.walletConnected=true; state.walletAddress=address;
       document.getElementById('walletDot').classList.add('connected');
       document.getElementById('walletLabel').textContent=address.slice(0,6)+'…'+address.slice(-4);
+      document.getElementById('myWishesBtn').style.display='block';
       if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Seal this wish forever →';
     } catch(e) {
       alert('Could not connect wallet: ' + e.message);
@@ -723,17 +757,8 @@
   async function handleMint(){if(!validate())return;state.paymentMethod==='upi'?await handleUPIFlow():await handleCryptoFlow();}
 
   async function handleUPIFlow(){
-    const wish=collectWishData();
-    showProcessing('Preparing your wish…','Creating session');await delay(800);
-    // PLACEHOLDER: await supabase.from('wish_sessions').insert({uuid:wish.uuid,wish_data:wish,pay_status:'pending',mint_status:'pending'});
-    showProcessing('Opening payment…','Redirecting to UPI gateway');await delay(1000);
-    // PLACEHOLDER: onramp.open({partnerOrderId:wish.uuid,cryptoCurrency:'MATIC',fiatCurrency:'INR',fiatAmount:state.tierPrice});
-    showProcessing('Payment confirmed ✓','Minting on Polygon…');await delay(1200);
-    // PLACEHOLDER: const tokenId = await mintWish(wish);
-    const tokenId=4272+Math.floor(Math.random()*10000);
-    // PLACEHOLDER: await supabase.from('wish_sessions').delete().eq('uuid',wish.uuid);
-    showProcessing('Wish sealed ✓','Cleaning up session…');await delay(500);
-    hideProcessing();showSuccess(wish,tokenId);
+    // UPI/Card gateway not yet integrated — show clear message instead of fake-minting
+    document.getElementById('upiComingSoonModal').classList.add('visible');
   }
 
   async function handleCryptoFlow(){
@@ -800,6 +825,66 @@
   function showProcessing(t,s){document.getElementById('processingText').textContent=t;document.getElementById('processingSub').textContent=s;document.getElementById('processingOverlay').classList.add('visible');}
   function hideProcessing(){document.getElementById('processingOverlay').classList.remove('visible');}
   function closeModal(){document.getElementById('successModal').classList.remove('visible');}
+
+  function switchToCrypto(){
+    document.getElementById('upiComingSoonModal').classList.remove('visible');
+    // Switch payment selection to crypto
+    document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('[data-method="crypto"]').classList.add('active');
+    state.paymentMethod='crypto';
+    document.getElementById('upiInfo').classList.remove('visible');
+    document.getElementById('cryptoInfo').classList.add('visible');
+    document.getElementById('mintBtn').textContent=state.walletConnected?'Seal this wish forever →':'Connect wallet to mint →';
+  }
+
+  // ── MY WISHES ─────────────────────────────────────────────────────────
+
+  function openMyWishes(){
+    const list=document.getElementById('myWishesList');
+    const empty=document.getElementById('myWishesEmpty');
+    list.innerHTML='';
+
+    // Collect from localStorage — all keys starting with ew_wish_
+    const wishes=[];
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key && key.startsWith('ew_wish_')){
+          const w=JSON.parse(localStorage.getItem(key));
+          if(w) wishes.push(w);
+        }
+      }
+    }catch(e){}
+
+    // Sort newest first
+    wishes.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+
+    if(wishes.length===0){
+      empty.style.display='block';
+    } else {
+      empty.style.display='none';
+      wishes.forEach(w=>{
+        const url=buildWishURL(w.tokenId);
+        const tierBadge=w.tier!=='basic'?`<span style="font-size:10px;padding:1px 8px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">${w.tier==='eternal'?'✦✦':'✦'} ${w.tier}</span>`:'';
+        const card=document.createElement('div');
+        card.style.cssText='background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s;';
+        card.onmouseover=()=>card.style.borderColor='var(--gold)';
+        card.onmouseout=()=>card.style.borderColor='var(--border)';
+        card.onclick=()=>window.open(url,'_blank');
+        card.innerHTML=`
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion} ${tierBadge}</span>
+            <span style="font-size:11px;color:var(--chain-light);">#${w.tokenId}</span>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${w.message.slice(0,80)}${w.message.length>80?'…':''}"</div>
+          <div style="font-size:11px;color:var(--muted);">To ${w.to} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    document.getElementById('myWishesModal').classList.add('visible');
+  }
   function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 
   function copyLink(){navigator.clipboard.writeText(document.getElementById('wishLink').value).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);});}
@@ -834,6 +919,19 @@
 
   document.getElementById('wishDate').valueAsDate=new Date();
   renderFeed();
+
+  // Show My Wishes button immediately if any wishes exist in localStorage
+  // Works even without wallet connected — UPI users can see their wishes too
+  (function checkLocalWishes(){
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        if(localStorage.key(i)?.startsWith('ew_wish_')){
+          document.getElementById('myWishesBtn').style.display='block';
+          return;
+        }
+      }
+    }catch(e){}
+  })();
 </script>
 </body>
 </html>
