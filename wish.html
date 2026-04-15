@@ -119,8 +119,8 @@
   .copy-tx-btn { background: none; border: none; cursor: pointer; font-size: 11px; color: var(--chain-light); padding: 2px 6px; border-radius: 4px; transition: all 0.2s; margin-left: 4px; }
   .copy-tx-btn:hover { color: var(--gold); background: var(--gold-pale); }
 
-  .polygonscan-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 14px; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; color: var(--chain); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 10px; transition: all 0.2s; text-decoration: none; font-weight: 500; }
-  .polygonscan-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
+  .basescan-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 14px; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; color: var(--chain); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 10px; transition: all 0.2s; text-decoration: none; font-weight: 500; }
+  .basescan-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
   .immutable-badge { background: var(--ink); color: var(--gold-light); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 10px; font-size: 11px; text-align: center; letter-spacing: 0.06em; line-height: 1.6; }
 
   /* SHARE PANEL */
@@ -185,7 +185,7 @@
 
   <div class="hero-band">
     <div class="proof-dot"></div>
-    <span class="hero-band-text"><strong>Sealed forever</strong> on Polygon · Immutable · Cannot be deleted</span>
+    <span class="hero-band-text"><strong>Sealed forever</strong> on Base · Immutable · Cannot be deleted</span>
     <span class="hero-band-right" id="heroTime">—</span>
   </div>
 
@@ -246,7 +246,7 @@
           <span style="font-size:16px;">⛓</span>
           <div>
             <div class="proof-header-title">Blockchain proof</div>
-            <div class="proof-header-sub">Polygon · Immutable record</div>
+            <div class="proof-header-sub">Base · Immutable record</div>
           </div>
         </div>
         <div class="proof-body">
@@ -264,7 +264,7 @@
           </div>
           <div class="proof-row">
             <span class="proof-row-icon">🌐</span>
-            <div><div class="proof-row-label">Network</div><div class="proof-row-value">Polygon Mainnet · Chain 137</div></div>
+            <div><div class="proof-row-label">Network</div><div class="proof-row-value">Base Mainnet · Chain 8453</div></div>
           </div>
           <div class="proof-row">
             <span class="proof-row-icon">📄</span>
@@ -285,9 +285,9 @@
             </div>
           </div>
 
-          <!-- PLACEHOLDER: Replace href with actual PolygonScan URL after contract deployment -->
-          <a id="polygonscanLink" href="#" target="_blank" class="polygonscan-btn" onclick="return handlePolygonscan()">
-            View on PolygonScan ↗
+          <!-- Basescan link — live on Base Mainnet -->
+          <a id="basescanLink" href="#" target="_blank" class="basescan-btn" onclick="return handleBasescan()">
+            View on Basescan ↗
           </a>
           <div class="immutable-badge">This wish is immutable.<br>No one can edit or delete it. Not even us.</div>
         </div>
@@ -467,8 +467,8 @@
     document.getElementById('proofTier').textContent = data.tier.charAt(0).toUpperCase() + data.tier.slice(1);
     document.getElementById('proofContract').textContent = '0x0000…0000'; // PLACEHOLDER
     document.getElementById('proofTxHash').textContent = data.txHash.slice(0,10) + '…' + data.txHash.slice(-8);
-    // PLACEHOLDER: Replace with actual PolygonScan URL after contract deployed
-    document.getElementById('polygonscanLink').href = `https://polygonscan.com/tx/${data.txHash}`;
+    // Basescan URL — wired to txHash from contract event
+    document.getElementById('basescanLink').href = `https://basescan.org/tx/${data.txHash}`;
 
     // Share
     document.getElementById('shareLink').value = url;
@@ -522,10 +522,10 @@
     });
   }
 
-  function handlePolygonscan() {
-    const href = document.getElementById('polygonscanLink').href;
+  function handleBasescan() {
+    const href = document.getElementById('basescanLink').href;
     if (!href || href === '#' || href.includes('0x0000')) {
-      alert('PolygonScan link will be live after smart contract deployment.');
+      alert('Basescan link will be live after smart contract deployment.');
       return false;
     }
     return true;
