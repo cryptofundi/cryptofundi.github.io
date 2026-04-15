@@ -307,44 +307,93 @@
 
     <!-- PREMIUM FIELDS (shown for premium + eternal) -->
     <div class="premium-fields" id="premiumFields">
-      <div class="premium-label">✦ Premium features — make your wish unforgettable</div>
+      <div class="premium-label" id="premiumLabelText">✦ Premium features — make your wish unforgettable</div>
 
-      <!-- Image upload -->
-      <div class="field" style="margin-bottom: 16px;">
-        <label>Add a photo (optional)</label>
-        <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
+      <!-- Photo upload + crop -->
+      <div class="field" style="margin-bottom:20px;">
+        <label>Add a photo <span id="cropHint" style="color:var(--chain-light);font-size:10px;font-style:italic;display:none;">(Eternal — drag to crop)</span></label>
+        <div class="image-upload-area" id="uploadArea" onclick="triggerImageUpload()">
           <img id="uploadPreview" class="upload-preview" src="" alt="Preview">
           <div class="upload-placeholder" id="uploadPlaceholder">
             <span>📷</span>
             Tap to upload a photo
-            <div style="font-size: 11px; color: var(--chain-light); margin-top: 4px;">JPG, PNG · max 2MB</div>
+            <div style="font-size:11px;color:var(--chain-light);margin-top:4px;">JPG, PNG · max 5MB</div>
           </div>
         </div>
         <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+
+        <!-- CROP TOOL (Eternal only) -->
+        <div id="cropTool" style="display:none;margin-top:12px;">
+          <div style="font-size:11px;color:var(--chain);margin-bottom:8px;letter-spacing:0.05em;">DRAG TO CROP · <span style="color:var(--gold);">Eternal exclusive</span></div>
+          <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);border:1.5px solid var(--gold);background:#000;user-select:none;" id="cropContainer">
+            <canvas id="cropCanvas" style="display:block;max-width:100%;cursor:crosshair;"></canvas>
+            <div id="cropOverlay" style="position:absolute;inset:0;pointer-events:none;"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button onclick="applyCrop()" style="flex:1;padding:10px;background:var(--ink);color:var(--parchment);border:none;border-radius:var(--radius-sm);font-family:'Cormorant Garamond',serif;font-size:16px;cursor:pointer;">Apply crop ✓</button>
+            <button onclick="resetCrop()" style="padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;color:var(--muted);">Reset</button>
+          </div>
+        </div>
       </div>
 
       <!-- Theme selector -->
-      <div class="field">
+      <div class="field" style="margin-bottom:20px;">
         <label>Choose a design theme</label>
         <div class="themes" id="themeSelector">
           <button class="theme-btn active" data-theme="classic" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background: linear-gradient(135deg, #f4efe6, #c9973a);"></div>
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#f4efe6,#c9973a);"></div>
             <div class="theme-label">Classic Gold</div>
           </button>
           <button class="theme-btn" data-theme="romantic" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background: linear-gradient(135deg, #fce4ec, #c2185b);"></div>
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#fce4ec,#c2185b);"></div>
             <div class="theme-label">Romantic</div>
           </button>
           <button class="theme-btn" data-theme="dark" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background: linear-gradient(135deg, #1a1410, #c9973a);"></div>
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#1a1410,#c9973a);"></div>
             <div class="theme-label">Dark Luxury</div>
           </button>
           <button class="theme-btn" data-theme="nature" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background: linear-gradient(135deg, #e8f5e9, #2e7d32);"></div>
+            <div class="theme-swatch" style="background:linear-gradient(135deg,#e8f5e9,#2e7d32);"></div>
             <div class="theme-label">Nature</div>
           </button>
         </div>
       </div>
+
+      <!-- VOICE NOTE (Eternal only) -->
+      <div id="voiceNoteSection" style="display:none;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--chain);font-weight:500;margin-bottom:10px;">
+          Voice note <span style="color:var(--gold);font-style:italic;text-transform:none;letter-spacing:0;font-size:11px;">— sealed on-chain · Eternal exclusive</span>
+        </div>
+        <div style="background:var(--parchment);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;">
+
+          <!-- Recorder UI -->
+          <div id="recorderUI" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <button id="recordBtn" onclick="toggleRecording()" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--ink);color:var(--parchment);border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;">
+              <span id="recordIcon" style="width:10px;height:10px;background:#ef4444;border-radius:50%;display:inline-block;"></span>
+              <span id="recordLabel">Record voice note</span>
+            </button>
+            <span id="recordTimer" style="font-size:13px;color:var(--chain);font-family:monospace;min-width:40px;">0:00</span>
+            <span id="recordStatus" style="font-size:11px;color:var(--chain-light);">Max 30 seconds</span>
+          </div>
+
+          <!-- Waveform visualiser -->
+          <canvas id="waveformCanvas" width="400" height="48" style="display:none;width:100%;margin-top:12px;border-radius:6px;background:var(--cream);"></canvas>
+
+          <!-- Playback (shown after recording) -->
+          <div id="playbackUI" style="display:none;margin-top:12px;">
+            <audio id="audioPlayback" controls style="width:100%;height:36px;"></audio>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+              <div style="font-size:11px;color:var(--chain-light);">
+                🔒 Audio hash: <span id="audioHashDisplay" style="font-family:monospace;font-size:10px;color:var(--muted);">computing…</span>
+              </div>
+              <button onclick="clearRecording()" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px;">✕ Redo</button>
+            </div>
+            <div style="font-size:11px;color:var(--chain-light);margin-top:4px;">The hash of your voice note will be sealed on-chain. Audio stored on IPFS.</div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -411,6 +460,7 @@
       <div class="wish-preview-label">Your eternal message</div>
       <div class="wish-preview-text" id="previewMessage"></div>
     </div>
+    <div id="successAudioInfo" style="display:none;font-size:11px;color:var(--chain);background:var(--gold-pale);border:1px solid rgba(201,151,58,0.3);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:12px;"></div>
     <div class="chain-proof">
       <div class="chain-proof-dot"></div>
       <span>Confirmed · Token #<span id="tokenId">—</span> · Polygon</span>
@@ -441,244 +491,333 @@
 
 <script>
   const state = {
-    occasion: 'birthday', tier: 'basic', tierPrice: 19,
-    paymentMethod: 'upi', walletConnected: false, walletAddress: null,
-    theme: 'classic', imageData: null,
+    occasion:'birthday', tier:'basic', tierPrice:19,
+    paymentMethod:'upi', walletConnected:false, walletAddress:null,
+    theme:'classic', imageData:null, croppedImageData:null,
+    audioBlob:null, audioHash:null, audioURL:null,
+    isRecording:false, mediaRecorder:null, recordChunks:[],
+    recordInterval:null, recordSeconds:0,
+    cropImg:null, cropScale:1,
+    cropState:{ x:0,y:0,w:0,h:0,dragging:false,startX:0,startY:0 },
   };
 
-  // Consistent URL format: wish.html?id=TOKEN
-  // Works on GitHub Pages, local file, any subdirectory
   function buildWishURL(tokenId) {
-    // Safely build wish URL — works on GitHub Pages, localhost, any subdirectory
-    // e.g. https://cryptofundi.github.io/eternalwishes.html → https://cryptofundi.github.io/wish.html?id=4369
-    const origin = window.location.origin;                          // https://cryptofundi.github.io
-    const path = window.location.pathname;                          // /eternalwishes.html  or  /subfolder/eternalwishes.html
-    const dir = path.substring(0, path.lastIndexOf('/') + 1);       // /  or  /subfolder/
+    const origin = window.location.origin;
+    const path = window.location.pathname;
+    const dir = path.substring(0, path.lastIndexOf('/') + 1);
     return `${origin}${dir}wish.html?id=${tokenId}`;
   }
 
+
   // OCCASION
   function selectOccasion(el) {
-    document.querySelectorAll('.occasion-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    state.occasion = el.dataset.occasion;
+    document.querySelectorAll('.occasion-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active'); state.occasion=el.dataset.occasion;
   }
 
-  // TIER
+  // TIER — shows/hides premium and eternal exclusive sections
   function selectTier(el) {
-    document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tier-card').forEach(c=>c.classList.remove('active'));
     el.classList.add('active');
-    state.tier = el.dataset.tier;
-    state.tierPrice = parseInt(el.dataset.price);
-    document.getElementById('upiPrice').textContent = state.tierPrice;
-    const isPremium = ['premium','eternal'].includes(state.tier);
-    document.getElementById('premiumFields').classList.toggle('visible', isPremium);
+    state.tier=el.dataset.tier; state.tierPrice=parseInt(el.dataset.price);
+    document.getElementById('upiPrice').textContent=state.tierPrice;
+    const isPrem=['premium','eternal'].includes(state.tier);
+    const isEternal=state.tier==='eternal';
+    document.getElementById('premiumFields').classList.toggle('visible', isPrem);
+    document.getElementById('voiceNoteSection').style.display=isEternal?'block':'none';
+    document.getElementById('cropHint').style.display=isEternal?'inline':'none';
+    document.getElementById('premiumLabelText').textContent=isEternal
+      ?'✦✦ Eternal features — the ultimate wish':'✦ Premium features — make your wish unforgettable';
+    if(state.cropImg&&isEternal) document.getElementById('cropTool').style.display='block';
+    if(!isEternal) document.getElementById('cropTool').style.display='none';
   }
 
-  // THEME
   function selectTheme(el) {
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    state.theme = el.dataset.theme;
+    document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active'); state.theme=el.dataset.theme;
   }
 
-  // IMAGE UPLOAD
+  function triggerImageUpload(){ document.getElementById('imageInput').click(); }
+
   function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB'); return; }
-    const reader = new FileReader();
-    reader.onload = ev => {
-      state.imageData = ev.target.result;
-      document.getElementById('uploadPreview').src = ev.target.result;
-      document.getElementById('uploadPreview').classList.add('visible');
-      document.getElementById('uploadPlaceholder').style.display = 'none';
-      document.getElementById('uploadArea').classList.add('has-image');
+    const file=e.target.files[0]; if(!file) return;
+    if(file.size>5*1024*1024){alert('Image must be under 5MB');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      state.imageData=ev.target.result; state.croppedImageData=null;
+      const img=new Image();
+      img.onload=()=>{
+        state.cropImg=img;
+        document.getElementById('uploadPreview').src=ev.target.result;
+        document.getElementById('uploadPreview').classList.add('visible');
+        document.getElementById('uploadPlaceholder').style.display='none';
+        document.getElementById('uploadArea').classList.add('has-image');
+        document.getElementById('uploadArea').onclick=null;
+        if(state.tier==='eternal'){ initCropTool(img); document.getElementById('cropTool').style.display='block'; }
+      };
+      img.src=ev.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  // PAYMENT
-  function selectPayment(el) {
-    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    state.paymentMethod = el.dataset.method;
-    document.getElementById('upiInfo').classList.toggle('visible', state.paymentMethod === 'upi');
-    document.getElementById('cryptoInfo').classList.toggle('visible', state.paymentMethod === 'crypto');
-    const btn = document.getElementById('mintBtn');
-    btn.textContent = (state.paymentMethod === 'crypto' && !state.walletConnected)
-      ? 'Connect wallet to mint →' : 'Seal this wish forever →';
+  // CROP TOOL
+  function initCropTool(img) {
+    const canvas=document.getElementById('cropCanvas');
+    const container=document.getElementById('cropContainer');
+    const maxW=container.clientWidth||520;
+    const scale=Math.min(1,maxW/img.width);
+    canvas.width=Math.round(img.width*scale);
+    canvas.height=Math.round(img.height*scale);
+    state.cropScale=scale;
+    state.cropState={x:0,y:0,w:0,h:0,dragging:false,startX:0,startY:0};
+    drawCropCanvas();
+    canvas.onmousedown=cropStart; canvas.onmousemove=cropMove; canvas.onmouseup=cropEnd;
+    canvas.ontouchstart=e=>cropStart(e.touches[0]);
+    canvas.ontouchmove=e=>{e.preventDefault();cropMove(e.touches[0]);};
+    canvas.ontouchend=cropEnd;
   }
 
-  // WALLET
-  function toggleWallet() {
-    if (state.walletConnected) {
-      state.walletConnected = false; state.walletAddress = null;
+  function canvasXY(e){const r=document.getElementById('cropCanvas').getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+  function cropStart(e){const{x,y}=canvasXY(e);state.cropState={...state.cropState,dragging:true,startX:x,startY:y,x,y,w:0,h:0};}
+  function cropMove(e){if(!state.cropState.dragging)return;const{x,y}=canvasXY(e);state.cropState.w=x-state.cropState.startX;state.cropState.h=y-state.cropState.startY;drawCropCanvas();}
+  function cropEnd(){state.cropState.dragging=false;}
+
+  function drawCropCanvas(){
+    const canvas=document.getElementById('cropCanvas'),ctx=canvas.getContext('2d'),img=state.cropImg,cs=state.cropState;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    if(Math.abs(cs.w)>4&&Math.abs(cs.h)>4){
+      ctx.fillStyle='rgba(0,0,0,0.45)';ctx.fillRect(0,0,canvas.width,canvas.height);
+      const rx=cs.w>0?cs.x:cs.x+cs.w,ry=cs.h>0?cs.y:cs.y+cs.h,rw=Math.abs(cs.w),rh=Math.abs(cs.h);
+      ctx.drawImage(img,rx/state.cropScale,ry/state.cropScale,rw/state.cropScale,rh/state.cropScale,rx,ry,rw,rh);
+      ctx.strokeStyle='#c9973a';ctx.lineWidth=2;ctx.setLineDash([5,3]);ctx.strokeRect(rx,ry,rw,rh);ctx.setLineDash([]);
+    }
+  }
+
+  function applyCrop(){
+    const cs=state.cropState;
+    if(Math.abs(cs.w)<20||Math.abs(cs.h)<20){alert('Please drag a larger crop area.');return;}
+    const rx=cs.w>0?cs.x:cs.x+cs.w,ry=cs.h>0?cs.y:cs.y+cs.h,rw=Math.abs(cs.w),rh=Math.abs(cs.h);
+    const out=document.createElement('canvas');out.width=rw;out.height=rh;
+    out.getContext('2d').drawImage(state.cropImg,rx/state.cropScale,ry/state.cropScale,rw/state.cropScale,rh/state.cropScale,0,0,rw,rh);
+    state.croppedImageData=out.toDataURL('image/jpeg',0.88);
+    document.getElementById('uploadPreview').src=state.croppedImageData;
+    document.getElementById('cropTool').style.display='none';
+    document.getElementById('uploadArea').onclick=()=>{initCropTool(state.cropImg);document.getElementById('cropTool').style.display='block';};
+  }
+
+  function resetCrop(){
+    state.croppedImageData=null;
+    document.getElementById('uploadPreview').src=state.imageData;
+    initCropTool(state.cropImg);
+  }
+
+  // VOICE RECORDER
+  async function toggleRecording(){
+    if(state.isRecording){stopRecording();return;}
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      state.recordChunks=[];state.recordSeconds=0;
+      const mr=new MediaRecorder(stream);state.mediaRecorder=mr;
+      const actx=new AudioContext(),analyser=actx.createAnalyser();
+      actx.createMediaStreamSource(stream).connect(analyser);
+      analyser.fftSize=256;const buf=new Uint8Array(analyser.frequencyBinCount);
+      const wc=document.getElementById('waveformCanvas');wc.style.display='block';
+      const wctx=wc.getContext('2d');let animId;
+      function drawWave(){
+        animId=requestAnimationFrame(drawWave);
+        analyser.getByteTimeDomainData(buf);
+        wctx.fillStyle='#f4efe6';wctx.fillRect(0,0,wc.width,wc.height);
+        wctx.beginPath();wctx.strokeStyle='#c9973a';wctx.lineWidth=2;
+        const sw=wc.width/buf.length;let x=0;
+        for(let i=0;i<buf.length;i++){const v=buf[i]/128,y=(v*wc.height)/2;i===0?wctx.moveTo(x,y):wctx.lineTo(x,y);x+=sw;}
+        wctx.lineTo(wc.width,wc.height/2);wctx.stroke();
+      }
+      drawWave();
+      mr.ondataavailable=e=>{if(e.data.size>0)state.recordChunks.push(e.data);};
+      mr.onstop=async()=>{
+        cancelAnimationFrame(animId);actx.close();stream.getTracks().forEach(t=>t.stop());
+        const blob=new Blob(state.recordChunks,{type:'audio/webm'});
+        state.audioBlob=blob;state.audioURL=URL.createObjectURL(blob);
+        document.getElementById('audioPlayback').src=state.audioURL;
+        document.getElementById('playbackUI').style.display='block';
+        document.getElementById('recorderUI').style.display='none';
+        document.getElementById('waveformCanvas').style.display='none';
+        const hashBuf=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());
+        state.audioHash=Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        document.getElementById('audioHashDisplay').textContent=state.audioHash.slice(0,10)+'…'+state.audioHash.slice(-8);
+      };
+      mr.start(100);state.isRecording=true;
+      document.getElementById('recordBtn').style.background='#dc2626';
+      document.getElementById('recordLabel').textContent='Stop recording';
+      document.getElementById('recordIcon').style.animation='pulse 0.8s infinite';
+      state.recordInterval=setInterval(()=>{
+        state.recordSeconds++;
+        const s=state.recordSeconds;
+        document.getElementById('recordTimer').textContent=`${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+        if(s>=30)stopRecording();
+      },1000);
+    }catch(err){alert('Microphone access needed. Please allow it in your browser.');}
+  }
+
+  function stopRecording(){
+    if(state.mediaRecorder&&state.mediaRecorder.state!=='inactive')state.mediaRecorder.stop();
+    clearInterval(state.recordInterval);state.isRecording=false;
+    document.getElementById('recordBtn').style.background='var(--ink)';
+    document.getElementById('recordLabel').textContent='Record voice note';
+    document.getElementById('recordIcon').style.animation='';
+  }
+
+  function clearRecording(){
+    state.audioBlob=null;state.audioHash=null;state.audioURL=null;state.recordSeconds=0;state.recordChunks=[];
+    document.getElementById('playbackUI').style.display='none';
+    document.getElementById('recorderUI').style.display='flex';
+    document.getElementById('recordTimer').textContent='0:00';
+    document.getElementById('waveformCanvas').style.display='none';
+  }
+
+  function selectPayment(el){
+    document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');state.paymentMethod=el.dataset.method;
+    document.getElementById('upiInfo').classList.toggle('visible',state.paymentMethod==='upi');
+    document.getElementById('cryptoInfo').classList.toggle('visible',state.paymentMethod==='crypto');
+    document.getElementById('mintBtn').textContent=(state.paymentMethod==='crypto'&&!state.walletConnected)?'Connect wallet to mint →':'Seal this wish forever →';
+  }
+
+  function toggleWallet(){
+    if(state.walletConnected){
+      state.walletConnected=false;state.walletAddress=null;
       document.getElementById('walletDot').classList.remove('connected');
-      document.getElementById('walletLabel').textContent = 'Connect Wallet';
-      if (state.paymentMethod === 'crypto') document.getElementById('mintBtn').textContent = 'Connect wallet to mint →';
-    } else { connectWallet(); }
+      document.getElementById('walletLabel').textContent='Connect Wallet';
+      if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Connect wallet to mint →';
+    }else{connectWallet();}
   }
 
-  async function connectWallet() {
-    // PLACEHOLDER: Replace with actual MetaMask call
-    // const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    // state.walletAddress = accounts[0];
-    const mock = '0x' + Math.random().toString(16).substr(2,6) + '…' + Math.random().toString(16).substr(2,4);
-    state.walletConnected = true; state.walletAddress = mock;
+  async function connectWallet(){
+    // PLACEHOLDER: const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const mock='0x'+Math.random().toString(16).substr(2,6)+'…'+Math.random().toString(16).substr(2,4);
+    state.walletConnected=true;state.walletAddress=mock;
     document.getElementById('walletDot').classList.add('connected');
-    document.getElementById('walletLabel').textContent = mock;
-    if (state.paymentMethod === 'crypto') document.getElementById('mintBtn').textContent = 'Seal this wish forever →';
+    document.getElementById('walletLabel').textContent=mock;
+    if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Seal this wish forever →';
   }
 
-  function updateCharCount() {
-    document.getElementById('charCount').textContent = document.getElementById('wishMessage').value.length;
-  }
+  function updateCharCount(){document.getElementById('charCount').textContent=document.getElementById('wishMessage').value.length;}
 
-  function validate() {
-    const name = document.getElementById('recipientName').value.trim();
-    const msg = document.getElementById('wishMessage').value.trim();
-    if (!name) { alert('Please enter the recipient\'s name.'); return false; }
-    if (msg.length < 10) { alert('Please write at least 10 characters.'); return false; }
-    if (state.paymentMethod === 'crypto' && !state.walletConnected) { connectWallet(); return false; }
+  function validate(){
+    const name=document.getElementById('recipientName').value.trim();
+    const msg=document.getElementById('wishMessage').value.trim();
+    if(!name){alert('Please enter the recipient\'s name.');return false;}
+    if(msg.length<10){alert('Please write at least 10 characters.');return false;}
+    if(state.paymentMethod==='crypto'&&!state.walletConnected){connectWallet();return false;}
     return true;
   }
 
-  async function handleMint() {
-    if (!validate()) return;
-    state.paymentMethod === 'upi' ? await handleUPIFlow() : await handleCryptoFlow();
+  async function handleMint(){if(!validate())return;state.paymentMethod==='upi'?await handleUPIFlow():await handleCryptoFlow();}
+
+  async function handleUPIFlow(){
+    const wish=collectWishData();
+    showProcessing('Preparing your wish…','Creating session');await delay(800);
+    // PLACEHOLDER: await supabase.from('wish_sessions').insert({uuid:wish.uuid,wish_data:wish,pay_status:'pending',mint_status:'pending'});
+    showProcessing('Opening payment…','Redirecting to UPI gateway');await delay(1000);
+    // PLACEHOLDER: onramp.open({partnerOrderId:wish.uuid,cryptoCurrency:'MATIC',fiatCurrency:'INR',fiatAmount:state.tierPrice});
+    showProcessing('Payment confirmed ✓','Minting on Polygon…');await delay(1200);
+    // PLACEHOLDER: const tokenId = await mintWish(wish);
+    const tokenId=4272+Math.floor(Math.random()*10000);
+    // PLACEHOLDER: await supabase.from('wish_sessions').delete().eq('uuid',wish.uuid);
+    showProcessing('Wish sealed ✓','Cleaning up session…');await delay(500);
+    hideProcessing();showSuccess(wish,tokenId);
   }
 
-  async function handleUPIFlow() {
-    const wish = collectWishData();
-    showProcessing('Preparing your wish…', 'Creating session');
-    await delay(800);
-    // PLACEHOLDER: await supabase.from('wish_sessions').insert({ uuid: wish.uuid, wish_data: wish, pay_status: 'pending', mint_status: 'pending' });
-    showProcessing('Opening payment…', 'Redirecting to UPI gateway');
-    await delay(1000);
-    // PLACEHOLDER: onramp.open({ partnerOrderId: wish.uuid, cryptoCurrency: 'MATIC', fiatCurrency: 'INR', fiatAmount: state.tierPrice });
-    showProcessing('Payment confirmed ✓', 'Minting on Polygon…');
-    await delay(1200);
-    // PLACEHOLDER: const tokenId = await mintWish(wish.occasion, wish.recipient, wish.message, wish.tier, wish.theme, wish.imageIPFSHash);
-    const tokenId = 4272 + Math.floor(Math.random() * 100);
-    // PLACEHOLDER: await supabase.from('wish_sessions').delete().eq('uuid', wish.uuid);
-    showProcessing('Wish sealed ✓', 'Cleaning up session…');
-    await delay(500);
-    hideProcessing();
-    showSuccess(wish, tokenId);
-  }
-
-  async function handleCryptoFlow() {
-    const wish = collectWishData();
-    showProcessing('Confirm in your wallet…', 'Waiting for signature');
-    await delay(1500);
+  async function handleCryptoFlow(){
+    const wish=collectWishData();
+    showProcessing('Confirm in your wallet…','Waiting for signature');await delay(1500);
     // PLACEHOLDER:
-    // const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-    // const tx = await contract.mintWish(
-    //   wish.occasion, wish.recipient, wish.message,
-    //   wish.tier, wish.theme,
-    //   { value: ethers.utils.parseEther(TIER_PRICES[wish.tier]) }
+    // const contract=new ethers.Contract(CONTRACT_ADDRESS,ABI,signer);
+    // const tx=await contract.mintWish(
+    //   wish.occasion, wish.recipient, wish.message, wish.tier, wish.theme,
+    //   wish.audioHash||'', wish.imageIPFSHash||'',
+    //   {value:ethers.utils.parseEther(TIER_PRICES[wish.tier])}
     // );
-    // const receipt = await tx.wait();
-    // const tokenId = receipt.events[0].args.tokenId.toNumber();
-    showProcessing('Transaction confirmed ✓', 'Reading event from chain…');
-    await delay(1500);
-    const tokenId = 4272 + Math.floor(Math.random() * 100);
-    hideProcessing();
-    showSuccess(wish, tokenId);
-    // No Supabase for crypto path — blockchain events are the record
+    // const receipt=await tx.wait(); const tokenId=receipt.events[0].args.tokenId.toNumber();
+    showProcessing('Transaction confirmed ✓','Reading event from chain…');await delay(1500);
+    const tokenId=4272+Math.floor(Math.random()*10000);
+    hideProcessing();showSuccess(wish,tokenId);
   }
 
-  function collectWishData() {
-    return {
-      uuid: crypto.randomUUID(),
-      occasion: state.occasion,
-      recipient: document.getElementById('recipientName').value.trim(),
-      recipientWallet: document.getElementById('recipientWallet').value.trim(),
-      message: document.getElementById('wishMessage').value.trim(),
-      sender: document.getElementById('senderName').value.trim() || 'Anonymous',
-      tier: state.tier, price: state.tierPrice,
-      theme: state.theme, imageData: state.imageData,
-      paymentMethod: state.paymentMethod,
+  function collectWishData(){
+    return{
+      uuid:crypto.randomUUID(),occasion:state.occasion,
+      recipient:document.getElementById('recipientName').value.trim(),
+      recipientWallet:document.getElementById('recipientWallet').value.trim(),
+      message:document.getElementById('wishMessage').value.trim(),
+      sender:document.getElementById('senderName').value.trim()||'Anonymous',
+      tier:state.tier,price:state.tierPrice,theme:state.theme,
+      imageData:state.croppedImageData||state.imageData||null,
+      audioHash:state.audioHash||null,audioURL:state.audioURL||null,
+      paymentMethod:state.paymentMethod,
     };
   }
 
-  function showSuccess(wish, tokenId) {
-    const url = buildWishURL(tokenId);
-
-    // Save to sessionStorage so wish.html can render newly-minted wishes immediately
-    const wishRecord = {
-      tokenId, occasion: wish.occasion, to: wish.recipient,
-      from: wish.sender || 'Anonymous', message: wish.message,
-      tier: wish.tier, theme: wish.theme, imageURL: wish.imageData || null,
-      timestamp: new Date().toISOString(), isFirstOfDay: false,
-      txHash: '0x' + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join(''),
+  function showSuccess(wish,tokenId){
+    const url=buildWishURL(tokenId);
+    const rec={
+      tokenId,occasion:wish.occasion,to:wish.recipient,
+      from:wish.sender||'Anonymous',message:wish.message,
+      tier:wish.tier,theme:wish.theme,
+      imageURL:wish.imageData||null,
+      audioHash:wish.audioHash||null,audioURL:wish.audioURL||null,
+      timestamp:new Date().toISOString(),isFirstOfDay:false,
+      txHash:'0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join(''),
     };
-    // localStorage persists across tabs — so wish.html can render it even when opened from a shared link
-    try { localStorage.setItem('ew_wish_' + tokenId, JSON.stringify(wishRecord)); } catch(e) {}
-
-    document.getElementById('previewMessage').textContent = `"${wish.message}"`;
-    document.getElementById('tokenId').textContent = tokenId;
-    document.getElementById('viewWishBtn').href = url;
-    document.getElementById('wishLink').value = url;
+    try{localStorage.setItem('ew_wish_'+tokenId,JSON.stringify(rec));}catch(e){}
+    document.getElementById('previewMessage').textContent=`"${wish.message}"`;
+    document.getElementById('tokenId').textContent=tokenId;
+    document.getElementById('viewWishBtn').href=url;
+    document.getElementById('wishLink').value=url;
+    const ai=document.getElementById('successAudioInfo');
+    if(ai){ai.textContent=wish.audioHash?`🎙 Voice hash: ${wish.audioHash.slice(0,12)}… sealed on-chain`:'';ai.style.display=wish.audioHash?'block':'none';}
     document.getElementById('successModal').classList.add('visible');
-    feedWishes.unshift({ occasion: wish.occasion, to: wish.recipient, message: wish.message, from: wish.sender, token: tokenId, tier: wish.tier });
+    feedWishes.unshift({occasion:wish.occasion,to:wish.recipient,message:wish.message,from:wish.sender,token:tokenId,tier:wish.tier,hasAudio:!!wish.audioHash});
     renderFeed();
   }
 
-  function showProcessing(t, s) { document.getElementById('processingText').textContent = t; document.getElementById('processingSub').textContent = s; document.getElementById('processingOverlay').classList.add('visible'); }
-  function hideProcessing() { document.getElementById('processingOverlay').classList.remove('visible'); }
-  function closeModal() { document.getElementById('successModal').classList.remove('visible'); }
-  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function showProcessing(t,s){document.getElementById('processingText').textContent=t;document.getElementById('processingSub').textContent=s;document.getElementById('processingOverlay').classList.add('visible');}
+  function hideProcessing(){document.getElementById('processingOverlay').classList.remove('visible');}
+  function closeModal(){document.getElementById('successModal').classList.remove('visible');}
+  function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 
-  function copyLink() {
-    navigator.clipboard.writeText(document.getElementById('wishLink').value).then(() => {
-      const b = document.querySelector('.copy-btn'); b.textContent = 'Copied!';
-      setTimeout(() => b.textContent = 'Copy', 2000);
-    });
-  }
+  function copyLink(){navigator.clipboard.writeText(document.getElementById('wishLink').value).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);});}
+  function shareWhatsApp(){const u=encodeURIComponent(document.getElementById('wishLink').value);window.open(`https://wa.me/?text=${encodeURIComponent('✨ I just sealed an eternal wish on the blockchain — ')}${u}`,'_blank');}
+  function shareTwitter(){const u=encodeURIComponent(document.getElementById('wishLink').value);window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Just minted an eternal wish on the blockchain ✨')}&url=${u}`,'_blank');}
 
-  function shareWhatsApp() {
-    const u = encodeURIComponent(document.getElementById('wishLink').value);
-    window.open(`https://wa.me/?text=${encodeURIComponent('✨ I just sealed an eternal wish on the blockchain — ')}${u}`, '_blank');
-  }
+  const OCCASION_MAP={birthday:{i:'🎂',l:'Birthday'},anniversary:{i:'💍',l:'Anniversary'},wedding:{i:'💐',l:'Wedding'},newbaby:{i:'👶',l:'New Baby'},graduation:{i:'🎓',l:'Graduation'},promotion:{i:'🚀',l:'Promotion'},newyear:{i:'✨',l:'New Year'},memorial:{i:'🕯️',l:'In Memory'},custom:{i:'💫',l:'Wish'}};
+  const THEME_COLORS={classic:'var(--cream)',romantic:'#fce4ec',dark:'#2d2520',nature:'#e8f5e9'};
 
-  function shareTwitter() {
-    const u = encodeURIComponent(document.getElementById('wishLink').value);
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Just minted an eternal wish on the blockchain ✨')}&url=${u}`, '_blank');
-  }
-
-  // FEED
-  const OCCASION_MAP = { birthday:{i:'🎂',l:'Birthday'}, anniversary:{i:'💍',l:'Anniversary'}, wedding:{i:'💐',l:'Wedding'}, newbaby:{i:'👶',l:'New Baby'}, graduation:{i:'🎓',l:'Graduation'}, promotion:{i:'🚀',l:'Promotion'}, newyear:{i:'✨',l:'New Year'}, memorial:{i:'🕯️',l:'In Memory'}, custom:{i:'💫',l:'Wish'} };
-  const THEME_COLORS = { classic:'var(--cream)', romantic:'#fce4ec', dark:'#1a1410', nature:'#e8f5e9' };
-  const THEME_TEXT = { classic:'var(--ink)', romantic:'#880e4f', dark:'var(--gold-light)', nature:'#1b5e20' };
-
-  const feedWishes = [
-    { occasion:'birthday', to:'Priya S.', message:'May every year bring you closer to all your dreams. You deserve the world.', from:'0x8f2c…', token:4271, tier:'premium' },
-    { occasion:'anniversary', to:'Ravi & Meera', message:'Fifteen years of love that keeps growing. Here is to forever and beyond.', from:'0x1b4e…', token:4270, tier:'basic' },
-    { occasion:'graduation', to:'Arjun K.', message:'You did it. All those late nights were worth every single moment.', from:'Amma', token:4269, tier:'basic' },
-    { occasion:'newbaby', to:'Baby Kavya', message:'Welcome to the world, little one. You are already so loved.', from:'0x7d3a…', token:4268, tier:'eternal' },
-    { occasion:'promotion', to:'Sunita R.', message:'VP at 32. You have always been the hardest worker in every room.', from:'The team', token:4267, tier:'premium' },
+  const feedWishes=[
+    {occasion:'birthday',to:'Priya S.',message:'May every year bring you closer to all your dreams.',from:'0x8f2c…',token:4271,tier:'premium',hasAudio:false},
+    {occasion:'anniversary',to:'Ravi & Meera',message:'Fifteen years of love that keeps growing.',from:'0x1b4e…',token:4270,tier:'eternal',hasAudio:true},
+    {occasion:'graduation',to:'Arjun K.',message:'You did it. All those late nights were worth it.',from:'Amma',token:4269,tier:'basic',hasAudio:false},
+    {occasion:'newbaby',to:'Baby Kavya',message:'Welcome to the world, little one.',from:'0x7d3a…',token:4268,tier:'eternal',hasAudio:true},
+    {occasion:'promotion',to:'Sunita R.',message:'VP at 32. Hardest worker in every room.',from:'The team',token:4267,tier:'premium',hasAudio:false},
   ];
 
-  function renderFeed() {
-    document.getElementById('feedCount').textContent = `${4271 + feedWishes.length} wishes sealed forever`;
-    document.getElementById('wishFeed').innerHTML = feedWishes.map(w => {
-      const occ = OCCASION_MAP[w.occasion] || OCCASION_MAP.custom;
-      const bg = w.tier !== 'basic' ? THEME_COLORS.classic : 'var(--cream)';
-      const tierBadge = w.tier !== 'basic' ? `<span style="font-size:10px;padding:1px 7px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">✦ ${w.tier}</span>` : '';
+  function renderFeed(){
+    document.getElementById('feedCount').textContent=`${4271+feedWishes.length} wishes sealed forever`;
+    document.getElementById('wishFeed').innerHTML=feedWishes.map(w=>{
+      const occ=OCCASION_MAP[w.occasion]||OCCASION_MAP.custom;
+      const bg=w.tier!=='basic'?THEME_COLORS.classic:'var(--cream)';
+      const tierBadge=w.tier!=='basic'?`<span style="font-size:10px;padding:1px 7px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">${w.tier==='eternal'?'✦✦':'✦'} ${w.tier}</span>`:'';
+      const audioIcon=w.hasAudio?'<span title="Voice note on-chain" style="font-size:11px;margin-left:3px;">🎙</span>':'';
       return `<div class="feed-card" style="background:${bg};" onclick="window.location='wish.html?id=${w.token}'">
-        <div class="feed-occasion">${occ.i} ${occ.l} ${tierBadge}</div>
+        <div class="feed-occasion">${occ.i} ${occ.l} ${tierBadge}${audioIcon}</div>
         <div class="feed-message">"${w.message}"</div>
-        <div class="feed-meta">
-          <span>To ${w.to}</span>
-          <span class="feed-chain-badge">#${w.token}</span>
-        </div>
+        <div class="feed-meta"><span>To ${w.to}</span><span class="feed-chain-badge">#${w.token}</span></div>
       </div>`;
     }).join('');
   }
 
-  document.getElementById('wishDate').valueAsDate = new Date();
+  document.getElementById('wishDate').valueAsDate=new Date();
   renderFeed();
 </script>
 </body>
