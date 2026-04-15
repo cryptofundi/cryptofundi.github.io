@@ -321,7 +321,7 @@
 </div>
 
 <footer>
-  <a href="index.html">Eternal Wishes</a> · Polygon blockchain · No login · No tracking · No personal data stored
+  <a href="index.html">Eternal Wishes</a> · Base blockchain · No login · No tracking · No personal data stored
 </footer>
 
 <script>
@@ -341,12 +341,9 @@
     custom:{i:'💫',l:'Eternal Wish'},
   };
 
-  // ── MOCK DATA ──
-  // PLACEHOLDER: Replace loadWish() with actual contract.getWish(tokenId) call
-  const MOCK = {
-    '4271': { tokenId:4271, occasion:'birthday', to:'Ravi Kumar', message:'May every candle you blow out carry a wish straight to the universe. You have been a light in every room you have entered. Happy birthday — this moment is now sealed forever.', from:'Amit Sharma', timestamp: new Date(Date.now()-840000).toISOString(), txHash:'0x7f3a9b2e4c1d8f5a0e6b3c7d9a2f4e8b1c5d7f9a2e4c6b8d0f2a4c6e8b0d2f4', tier:'basic', theme:'classic', isFirstOfDay:true, imageURL:null },
-    '4270': { tokenId:4270, occasion:'anniversary', to:'Priya & Rahul', message:'Fifteen years of choosing each other every single morning. That is not love, that is a decision — the most beautiful one either of you ever made.', from:'The Mehta Family', timestamp: new Date(Date.now()-4020000).toISOString(), txHash:'0x1b4e9f2c5a7d3e8b0f6c2a4d7e9b1c3e5f7a9b0d2f4c6e8a0b2d4f6c8e0a2b4', tier:'premium', theme:'romantic', isFirstOfDay:false, imageURL:null },
-    '4269': { tokenId:4269, occasion:'graduation', to:'Arjun Khanna', message:'You stayed when everyone told you it was too hard. You pushed when you had every reason to quit. Today belongs entirely to you. Dr. Khanna has a wonderful ring to it.', from:'Amma', timestamp: new Date(Date.now()-10800000).toISOString(), txHash:'0x3c8f1a5e7b9d2f4c6a8e0b2d4f6a8c0e2b4d6f8a0c2e4f6b8d0a2c4e6f8b0d2', tier:'eternal', theme:'dark', isFirstOfDay:false, imageURL:null },
+  // Demo wishes shown when no tokenId in URL (landing page preview)
+  const DEMO_WISHES = {
+    'demo1': { tokenId:'demo1', occasion:'birthday', to:'Ravi Kumar', message:'May every candle you blow out carry a wish straight to the universe. You have been a light in every room you have entered. Happy birthday — this moment is now sealed forever.', from:'Amit Sharma', timestamp: new Date(Date.now()-840000).toISOString(), txHash:'0x7f3a…demo', tier:'basic', theme:'classic', isFirstOfDay:true, imageURL:null },
   };
 
   let currentWishData = null;
@@ -363,21 +360,19 @@
   }
 
   async function loadWish(tokenId) {
-    await new Promise(r => setTimeout(r, 600));
-
-    // 1. Check localStorage — catches freshly-minted wishes from same or other tab
+    // 1. Check localStorage first — freshly minted wishes stored here immediately
     try {
       const cached = localStorage.getItem('ew_wish_' + tokenId);
       if (cached) return JSON.parse(cached);
     } catch(e) {}
 
-    // 2. Hardcoded demo wishes (for testing before blockchain integration)
-    if (MOCK[tokenId]) return MOCK[tokenId];
-
-    // 3. PLACEHOLDER: Replace with actual blockchain read after contract deployed:
-    // const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-    // const contract = new ethers.Contract(CONTRACT_ADDRESS, WISH_ABI, provider);
-    // return await contract.getWish(tokenId);
+    // 2. Read from Base blockchain via EternalWishes contract
+    try {
+      const wish = await EternalWishes.getWish(tokenId);
+      if (wish) return wish;
+    } catch(e) {
+      console.log('Blockchain read failed, wish may not exist:', e.message);
+    }
 
     return null;
   }
@@ -487,13 +482,17 @@
   async function init() {
     const tokenId = getTokenId();
     try {
-      const data = await loadWish(tokenId || '4271');
+      // No tokenId = show demo wish on landing page
+      if (!tokenId) {
+        document.getElementById('loadingState').classList.add('hidden');
+        renderWish(DEMO_WISHES['demo1']);
+        document.getElementById('wishContent').classList.add('visible');
+        return;
+      }
+
+      const data = await loadWish(tokenId);
       document.getElementById('loadingState').classList.add('hidden');
       if (!data) {
-        // Pass token to "create first" link
-        if (tokenId) {
-          document.getElementById('createFirstBtn').href = `index.html`;
-        }
         document.getElementById('notFoundState').classList.add('visible');
         return;
       }
@@ -576,5 +575,9 @@
   window.addEventListener('resize', handleResize);
   init().then(handleResize);
 </script>
+
+<!-- Load ethers.js and contract integration -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="contract-integration.js"></script>
 </body>
 </html>
