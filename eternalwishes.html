@@ -483,7 +483,11 @@
   </div>
 </div>
 
-<footer>Eternal Wishes · Polygon blockchain · No login · No tracking · No personal data stored</footer>
+<footer>Eternal Wishes · Base blockchain · No login · No tracking · No personal data stored</footer>
+
+<!-- Load ethers.js and contract integration -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="contract-integration.js"></script>
 
 <style>
   @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
@@ -694,12 +698,15 @@
   }
 
   async function connectWallet(){
-    // PLACEHOLDER: const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const mock='0x'+Math.random().toString(16).substr(2,6)+'…'+Math.random().toString(16).substr(2,4);
-    state.walletConnected=true;state.walletAddress=mock;
-    document.getElementById('walletDot').classList.add('connected');
-    document.getElementById('walletLabel').textContent=mock;
-    if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Seal this wish forever →';
+    try {
+      const address = await EternalWishes.connectWallet();
+      state.walletConnected=true; state.walletAddress=address;
+      document.getElementById('walletDot').classList.add('connected');
+      document.getElementById('walletLabel').textContent=address.slice(0,6)+'…'+address.slice(-4);
+      if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Seal this wish forever →';
+    } catch(e) {
+      alert('Could not connect wallet: ' + e.message);
+    }
   }
 
   function updateCharCount(){document.getElementById('charCount').textContent=document.getElementById('wishMessage').value.length;}
@@ -731,18 +738,26 @@
 
   async function handleCryptoFlow(){
     const wish=collectWishData();
-    showProcessing('Confirm in your wallet…','Waiting for signature');await delay(1500);
-    // PLACEHOLDER:
-    // const contract=new ethers.Contract(CONTRACT_ADDRESS,ABI,signer);
-    // const tx=await contract.mintWish(
-    //   wish.occasion, wish.recipient, wish.message, wish.tier, wish.theme,
-    //   wish.audioHash||'', wish.imageIPFSHash||'',
-    //   {value:ethers.utils.parseEther(TIER_PRICES[wish.tier])}
-    // );
-    // const receipt=await tx.wait(); const tokenId=receipt.events[0].args.tokenId.toNumber();
-    showProcessing('Transaction confirmed ✓','Reading event from chain…');await delay(1500);
-    const tokenId=4272+Math.floor(Math.random()*10000);
-    hideProcessing();showSuccess(wish,tokenId);
+
+    // Connect wallet if not already connected
+    showProcessing('Connecting wallet…','Please approve in MetaMask');
+    try {
+      await EternalWishes.connectWallet();
+    } catch(e) {
+      hideProcessing();
+      alert('Wallet connection failed: ' + e.message);
+      return;
+    }
+
+    showProcessing('Confirm in your wallet…','Check MetaMask for the transaction');
+    try {
+      const result = await EternalWishes.mintCrypto(wish);
+      hideProcessing();
+      showSuccess(wish, result.tokenId, result.txHash);
+    } catch(e) {
+      hideProcessing();
+      alert('Mint failed: ' + (e.reason || e.message));
+    }
   }
 
   function collectWishData(){
@@ -759,7 +774,7 @@
     };
   }
 
-  function showSuccess(wish,tokenId){
+  function showSuccess(wish,tokenId,txHash){
     const url=buildWishURL(tokenId);
     const rec={
       tokenId,occasion:wish.occasion,to:wish.recipient,
@@ -768,7 +783,7 @@
       imageURL:wish.imageData||null,
       audioHash:wish.audioHash||null,audioURL:wish.audioURL||null,
       timestamp:new Date().toISOString(),isFirstOfDay:false,
-      txHash:'0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join(''),
+      txHash: txHash || ('0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('')),
     };
     try{localStorage.setItem('ew_wish_'+tokenId,JSON.stringify(rec));}catch(e){}
     document.getElementById('previewMessage').textContent=`"${wish.message}"`;
