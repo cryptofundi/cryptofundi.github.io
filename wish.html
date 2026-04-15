@@ -455,10 +455,26 @@
       vnPlayer.style.display = 'none';
     }
 
-    // Photo (Premium + Eternal)
-    if (data.imageURL && data.tier !== 'basic') {
-      document.getElementById('wishImage').src = data.imageURL;
-      document.getElementById('wishImageContainer').classList.add('visible');
+    // Image display — resolve in order:
+    // 1. imageData (full base64, stored in wish record from same browser)
+    // 2. imageURL as localStorage key (e.g. "ew_img_a1b2c3d4")
+    // 3. imageURL as direct URL (future IPFS path e.g. "ipfs://Qm...")
+    if (data.tier !== 'basic') {
+      let imgSrc = null;
+      if (data.imageData) {
+        imgSrc = data.imageData;
+      } else if (data.imageURL) {
+        if (data.imageURL.startsWith('ew_img_')) {
+          // Resolve localStorage key back to base64
+          try { imgSrc = localStorage.getItem(data.imageURL); } catch(e) {}
+        } else {
+          imgSrc = data.imageURL;  // direct URL or IPFS gateway
+        }
+      }
+      if (imgSrc) {
+        document.getElementById('wishImage').src = imgSrc;
+        document.getElementById('wishImageContainer').classList.add('visible');
+      }
     }
 
     // Proof panel
