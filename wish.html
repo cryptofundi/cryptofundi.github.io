@@ -210,6 +210,21 @@
 
           <div class="message-divider"><span class="divider-ornament">✦</span></div>
           <div class="wish-message" id="wishMessage">Loading…</div>
+          <!-- VOICE NOTE (Eternal tier only) -->
+          <div id="voiceNotePlayer" style="display:none;margin-bottom:20px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+              🎙 <span>Voice note — sealed on-chain</span>
+            </div>
+            <div style="background:var(--parchment);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+              <audio id="voiceAudioEl" controls style="width:100%;height:36px;"></audio>
+              <div style="font-size:10px;color:var(--chain-light);margin-top:8px;display:flex;align-items:center;gap:6px;">
+                <span style="font-size:12px;">🔒</span>
+                SHA-256 hash sealed on-chain:
+                <span id="voiceHashDisplay" style="font-family:monospace;font-size:10px;color:var(--muted);word-break:break-all;"></span>
+              </div>
+            </div>
+          </div>
+
           <div class="from-line">
             <div class="from-dash"></div>
             <span>from </span>
@@ -430,7 +445,22 @@
     document.getElementById('wishFrom').textContent = data.from;
     document.getElementById('wishTimestamp').textContent = '🕐 ' + fmt(data.timestamp);
 
-    // Premium image
+    // Voice note player (Eternal tier)
+    const vnPlayer = document.getElementById('voiceNotePlayer');
+    if (data.tier === 'eternal' && data.audioHash) {
+      vnPlayer.style.display = 'block';
+      document.getElementById('voiceHashDisplay').textContent =
+        data.audioHash.slice(0,12) + '…' + data.audioHash.slice(-8);
+      if (data.audioURL) {
+        document.getElementById('voiceAudioEl').src = data.audioURL;
+      } else {
+        document.getElementById('voiceAudioEl').style.display = 'none';
+      }
+    } else {
+      vnPlayer.style.display = 'none';
+    }
+
+    // Photo (Premium + Eternal)
     if (data.imageURL && data.tier !== 'basic') {
       document.getElementById('wishImage').src = data.imageURL;
       document.getElementById('wishImageContainer').classList.add('visible');
