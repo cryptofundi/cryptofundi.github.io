@@ -147,8 +147,8 @@ const EternalWishes = {
         wish.message      || "",
         wish.sender       || "",
         wish.occasion     || "birthday",
-        wish.imageIPFSHash || "",
-        wish.audioHash    || "",
+        wish.imageURL     || "",     // base64 data URI for MVP; replace with IPFS hash later
+        wish.audioHash    || "",     // SHA-256 hex from voice recorder
         wish.theme        || "classic",
       ],
       { value: price }
@@ -200,7 +200,7 @@ const EternalWishes = {
         wish.message      || "",
         wish.sender       || "",
         wish.occasion     || "birthday",
-        wish.imageIPFSHash || "",
+        wish.imageURL     || "",     // base64 data URI for MVP; replace with IPFS hash later
         wish.audioHash    || "",
         wish.theme        || "classic",
       ],
