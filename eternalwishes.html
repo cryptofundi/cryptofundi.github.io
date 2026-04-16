@@ -519,6 +519,7 @@
 
 <!-- Load ethers.js and contract integration -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="pinata.js"></script>
 <script src="contract-integration.js"></script>
 
 <style>
@@ -530,7 +531,7 @@
     occasion:'birthday', tier:'basic', tierPrice:19,
     paymentMethod:'upi', walletConnected:false, walletAddress:null,
     theme:'classic', imageData:null, croppedImageData:null,
-    audioBlob:null, audioHash:null, audioURL:null,
+    audioBlob:null, audioHash:null, audioURL:null, audioBase64:null,
     isRecording:false, mediaRecorder:null, recordChunks:[],
     recordInterval:null, recordSeconds:0,
     cropImg:null, cropScale:1,
@@ -674,11 +675,19 @@
       mr.onstop=async()=>{
         cancelAnimationFrame(animId);actx.close();stream.getTracks().forEach(t=>t.stop());
         const blob=new Blob(state.recordChunks,{type:'audio/webm'});
-        state.audioBlob=blob;state.audioURL=URL.createObjectURL(blob);
+        state.audioBlob=blob;
+        state.audioURL=URL.createObjectURL(blob);  // for playback in current tab
         document.getElementById('audioPlayback').src=state.audioURL;
-        document.getElementById('playbackUI').style.display='block';
-        document.getElementById('recorderUI').style.display='none';
-        document.getElementById('waveformCanvas').style.display='none';
+
+        // Convert blob to base64 and store in localStorage so wish.html can play it
+        // Blob URLs die when the tab changes — base64 persists across navigation
+        const reader = new FileReader();
+        reader.onload = ev => {
+          state.audioBase64 = ev.target.result;  // data:audio/webm;base64,...
+        };
+        reader.readAsDataURL(blob);
+
+        // SHA-256 hash
         const hashBuf=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());
         state.audioHash=Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
         document.getElementById('audioHashDisplay').textContent=state.audioHash.slice(0,10)+'…'+state.audioHash.slice(-8);
@@ -705,7 +714,7 @@
   }
 
   function clearRecording(){
-    state.audioBlob=null;state.audioHash=null;state.audioURL=null;state.recordSeconds=0;state.recordChunks=[];
+    state.audioBlob=null;state.audioHash=null;state.audioURL=null;state.audioBase64=null;state.recordSeconds=0;state.recordChunks=[];
     document.getElementById('playbackUI').style.display='none';
     document.getElementById('recorderUI').style.display='flex';
     document.getElementById('recordTimer').textContent='0:00';
@@ -762,10 +771,10 @@
   }
 
   async function handleCryptoFlow(){
-    const wish=collectWishData();
+    const wish = collectWishData();
 
-    // Connect wallet if not already connected
-    showProcessing('Connecting wallet…','Please approve in MetaMask');
+    // ── Step 1: Connect wallet ──────────────────────────────────────────
+    showProcessing('Connecting wallet…', 'Please approve in MetaMask');
     try {
       await EternalWishes.connectWallet();
     } catch(e) {
@@ -774,7 +783,42 @@
       return;
     }
 
-    showProcessing('Confirm in your wallet…','Check MetaMask for the transaction');
+    // ── Step 2: Upload image to IPFS (Premium + Eternal) ───────────────
+    if (wish.imageData && ['premium','eternal'].includes(wish.tier)) {
+      showProcessing('Uploading photo to IPFS…', 'Pinning to decentralised storage');
+      try {
+        wish.imageURL = await PINATA.uploadImage(wish.imageData, 'wish-image.jpg');
+        // Also update localStorage key to real IPFS URI
+        if (wish.imageURL.startsWith('ipfs://')) {
+          const oldKey = Object.keys(localStorage).find(k =>
+            k.startsWith('ew_img_') && localStorage.getItem(k) === wish.imageData
+          );
+          if (oldKey) localStorage.removeItem(oldKey);  // clean up base64 blob
+        }
+      } catch(e) {
+        hideProcessing();
+        alert('Image upload failed: ' + e.message + '\n\nCheck your internet connection and try again.');
+        return;
+      }
+    }
+
+    // ── Step 3: Upload audio to IPFS (Eternal only) ────────────────────
+    if (wish.tier === 'eternal' && state.audioBlob) {
+      showProcessing('Uploading voice note to IPFS…', 'Sealing audio to decentralised storage');
+      try {
+        const audioIPFS = await PINATA.uploadAudio(state.audioBlob, 'wish-voice.webm');
+        wish.audioIPFSURL = audioIPFS;  // stored for wish.html playback
+        // audioHash (SHA-256) is already set — that goes on-chain
+        // audioIPFSURL is stored in localStorage for playback
+      } catch(e) {
+        hideProcessing();
+        alert('Audio upload failed: ' + e.message + '\n\nCheck your internet connection and try again.');
+        return;
+      }
+    }
+
+    // ── Step 4: Mint on-chain ───────────────────────────────────────────
+    showProcessing('Confirm in your wallet…', 'Check MetaMask for the transaction');
     try {
       const result = await EternalWishes.mintCrypto(wish);
       hideProcessing();
@@ -810,6 +854,7 @@
       imageData:imageData,   // full base64 kept in memory for immediate display
       audioHash:state.audioHash||null,
       audioURL:state.audioURL||null,
+      audioBase64:state.audioBase64||null,
       paymentMethod:state.paymentMethod,
     };
   }
@@ -822,7 +867,10 @@
       tier:wish.tier,theme:wish.theme,
       imageURL:wish.imageURL||null,      // short key (e.g. ew_img_a1b2c3d4) — on-chain reference
       imageData:wish.imageData||null,    // full base64 — for immediate display in wish.html
-      audioHash:wish.audioHash||null,audioURL:wish.audioURL||null,
+      audioHash:wish.audioHash||null,
+      audioURL:wish.audioURL||null,
+      audioBase64:wish.audioBase64||null,
+      audioIPFSURL:wish.audioIPFSURL||null,  // ipfs:// URI — works on any device
       timestamp:new Date().toISOString(),isFirstOfDay:false,
       txHash: txHash || ('0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('')),
     };
