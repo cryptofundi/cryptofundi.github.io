@@ -446,29 +446,45 @@
       vnPlayer.style.display = 'block';
       document.getElementById('voiceHashDisplay').textContent =
         data.audioHash.slice(0,12) + '…' + data.audioHash.slice(-8);
-      if (data.audioURL) {
-        document.getElementById('voiceAudioEl').src = data.audioURL;
+
+      // Audio resolution: IPFS first (any device), then base64 (same device), then blob (same tab)
+      let audioSrc = null;
+      if (data.audioIPFSURL && PINATA.isIPFS(data.audioIPFSURL)) {
+        audioSrc = PINATA.toGatewayURL(data.audioIPFSURL);
+      } else if (data.audioBase64) {
+        audioSrc = data.audioBase64;
+      } else if (data.audioURL) {
+        audioSrc = data.audioURL;
+      }
+
+      if (audioSrc) {
+        document.getElementById('voiceAudioEl').src = audioSrc;
       } else {
         document.getElementById('voiceAudioEl').style.display = 'none';
+        const note = document.createElement('div');
+        note.style.cssText = 'font-size:11px;color:var(--chain-light);margin-top:6px;';
+        note.textContent = 'Voice note sealed on-chain. Open on the original device to play.';
+        vnPlayer.querySelector('div:last-child').appendChild(note);
       }
     } else {
       vnPlayer.style.display = 'none';
     }
 
-    // Image display — resolve in order:
-    // 1. imageData (full base64, stored in wish record from same browser)
-    // 2. imageURL as localStorage key (e.g. "ew_img_a1b2c3d4")
-    // 3. imageURL as direct URL (future IPFS path e.g. "ipfs://Qm...")
+    // Image display — resolution order:
+    // 1. imageData (full base64 in localStorage — same device, instant)
+    // 2. imageURL as ipfs:// URI → resolve via Pinata gateway (any device)
+    // 3. imageURL as ew_img_ localStorage key → resolve to base64 (legacy)
     if (data.tier !== 'basic') {
       let imgSrc = null;
       if (data.imageData) {
         imgSrc = data.imageData;
       } else if (data.imageURL) {
-        if (data.imageURL.startsWith('ew_img_')) {
-          // Resolve localStorage key back to base64
+        if (PINATA.isIPFS(data.imageURL)) {
+          imgSrc = PINATA.toGatewayURL(data.imageURL);
+        } else if (data.imageURL.startsWith('ew_img_')) {
           try { imgSrc = localStorage.getItem(data.imageURL); } catch(e) {}
         } else {
-          imgSrc = data.imageURL;  // direct URL or IPFS gateway
+          imgSrc = data.imageURL;
         }
       }
       if (imgSrc) {
@@ -594,6 +610,7 @@
 
 <!-- Load ethers.js and contract integration -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="pinata.js"></script>
 <script src="contract-integration.js"></script>
 </body>
 </html>
