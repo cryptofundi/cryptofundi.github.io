@@ -347,18 +347,16 @@
           <div style="font-size:11px;color:var(--chain);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">Adjust photo position</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:11px;color:var(--muted);width:24px;">↕</span>
+              <span style="font-size:11px;color:var(--muted);width:40px;font-weight:500;">Top↕Bot</span>
               <input type="range" id="imgPosY" min="0" max="100" value="50"
                      oninput="updateImagePosition()"
                      style="flex:1;accent-color:var(--gold);">
-              <span style="font-size:11px;color:var(--muted);width:24px;">Y</span>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:11px;color:var(--muted);width:24px;">↔</span>
+              <span style="font-size:11px;color:var(--muted);width:40px;font-weight:500;">Left↔Right</span>
               <input type="range" id="imgPosX" min="0" max="100" value="50"
                      oninput="updateImagePosition()"
                      style="flex:1;accent-color:var(--gold);">
-              <span style="font-size:11px;color:var(--muted);width:24px;">X</span>
             </div>
           </div>
           <div style="display:flex;justify-content:flex-end;margin-top:8px;">
@@ -617,32 +615,43 @@
     reader.onload=ev=>{
       state.imageData=ev.target.result;
       state.croppedImageData=null;
-      state.imagePosX=50; state.imagePosY=50;
 
-      // Show preview using object-fit:cover — no distortion regardless of image shape
-      const preview=document.getElementById('uploadPreview');
-      preview.src=ev.target.result;
-      preview.style.display='block';
-      preview.style.objectPosition='50% 50%';
-      document.getElementById('uploadPlaceholder').style.display='none';
-      document.getElementById('uploadArea').classList.add('has-image');
-      document.getElementById('uploadArea').onclick=null;
+      // Smart default: detect portrait (face) photos and start Y at 25%
+      // so the face frames correctly without needing slider adjustment
+      const tempImg=new Image();
+      tempImg.onload=()=>{
+        const isPortrait=tempImg.naturalHeight>tempImg.naturalWidth;
+        const defaultY=isPortrait?25:50;
+        state.imagePosX=50; state.imagePosY=defaultY;
 
-      // Show position controls for all tiers
-      document.getElementById('imageControls').style.display='block';
-      document.getElementById('imgPosX').value=50;
-      document.getElementById('imgPosY').value=50;
+        const preview=document.getElementById('uploadPreview');
+        preview.src=ev.target.result;
+        preview.style.display='block';
+        preview.style.height='220px';
+        preview.style.objectFit='cover';
+        preview.style.objectPosition=`50% ${defaultY}%`;
 
-      // Show crop tool for Eternal tier (additional precision option)
-      if(state.tier==='eternal'){
-        const img=new Image();
-        img.onload=()=>{ state.cropImg=img; initCropTool(img); document.getElementById('cropTool').style.display='block'; };
-        img.src=ev.target.result;
-        document.getElementById('cropHint').style.display='inline';
-      }
+        document.getElementById('uploadPlaceholder').style.display='none';
+        document.getElementById('uploadArea').classList.add('has-image');
+        document.getElementById('uploadArea').onclick=null;
+
+        document.getElementById('imageControls').style.display='block';
+        document.getElementById('imgPosX').value=50;
+        document.getElementById('imgPosY').value=defaultY;
+
+        // Show crop tool for Eternal tier
+        if(state.tier==='eternal'){
+          state.cropImg=tempImg;
+          initCropTool(tempImg);
+          document.getElementById('cropTool').style.display='block';
+          document.getElementById('cropHint').style.display='inline';
+        }
+      };
+      tempImg.src=ev.target.result;
     };
     reader.readAsDataURL(file);
   }
+
 
   function updateImagePosition(){
     const x=document.getElementById('imgPosX').value;
