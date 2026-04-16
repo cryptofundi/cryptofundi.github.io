@@ -234,22 +234,42 @@ const EternalWishes = {
     const c = this.contract || this.initReadOnly();
     const raw = await c.getWish(tokenId);
 
-    // Map tuple to named object
+    // raw.tier comes back as BigInt from ethers — convert before array lookup
+    const tierName = ["basic", "premium", "eternal"][Number(raw.tier)] || "basic";
+
+    // Look up txHash from WishMinted event so Basescan link works on any device
+    let txHash = null;
+    try {
+      const provider = this.provider || this.readOnly || c.provider;
+      const latest   = await provider.getBlockNumber();
+      const filter   = c.filters.WishMinted(BigInt(tokenId));
+      const events   = await c.queryFilter(filter, Math.max(0, latest - 100000), latest);
+      if (events.length > 0) txHash = events[0].transactionHash;
+    } catch(e) {
+      console.log('txHash lookup skipped:', e.message);
+    }
+
     return {
-      tokenId:    Number(tokenId),
-      minter:     raw.minter,
-      payer:      raw.payer,
-      to:         raw.to,
-      message:    raw.message,
-      from:       raw.from,
-      occasion:   raw.occasion,
-      imageURL:   raw.imageURL,
-      audioHash:  raw.audioHash,
-      theme:      raw.theme,
-      tier:       ["basic", "premium", "eternal"][raw.tier] || "basic",
-      timestamp:  new Date(Number(raw.timestamp) * 1000).toISOString(),
-      upiPayment: raw.upiPayment,
-      isFirstOfDay: false,  // compute separately if needed
+      tokenId:       Number(tokenId),
+      minter:        raw.minter,
+      payer:         raw.payer,
+      to:            raw.to,
+      message:       raw.message,
+      from:          raw.from,
+      occasion:      raw.occasion,
+      imageURL:      raw.imageURL || null,
+      audioHash:     raw.audioHash || null,
+      theme:         raw.theme || "classic",
+      tier:          tierName,
+      timestamp:     new Date(Number(raw.timestamp) * 1000).toISOString(),
+      upiPayment:    raw.upiPayment,
+      isFirstOfDay:  false,
+      txHash:        txHash,
+      // Device-local fields — not available on other devices from chain read
+      imageData:     null,
+      audioBase64:   null,
+      audioURL:      null,
+      audioIPFSURL:  null,
     };
   },
 
