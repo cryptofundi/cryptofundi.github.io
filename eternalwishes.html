@@ -399,7 +399,7 @@
             <audio id="audioPlayback" controls style="width:100%;height:36px;"></audio>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
               <div style="font-size:11px;color:var(--chain-light);">
-                🔒 Audio hash: <span id="audioHashDisplay" style="font-family:monospace;font-size:10px;color:var(--muted);">computing…</span>
+                🔒 Voice proof (SHA-256): <span id="audioHashDisplay" style="font-family:monospace;font-size:10px;color:var(--muted);">computing…</span>
               </div>
               <button onclick="clearRecording()" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px;">✕ Redo</button>
             </div>
@@ -525,15 +525,15 @@
 
 <!-- External scripts loaded FIRST so PINATA and EternalWishes are available -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js"></script>
-<script src="contract-integration.js"></script>
+<script src="pinata.js" defer></script>
+<script src="contract-integration.js" defer></script>
 
 <script>
   const state = {
     occasion:'birthday', tier:'basic', tierPrice:19,
     paymentMethod:'upi', walletConnected:false, walletAddress:null,
     theme:'classic', imageData:null, croppedImageData:null,
-    audioBlob:null, audioHash:null, audioURL:null, audioBase64:null,
+    audioBlob:null, audioHash:null, audioURL:null, audioBase64:null,  // audioHash = SHA-256 = audioProof field
     isRecording:false, mediaRecorder:null, recordChunks:[],
     recordInterval:null, recordSeconds:0,
     cropImg:null, cropScale:1,
@@ -742,6 +742,16 @@
   }
 
   async function connectWallet(){
+    // Wait for EternalWishes to finish loading if scripts are still downloading
+    let attempts = 0;
+    while (typeof EternalWishes === 'undefined' && attempts < 30) {
+      await new Promise(r => setTimeout(r, 100));
+      attempts++;
+    }
+    if (typeof EternalWishes === 'undefined') {
+      alert('Page still loading. Please wait a moment and try again.');
+      return;
+    }
     try {
       const address = await EternalWishes.connectWallet();
       state.walletConnected=true; state.walletAddress=address;
@@ -809,9 +819,9 @@
       showProcessing('Uploading voice note to IPFS…', 'Sealing audio to decentralised storage');
       try {
         const audioIPFS = await PINATA.uploadAudio(state.audioBlob, 'wish-voice.webm');
-        wish.audioIPFSURL = audioIPFS;  // stored for wish.html playback
-        // audioHash (SHA-256) is already set — that goes on-chain
-        // audioIPFSURL is stored in localStorage for playback
+        wish.audioCID = audioIPFS;      // IPFS CID → goes on-chain for cross-device playback
+        wish.audioIPFSURL = audioIPFS;  // also kept for localStorage
+        // audioProof (SHA-256) is state.audioHash — also goes on-chain as verification
       } catch(e) {
         hideProcessing();
         alert('Audio upload failed: ' + e.message + '\n\nCheck your internet connection and try again.');
@@ -854,9 +864,12 @@
       tier:state.tier,price:state.tierPrice,theme:state.theme,
       imageURL:imageURL,     // short key stored on-chain; actual image in localStorage
       imageData:imageData,   // full base64 kept in memory for immediate display
-      audioHash:state.audioHash||null,
+      audioCID:state.audioIPFSURL||null,    // IPFS CID for cross-device playback
+      audioProof:state.audioHash||null,     // SHA-256 hex for on-chain verification
       audioURL:state.audioURL||null,
       audioBase64:state.audioBase64||null,
+      audioIPFSURL:state.audioIPFSURL||null,
+      campaignHash:null,                    // bytes32(0) = personal wish
       paymentMethod:state.paymentMethod,
     };
   }
@@ -869,10 +882,11 @@
       tier:wish.tier,theme:wish.theme,
       imageURL:wish.imageURL||null,      // short key (e.g. ew_img_a1b2c3d4) — on-chain reference
       imageData:wish.imageData||null,    // full base64 — for immediate display in wish.html
-      audioHash:wish.audioHash||null,
+      audioCID:wish.audioCID||null,
+      audioProof:wish.audioProof||null,
       audioURL:wish.audioURL||null,
       audioBase64:wish.audioBase64||null,
-      audioIPFSURL:wish.audioIPFSURL||null,  // ipfs:// URI — works on any device
+      audioIPFSURL:wish.audioIPFSURL||null,
       timestamp:new Date().toISOString(),isFirstOfDay:false,
       txHash: txHash || ('0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('')),
     };
@@ -882,7 +896,7 @@
     document.getElementById('viewWishBtn').href=url;
     document.getElementById('wishLink').value=url;
     const ai=document.getElementById('successAudioInfo');
-    if(ai){ai.textContent=wish.audioHash?`🎙 Voice hash: ${wish.audioHash.slice(0,12)}… sealed on-chain`:'';ai.style.display=wish.audioHash?'block':'none';}
+    if(ai){ai.textContent=wish.audioProof?`🎙 Voice proof: ${wish.audioProof.slice(0,12)}… sealed on-chain`:'';ai.style.display=wish.audioHash?'block':'none';}
     document.getElementById('successModal').classList.add('visible');
     feedWishes.unshift({occasion:wish.occasion,to:wish.recipient,message:wish.message,from:wish.sender,token:tokenId,tier:wish.tier,hasAudio:!!wish.audioHash});
     renderFeed();
