@@ -507,9 +507,14 @@
     document.getElementById('proofTimestamp').textContent = fmt(data.timestamp);
     document.getElementById('proofTier').textContent = data.tier.charAt(0).toUpperCase() + data.tier.slice(1);
     document.getElementById('proofContract').textContent = '0x0000…0000'; // PLACEHOLDER
-    document.getElementById('proofTxHash').textContent = data.txHash.slice(0,10) + '…' + data.txHash.slice(-8);
-    // Basescan URL — wired to txHash from contract event
-    document.getElementById('basescanLink').href = `https://basescan.org/tx/${data.txHash}`;
+    if (data.txHash) {
+      document.getElementById('proofTxHash').textContent = data.txHash.slice(0,10) + '…' + data.txHash.slice(-8);
+      document.getElementById('basescanLink').href = `https://basescan.org/tx/${data.txHash}`;
+    } else {
+      document.getElementById('proofTxHash').textContent = 'View on Basescan ↗';
+      document.getElementById('basescanLink').href =
+        `https://basescan.org/token/0xCCc9B111713D8CD98973ca744c7082003274C6da?a=${data.tokenId}`;
+    }
 
     // Share
     document.getElementById('shareLink').value = url;
