@@ -324,11 +324,16 @@
     <div class="premium-fields" id="premiumFields">
       <div class="premium-label" id="premiumLabelText">✦ Premium features — make your wish unforgettable</div>
 
-      <!-- Photo upload + crop -->
+      <!-- Photo upload — QRNFT-inspired: object-fit cover + position slider -->
       <div class="field" style="margin-bottom:20px;">
-        <label>Add a photo <span id="cropHint" style="color:var(--chain-light);font-size:10px;font-style:italic;display:none;">(Eternal — drag to crop)</span></label>
-        <div class="image-upload-area" id="uploadArea" onclick="triggerImageUpload()">
-          <img id="uploadPreview" class="upload-preview" src="" alt="Preview">
+        <label>Add a photo <span id="cropHint" style="color:var(--chain-light);font-size:10px;font-style:italic;display:none;">(Eternal — drag slider to reposition)</span></label>
+
+        <!-- Upload trigger area -->
+        <div class="image-upload-area" id="uploadArea" onclick="triggerImageUpload()"
+             style="position:relative;overflow:hidden;min-height:56px;">
+          <!-- Preview — uses object-fit:cover so image always fills correctly -->
+          <img id="uploadPreview" class="upload-preview" src="" alt="Preview"
+               style="width:100%;height:180px;object-fit:cover;object-position:50% 50%;border-radius:8px;display:none;">
           <div class="upload-placeholder" id="uploadPlaceholder">
             <span>📷</span>
             Tap to upload a photo
@@ -337,12 +342,38 @@
         </div>
         <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
 
-        <!-- CROP TOOL (Eternal only) -->
+        <!-- Position controls (shown after upload) -->
+        <div id="imageControls" style="display:none;margin-top:10px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+          <div style="font-size:11px;color:var(--chain);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">Adjust photo position</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:11px;color:var(--muted);width:24px;">↕</span>
+              <input type="range" id="imgPosY" min="0" max="100" value="50"
+                     oninput="updateImagePosition()"
+                     style="flex:1;accent-color:var(--gold);">
+              <span style="font-size:11px;color:var(--muted);width:24px;">Y</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:11px;color:var(--muted);width:24px;">↔</span>
+              <input type="range" id="imgPosX" min="0" max="100" value="50"
+                     oninput="updateImagePosition()"
+                     style="flex:1;accent-color:var(--gold);">
+              <span style="font-size:11px;color:var(--muted);width:24px;">X</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+            <button onclick="resetImagePosition()"
+                    style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px;">
+              ↺ Reset position
+            </button>
+          </div>
+        </div>
+
+        <!-- Crop tool (Eternal only — canvas based for precise crop) -->
         <div id="cropTool" style="display:none;margin-top:12px;">
           <div style="font-size:11px;color:var(--chain);margin-bottom:8px;letter-spacing:0.05em;">DRAG TO CROP · <span style="color:var(--gold);">Eternal exclusive</span></div>
           <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);border:1.5px solid var(--gold);background:#000;user-select:none;" id="cropContainer">
             <canvas id="cropCanvas" style="display:block;max-width:100%;cursor:crosshair;"></canvas>
-            <div id="cropOverlay" style="position:absolute;inset:0;pointer-events:none;"></div>
           </div>
           <div style="display:flex;gap:8px;margin-top:10px;">
             <button onclick="applyCrop()" style="flex:1;padding:10px;background:var(--ink);color:var(--parchment);border:none;border-radius:var(--radius-sm);font-family:'Cormorant Garamond',serif;font-size:16px;cursor:pointer;">Apply crop ✓</button>
@@ -351,7 +382,7 @@
         </div>
       </div>
 
-      <!-- Theme selector -->
+<!-- Theme selector -->
       <div class="field" style="margin-bottom:20px;">
         <label>Choose a design theme</label>
         <div class="themes" id="themeSelector">
@@ -536,7 +567,7 @@
     audioBlob:null, audioHash:null, audioURL:null, audioBase64:null,  // audioHash = SHA-256 = audioProof field
     isRecording:false, mediaRecorder:null, recordChunks:[],
     recordInterval:null, recordSeconds:0,
-    cropImg:null, cropScale:1,
+    cropImg:null, cropScale:1, imagePosX:50, imagePosY:50,
     cropState:{ x:0,y:0,w:0,h:0,dragging:false,startX:0,startY:0 },
   };
 
@@ -567,7 +598,8 @@
     document.getElementById('cropHint').style.display=isEternal?'inline':'none';
     document.getElementById('premiumLabelText').textContent=isEternal
       ?'✦✦ Eternal features — the ultimate wish':'✦ Premium features — make your wish unforgettable';
-    if(state.cropImg&&isEternal) document.getElementById('cropTool').style.display='block';
+    // Show crop tool for Eternal if image already uploaded
+    if(state.cropImg&&isEternal){ initCropTool(state.cropImg); document.getElementById('cropTool').style.display='block'; }
     if(!isEternal) document.getElementById('cropTool').style.display='none';
   }
 
@@ -583,20 +615,48 @@
     if(file.size>5*1024*1024){alert('Image must be under 5MB');return;}
     const reader=new FileReader();
     reader.onload=ev=>{
-      state.imageData=ev.target.result; state.croppedImageData=null;
-      const img=new Image();
-      img.onload=()=>{
-        state.cropImg=img;
-        document.getElementById('uploadPreview').src=ev.target.result;
-        document.getElementById('uploadPreview').classList.add('visible');
-        document.getElementById('uploadPlaceholder').style.display='none';
-        document.getElementById('uploadArea').classList.add('has-image');
-        document.getElementById('uploadArea').onclick=null;
-        if(state.tier==='eternal'){ initCropTool(img); document.getElementById('cropTool').style.display='block'; }
-      };
-      img.src=ev.target.result;
+      state.imageData=ev.target.result;
+      state.croppedImageData=null;
+      state.imagePosX=50; state.imagePosY=50;
+
+      // Show preview using object-fit:cover — no distortion regardless of image shape
+      const preview=document.getElementById('uploadPreview');
+      preview.src=ev.target.result;
+      preview.style.display='block';
+      preview.style.objectPosition='50% 50%';
+      document.getElementById('uploadPlaceholder').style.display='none';
+      document.getElementById('uploadArea').classList.add('has-image');
+      document.getElementById('uploadArea').onclick=null;
+
+      // Show position controls for all tiers
+      document.getElementById('imageControls').style.display='block';
+      document.getElementById('imgPosX').value=50;
+      document.getElementById('imgPosY').value=50;
+
+      // Show crop tool for Eternal tier (additional precision option)
+      if(state.tier==='eternal'){
+        const img=new Image();
+        img.onload=()=>{ state.cropImg=img; initCropTool(img); document.getElementById('cropTool').style.display='block'; };
+        img.src=ev.target.result;
+        document.getElementById('cropHint').style.display='inline';
+      }
     };
     reader.readAsDataURL(file);
+  }
+
+  function updateImagePosition(){
+    const x=document.getElementById('imgPosX').value;
+    const y=document.getElementById('imgPosY').value;
+    state.imagePosX=Number(x);
+    state.imagePosY=Number(y);
+    document.getElementById('uploadPreview').style.objectPosition=`${x}% ${y}%`;
+  }
+
+  function resetImagePosition(){
+    state.imagePosX=50; state.imagePosY=50;
+    document.getElementById('imgPosX').value=50;
+    document.getElementById('imgPosY').value=50;
+    document.getElementById('uploadPreview').style.objectPosition='50% 50%';
   }
 
   // CROP TOOL
@@ -880,8 +940,10 @@
       tokenId,occasion:wish.occasion,to:wish.recipient,
       from:wish.sender||'Anonymous',message:wish.message,
       tier:wish.tier,theme:wish.theme,
-      imageURL:wish.imageURL||null,      // short key (e.g. ew_img_a1b2c3d4) — on-chain reference
-      imageData:wish.imageData||null,    // full base64 — for immediate display in wish.html
+      imageURL:wish.imageURL||null,
+      imageData:wish.imageData||null,
+      imagePosX:wish.imagePosX||50,
+      imagePosY:wish.imagePosY||50,
       audioCID:wish.audioCID||null,
       audioProof:wish.audioProof||null,
       audioURL:wish.audioURL||null,
