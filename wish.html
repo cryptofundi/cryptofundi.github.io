@@ -326,8 +326,8 @@
 
 <!-- External scripts loaded FIRST so PINATA and EternalWishes are available when init() runs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js"></script>
-<script src="contract-integration.js"></script>
+<script src="pinata.js" defer></script>
+<script src="contract-integration.js" defer></script>
 
 <script>
   // ── THEME DEFINITIONS ──
@@ -372,12 +372,18 @@
     } catch(e) {}
 
     // 2. Read from Base blockchain via EternalWishes contract
+    // Wait up to 3 seconds for external scripts to finish loading
     try {
-      if (typeof EternalWishes === 'undefined') {
-        console.warn('EternalWishes not loaded yet — blockchain read skipped');
-      } else {
+      let attempts = 0;
+      while (typeof EternalWishes === 'undefined' && attempts < 30) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
+      if (typeof EternalWishes !== 'undefined') {
         const wish = await EternalWishes.getWish(tokenId);
         if (wish) return wish;
+      } else {
+        console.warn('EternalWishes script did not load in time');
       }
     } catch(e) {
       console.log('Blockchain read failed, wish may not exist:', e.message);
@@ -451,14 +457,17 @@
 
     // Voice note player (Eternal tier)
     const vnPlayer = document.getElementById('voiceNotePlayer');
-    if (data.tier === 'eternal' && data.audioHash) {
+    if (data.tier === 'eternal' && (data.audioCID || data.audioProof)) {
       vnPlayer.style.display = 'block';
       document.getElementById('voiceHashDisplay').textContent =
-        data.audioHash.slice(0,12) + '…' + data.audioHash.slice(-8);
+        (data.audioProof || '').slice(0,12) + '…' + (data.audioProof || '').slice(-8);
 
       // Audio resolution: IPFS first (any device), then base64 (same device), then blob (same tab)
       let audioSrc = null;
-      if (data.audioIPFSURL && PINATA.isIPFS(data.audioIPFSURL)) {
+      // audioCID from contract = IPFS CID → works on any device
+      if (data.audioCID && PINATA.isIPFS(data.audioCID)) {
+        audioSrc = PINATA.toGatewayURL(data.audioCID);
+      } else if (data.audioIPFSURL && PINATA.isIPFS(data.audioIPFSURL)) {
         audioSrc = PINATA.toGatewayURL(data.audioIPFSURL);
       } else if (data.audioBase64) {
         audioSrc = data.audioBase64;
