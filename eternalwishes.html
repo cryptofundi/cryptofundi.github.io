@@ -517,14 +517,16 @@
 
 <footer>Eternal Wishes · Base blockchain · No login · No tracking · No personal data stored</footer>
 
-<!-- Load ethers.js and contract integration -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js"></script>
-<script src="contract-integration.js"></script>
+
 
 <style>
   @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 </style>
+
+<!-- External scripts loaded FIRST so PINATA and EternalWishes are available -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="pinata.js"></script>
+<script src="contract-integration.js"></script>
 
 <script>
   const state = {
