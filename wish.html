@@ -324,6 +324,11 @@
   <a href="index.html">Eternal Wishes</a> · Base blockchain · No login · No tracking · No personal data stored
 </footer>
 
+<!-- External scripts loaded FIRST so PINATA and EternalWishes are available when init() runs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="pinata.js"></script>
+<script src="contract-integration.js"></script>
+
 <script>
   // ── THEME DEFINITIONS ──
   const THEMES = {
@@ -368,8 +373,12 @@
 
     // 2. Read from Base blockchain via EternalWishes contract
     try {
-      const wish = await EternalWishes.getWish(tokenId);
-      if (wish) return wish;
+      if (typeof EternalWishes === 'undefined') {
+        console.warn('EternalWishes not loaded yet — blockchain read skipped');
+      } else {
+        const wish = await EternalWishes.getWish(tokenId);
+        if (wish) return wish;
+      }
     } catch(e) {
       console.log('Blockchain read failed, wish may not exist:', e.message);
     }
@@ -608,9 +617,6 @@
   init().then(handleResize);
 </script>
 
-<!-- Load ethers.js and contract integration -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js"></script>
-<script src="contract-integration.js"></script>
+
 </body>
 </html>
