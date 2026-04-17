@@ -549,6 +549,7 @@
 
 
 <style>
+
   @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 </style>
 
@@ -1068,8 +1069,10 @@
     }).join('');
   }
 
+
   document.getElementById('wishDate').valueAsDate=new Date();
   renderFeed();
+
 
   // Show My Wishes button immediately if any wishes exist in localStorage
   // Works even without wallet connected — UPI users can see their wishes too
