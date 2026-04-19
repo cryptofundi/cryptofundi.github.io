@@ -464,10 +464,10 @@
       </button>
     </div>
 
-    <div class="payment-info visible" id="upiInfo">
+    <div class="payment-info" id="upiInfo">
       <strong>UPI / Card:</strong> Pay ₹<span id="upiPrice">19</span> — converted to ETH and your wish is minted on Base automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
     </div>
-    <div class="payment-info" id="cryptoInfo">
+    <div class="payment-info visible" id="cryptoInfo">
       <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved. Wish mints the moment the transaction confirms on-chain.
     </div>
 
@@ -563,7 +563,7 @@
 <script>
   const state = {
     occasion:'birthday', tier:'basic', tierPrice:19,
-    paymentMethod:'upi', walletConnected:false, walletAddress:null,
+    paymentMethod:'crypto', walletConnected:false, walletAddress:null,
     theme:'classic', imageData:null, croppedImageData:null,
     audioBlob:null, audioHash:null, audioURL:null, audioBase64:null,  // audioHash = SHA-256 = audioProof field
     isRecording:false, mediaRecorder:null, recordChunks:[],
@@ -1041,16 +1041,41 @@
   const OCCASION_MAP={birthday:{i:'🎂',l:'Birthday'},anniversary:{i:'💍',l:'Anniversary'},wedding:{i:'💐',l:'Wedding'},newbaby:{i:'👶',l:'New Baby'},graduation:{i:'🎓',l:'Graduation'},promotion:{i:'🚀',l:'Promotion'},newyear:{i:'✨',l:'New Year'},memorial:{i:'🕯️',l:'In Memory'},custom:{i:'💫',l:'Wish'}};
   const THEME_COLORS={classic:'var(--cream)',romantic:'#fce4ec',dark:'#2d2520',nature:'#e8f5e9'};
 
-  const feedWishes=[
-    {occasion:'birthday',to:'Priya S.',message:'May every year bring you closer to all your dreams.',from:'0x8f2c…',token:4271,tier:'premium',hasAudio:false},
-    {occasion:'anniversary',to:'Ravi & Meera',message:'Fifteen years of love that keeps growing.',from:'0x1b4e…',token:4270,tier:'eternal',hasAudio:true},
-    {occasion:'graduation',to:'Arjun K.',message:'You did it. All those late nights were worth it.',from:'Amma',token:4269,tier:'basic',hasAudio:false},
-    {occasion:'newbaby',to:'Baby Kavya',message:'Welcome to the world, little one.',from:'0x7d3a…',token:4268,tier:'eternal',hasAudio:true},
-    {occasion:'promotion',to:'Sunita R.',message:'VP at 32. Hardest worker in every room.',from:'The team',token:4267,tier:'premium',hasAudio:false},
-  ];
+  let feedWishes = [];
+
+  // Load real wishes from blockchain
+  async function loadRecentFeed() {
+    try {
+      if (typeof EternalWishes === 'undefined') return;
+      const totalSupply = await (EternalWishes.contract || EternalWishes.initReadOnly()).totalSupply();
+      const total = Number(totalSupply);
+      document.getElementById('feedCount').textContent = `${total} wishes sealed forever`;
+
+      if (total === 0) return;
+
+      // Load last 6 wishes (or fewer if less exist)
+      const count = Math.min(total, 6);
+      const tokenIds = [];
+      for (let i = total; i > total - count; i--) tokenIds.push(i);
+
+      for (const id of tokenIds) {
+        try {
+          const w = await EternalWishes.getWish(id);
+          feedWishes.push({
+            occasion: w.occasion, to: w.to, message: w.message,
+            from: w.from, token: w.tokenId, tier: w.tier,
+            hasAudio: !!(w.audioCID)
+          });
+        } catch(e) { console.log('Skip token', id, e.message); }
+      }
+      renderFeed();
+    } catch(e) {
+      console.log('Feed load skipped:', e.message);
+    }
+  }
 
   function renderFeed(){
-    document.getElementById('feedCount').textContent=`${4271+feedWishes.length} wishes sealed forever`;
+    // feedCount set by loadRecentFeed()
     document.getElementById('wishFeed').innerHTML=feedWishes.map(w=>{
       const occ=OCCASION_MAP[w.occasion]||OCCASION_MAP.custom;
       const bg=w.tier!=='basic'?THEME_COLORS.classic:'var(--cream)';
@@ -1067,6 +1092,7 @@
 
   document.getElementById('wishDate').valueAsDate=new Date();
   renderFeed();
+  loadRecentFeed();  // fetch real wishes from blockchain
 
 
   // Show My Wishes button immediately if any wishes exist in localStorage
