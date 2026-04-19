@@ -870,13 +870,7 @@
       showProcessing('Uploading photo to IPFS…', 'Pinning to decentralised storage');
       try {
         wish.imageURL = await PINATA.uploadImage(wish.imageData, 'wish-image.jpg');
-        // Also update localStorage key to real IPFS URI
-        if (wish.imageURL.startsWith('ipfs://')) {
-          const oldKey = Object.keys(localStorage).find(k =>
-            k.startsWith('ew_img_') && localStorage.getItem(k) === wish.imageData
-          );
-          if (oldKey) localStorage.removeItem(oldKey);  // clean up base64 blob
-        }
+        // imageURL is now an ipfs:// hash — stored on-chain, works cross-device
       } catch(e) {
         hideProcessing();
         alert('Image upload failed: ' + e.message + '\n\nCheck your internet connection and try again.');
@@ -917,13 +911,10 @@
     // - Pass only the short key reference as imageURL to the contract
     // - wish.html reads the key → looks up localStorage → displays image
     // Future: upload to Pinata → store ipfs://Qm... hash in contract instead
+    // imageURL starts null — handleCryptoFlow uploads to IPFS and sets it to ipfs://...
+    // Before IPFS upload, we pass the base64 as imageData so the upload function has the raw bytes
     let imageURL = null;
     const imageData = state.croppedImageData || state.imageData || null;
-    if(imageData && ['premium','eternal'].includes(state.tier)){
-      const imageKey = 'ew_img_' + crypto.randomUUID().slice(0,8);
-      try{ localStorage.setItem(imageKey, imageData); }catch(e){}
-      imageURL = imageKey;   // short key e.g. "ew_img_a1b2c3d4" — well under 200 chars
-    }
 
     return{
       uuid:crypto.randomUUID(),occasion:state.occasion,
@@ -950,8 +941,8 @@
       tokenId,occasion:wish.occasion,to:wish.recipient,
       from:wish.sender||'Anonymous',message:wish.message,
       tier:wish.tier,theme:wish.theme,
-      imageURL:wish.imageURL||null,
-      imageData:wish.imageData||null,
+      imageURL:wish.imageURL||null,     // ipfs:// hash after PINATA upload
+      imageData:null,                   // DON'T store base64 — too big for localStorage (2-3MB)
       imagePosX:wish.imagePosX||50,
       imagePosY:wish.imagePosY||50,
       audioCID:wish.audioCID||null,
