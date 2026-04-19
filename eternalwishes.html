@@ -824,11 +824,12 @@
 
   function toggleWallet(){
     if(state.walletConnected){
-      // "Disconnect" — clear local state (MetaMask stays connected but we forget it)
+      // "Disconnect" — clear local state and flag for forced account picker on reconnect
       state.walletConnected=false;
       state.walletAddress=null;
       EternalWishes.signer=null;
       EternalWishes.contract=null;
+      EternalWishes._wasDisconnected=true;
       document.getElementById('walletDot').classList.remove('connected');
       document.getElementById('walletLabel').textContent='Connect Wallet';
       document.getElementById('myWishesBtn').style.display='none';
