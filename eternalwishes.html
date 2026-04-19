@@ -629,9 +629,11 @@
         const preview=document.getElementById('uploadPreview');
         preview.src=ev.target.result;
         preview.style.display='block';
-        preview.style.height='220px';
-        preview.style.objectFit='cover';
-        preview.style.objectPosition=`50% ${defaultY}%`;
+        preview.style.maxHeight='400px';
+        preview.style.width='100%';
+        preview.style.height='auto';
+        preview.style.objectFit='contain';
+        preview.style.objectPosition='center';
 
         document.getElementById('uploadPlaceholder').style.display='none';
         document.getElementById('uploadArea').classList.add('has-image');
