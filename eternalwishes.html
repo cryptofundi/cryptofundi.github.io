@@ -448,18 +448,18 @@
   <div style="animation: fadeUp 0.5s 0.4s both;">
     <p class="section-label">Step 4 — Pay & mint forever</p>
     <div class="payment-options">
-      <button class="pay-btn active" data-method="upi" onclick="selectPayment(this)">
+      <button class="pay-btn active" data-method="crypto" onclick="selectPayment(this)">
+        <div class="pay-icon">🦊</div>
+        <div>
+          <div class="pay-label">Crypto Wallet</div>
+          <div class="pay-sub">MetaMask, WalletConnect</div>
+        </div>
+      </button>
+      <button class="pay-btn" data-method="upi" onclick="selectPayment(this)">
         <div class="pay-icon">🇮🇳</div>
         <div>
           <div class="pay-label">UPI / Card</div>
           <div class="pay-sub">GPay, PhonePe, Credit Card</div>
-        </div>
-      </button>
-      <button class="pay-btn" data-method="crypto" onclick="selectPayment(this)">
-        <div class="pay-icon">⛓</div>
-        <div>
-          <div class="pay-label">Crypto Wallet</div>
-          <div class="pay-sub">MetaMask, WalletConnect</div>
         </div>
       </button>
     </div>
@@ -468,7 +468,16 @@
       <strong>UPI / Card:</strong> Pay ~$<span id="upiPrice">0.15</span> — converted to ETH and your wish is minted on Base automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
     </div>
     <div class="payment-info visible" id="cryptoInfo">
-      <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved. Wish mints the moment the transaction confirms on-chain.
+      <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved.<br><br>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;">
+        <div style="font-weight:600;color:var(--ink);margin-bottom:6px;">🔒 Safety note</div>
+        <div style="color:var(--muted);">
+          • You only pay the exact wish price — no approvals, no token access<br>
+          • Contract is <a href="https://basescan.org/address/0xdaB67208DFF64A428a60Db1BaF0A4091aAda1175#code" target="_blank" style="color:var(--gold);text-decoration:underline;">verified on Basescan</a> — read the code yourself<br>
+          • No wallet permissions requested — just a simple ETH transfer<br>
+          • Tip: use a fresh wallet if you prefer extra caution
+        </div>
+      </div>
     </div>
 
     <button class="mint-btn" id="mintBtn" onclick="handleMint()">
@@ -481,8 +490,13 @@
   <div class="feed-section" style="animation: fadeUp 0.5s 0.5s both;">
     <div class="feed-header">
       <h2 class="feed-title">Recently sealed wishes</h2>
-      <span class="feed-count" id="feedCount">loading…</span>
+      <span class="feed-count" id="feedCount"></span>
     </div>
+    <div id="feedLoading" style="text-align:center;padding:30px 0;color:var(--muted);font-size:13px;">
+      <div style="display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;"></div>
+      Loading wishes from Base blockchain…
+    </div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
     <div class="feed-grid" id="wishFeed"></div>
   </div>
 </main>
@@ -1069,8 +1083,10 @@
         } catch(e) { console.log('Skip token', id, e.message); }
       }
       renderFeed();
+      document.getElementById('feedLoading').style.display='none';
     } catch(e) {
       console.log('Feed load skipped:', e.message);
+      document.getElementById('feedLoading').style.display='none';
     }
   }
 
