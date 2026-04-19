@@ -191,6 +191,9 @@
   <button class="wallet-connect-btn" id="myWishesBtn" onclick="openMyWishes()" style="display:none;margin-top:6px;background:var(--cream);color:var(--ink);border:1px solid var(--border);">
     ✦ My Wishes
   </button>
+  <button class="wallet-connect-btn" id="disconnectBtn" onclick="toggleWallet()" style="display:none;margin-top:4px;background:none;color:var(--muted);border:1px solid var(--border);font-size:11px;padding:6px 12px;">
+    Disconnect
+  </button>
 </div>
 
 <!-- My Wishes Modal -->
@@ -821,16 +824,23 @@
 
   function toggleWallet(){
     if(state.walletConnected){
-      state.walletConnected=false;state.walletAddress=null;
+      // "Disconnect" — clear local state (MetaMask stays connected but we forget it)
+      state.walletConnected=false;
+      state.walletAddress=null;
+      EternalWishes.signer=null;
+      EternalWishes.contract=null;
       document.getElementById('walletDot').classList.remove('connected');
       document.getElementById('walletLabel').textContent='Connect Wallet';
       document.getElementById('myWishesBtn').style.display='none';
+      document.getElementById('disconnectBtn').style.display='none';
       if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Connect wallet to mint →';
-    }else{connectWallet();}
+    }else{
+      connectWallet();
+    }
   }
 
   async function connectWallet(){
-    // Wait for EternalWishes to finish loading if scripts are still downloading
+    // Wait for EternalWishes to finish loading
     let attempts = 0;
     while (typeof EternalWishes === 'undefined' && attempts < 30) {
       await new Promise(r => setTimeout(r, 100));
@@ -842,14 +852,34 @@
     }
     try {
       const address = await EternalWishes.connectWallet();
-      state.walletConnected=true; state.walletAddress=address;
-      document.getElementById('walletDot').classList.add('connected');
-      document.getElementById('walletLabel').textContent=address.slice(0,6)+'…'+address.slice(-4);
-      document.getElementById('myWishesBtn').style.display='block';
-      if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Seal this wish forever →';
+      updateWalletUI(address);
+
+      // Hook into account change callbacks
+      EternalWishes._onAccountChange = function(addr) {
+        updateWalletUI(addr);
+      };
+      EternalWishes._onDisconnect = function() {
+        state.walletConnected=false;
+        state.walletAddress=null;
+        document.getElementById('walletDot').classList.remove('connected');
+        document.getElementById('walletLabel').textContent='Connect Wallet';
+        document.getElementById('myWishesBtn').style.display='none';
+        document.getElementById('disconnectBtn').style.display='none';
+        if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Connect wallet to mint →';
+      };
     } catch(e) {
       alert('Could not connect wallet: ' + e.message);
     }
+  }
+
+  function updateWalletUI(address){
+    document.getElementById('disconnectBtn').style.display='block';
+    state.walletConnected=true;
+    state.walletAddress=address;
+    document.getElementById('walletDot').classList.add('connected');
+    document.getElementById('walletLabel').textContent=address.slice(0,6)+'…'+address.slice(-4);
+    document.getElementById('myWishesBtn').style.display='block';
+    if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Seal this wish forever →';
   }
 
   function updateCharCount(){document.getElementById('charCount').textContent=document.getElementById('wishMessage').value.length;}
