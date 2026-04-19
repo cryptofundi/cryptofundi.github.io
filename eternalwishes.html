@@ -1043,22 +1043,18 @@
 
     let wishes=[];
 
-    // If wallet connected — query blockchain for wishes by this wallet
+    // If wallet connected — query blockchain events (single RPC call, no getWish needed)
     if(state.walletConnected && state.walletAddress && typeof EternalWishes!=='undefined'){
       try{
-        const chainWishes=await EternalWishes.getWishesByWallet(state.walletAddress, 20);
-        for(const cw of chainWishes){
-          try{
-            const full=await EternalWishes.getWish(cw.tokenId);
-            wishes.push(full);
-          }catch(e){ wishes.push(cw); }
-        }
+        // getWishesByWallet reads WishMinted events — returns to, occasion, tier, timestamp
+        // This is ONE RPC call regardless of how many wishes exist — fast even for 1000+
+        wishes=await EternalWishes.getWishesByWallet(state.walletAddress, 100);
       }catch(e){
         console.log('Blockchain wish lookup failed:', e.message);
       }
     }
 
-    // Only use localStorage if NO wallet connected (e.g. UPI users without wallet)
+    // Only use localStorage if NO wallet connected (for UPI users without wallet)
     if(!state.walletConnected){
       try{
         for(let i=0;i<localStorage.length;i++){
@@ -1075,28 +1071,70 @@
     wishes.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
 
     list.innerHTML='';
+
     if(wishes.length===0){
       empty.style.display='block';
     } else {
       empty.style.display='none';
-      wishes.forEach(w=>{
-        const url=buildWishURL(w.tokenId);
-        const tierBadge=w.tier!=='basic'?`<span style="font-size:10px;padding:1px 8px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">${w.tier==='eternal'?'✦✦':'✦'} ${w.tier}</span>`:'';
-        const card=document.createElement('div');
-        card.style.cssText='background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s;';
-        card.onmouseover=()=>card.style.borderColor='var(--gold)';
-        card.onmouseout=()=>card.style.borderColor='var(--border)';
-        card.onclick=()=>window.open(url,'_blank');
-        card.innerHTML=`
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion||''} ${tierBadge}</span>
-            <span style="font-size:11px;color:var(--chain-light);">#${w.tokenId}</span>
-          </div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${(w.message||'').slice(0,80)}${(w.message||'').length>80?'…':''}"</div>
-          <div style="font-size:11px;color:var(--muted);">To ${w.to||'—'} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
-        `;
-        list.appendChild(card);
-      });
+
+      // Show first 10, with "Show more" button if there are more
+      const PAGE_SIZE=10;
+      let shown=0;
+
+      function renderWishCards(startIdx, count){
+        const batch=wishes.slice(startIdx, startIdx+count);
+        batch.forEach(w=>{
+          const url=buildWishURL(w.tokenId);
+          const tierLabel=(w.tier||'basic').charAt(0).toUpperCase()+(w.tier||'basic').slice(1);
+          const tierBadge=(w.tier||'basic')!=='basic'?`<span style="font-size:10px;padding:1px 8px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">${w.tier==='eternal'?'✦✦':'✦'} ${tierLabel}</span>`:'';
+          const card=document.createElement('div');
+          card.style.cssText='background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s;';
+          card.onmouseover=()=>card.style.borderColor='var(--gold)';
+          card.onmouseout=()=>card.style.borderColor='var(--border)';
+          card.onclick=()=>window.open(url,'_blank');
+          card.innerHTML=`
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion||''} ${tierBadge}</span>
+              <span style="font-size:11px;color:var(--chain-light);">#${w.tokenId}</span>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${(w.to||'—')}"</div>
+            <div style="font-size:11px;color:var(--muted);">To ${w.to||'—'} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
+          `;
+          list.appendChild(card);
+        });
+        shown+=batch.length;
+      }
+
+      renderWishCards(0, PAGE_SIZE);
+
+      // "Show more" button if there are more wishes
+      if(wishes.length>PAGE_SIZE){
+        const countInfo=document.createElement('div');
+        countInfo.style.cssText='text-align:center;font-size:12px;color:var(--muted);padding:8px 0 4px;';
+        countInfo.textContent=`Showing ${Math.min(PAGE_SIZE, wishes.length)} of ${wishes.length} wishes`;
+        list.appendChild(countInfo);
+
+        const moreBtn=document.createElement('button');
+        moreBtn.style.cssText='width:100%;padding:12px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--ink);cursor:pointer;transition:border-color 0.2s;';
+        moreBtn.textContent='Show more wishes ↓';
+        moreBtn.onmouseover=()=>moreBtn.style.borderColor='var(--gold)';
+        moreBtn.onmouseout=()=>moreBtn.style.borderColor='var(--border)';
+        moreBtn.onclick=()=>{
+          moreBtn.remove();
+          countInfo.remove();
+          renderWishCards(shown, PAGE_SIZE);
+          if(shown<wishes.length){
+            const newInfo=document.createElement('div');
+            newInfo.style.cssText='text-align:center;font-size:12px;color:var(--muted);padding:8px 0 4px;';
+            newInfo.textContent=`Showing ${shown} of ${wishes.length} wishes`;
+            list.appendChild(newInfo);
+            const newBtn=moreBtn.cloneNode(true);
+            newBtn.onclick=moreBtn.onclick;
+            list.appendChild(newBtn);
+          }
+        };
+        list.appendChild(moreBtn);
+      }
     }
   }
   function delay(ms){return new Promise(r=>setTimeout(r,ms));}
