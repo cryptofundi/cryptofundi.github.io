@@ -94,7 +94,16 @@ const EternalWishes = {
   async connectWallet() {
     if (!window.ethereum) throw new Error("No wallet detected. Please install MetaMask.");
 
-    await window.ethereum.request({ method: "eth_requestAccounts" });
+    // Force MetaMask to show account picker (not just auto-connect the last account)
+    if (this._wasDisconnected) {
+      await window.ethereum.request({
+        method: "wallet_requestPermissions",
+        params: [{ eth_accounts: {} }]
+      });
+      this._wasDisconnected = false;
+    } else {
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+    }
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
 
     const { chainId } = await this.provider.getNetwork();
