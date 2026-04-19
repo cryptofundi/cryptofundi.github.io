@@ -273,7 +273,7 @@
             <div>
               <div class="proof-row-label">Contract</div>
               <!-- PLACEHOLDER: Replace with actual deployed contract address -->
-              <div class="proof-row-value mono" id="proofContract">0x0000…0000</div>
+              <div class="proof-row-value mono" id="proofContract">0xdaB6…1175</div>
             </div>
           </div>
           <div class="proof-row">
@@ -326,12 +326,20 @@
   <a href="index.html">Eternal Wishes</a> · Base blockchain · No login · No tracking · No personal data stored
 </footer>
 
-<!-- External scripts loaded FIRST so PINATA and EternalWishes are available when init() runs -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js" defer></script>
-<script src="contract-integration.js" defer></script>
+<script src="pinata.js"></script>
+<script src="contract-integration.js"></script>
 
 <script>
+  // ── DIAGNOSTIC: Check if external scripts loaded ──
+  console.log('ethers loaded:', typeof ethers !== 'undefined');
+  console.log('PINATA loaded:', typeof PINATA !== 'undefined');
+  console.log('EternalWishes loaded:', typeof EternalWishes !== 'undefined');
+  if (typeof ethers === 'undefined') console.error('❌ ethers.js FAILED to load — check CDN URL');
+  if (typeof PINATA === 'undefined') console.error('❌ pinata.js FAILED to load — is the file in your GitHub repo?');
+  if (typeof EternalWishes === 'undefined') console.error('❌ contract-integration.js FAILED to load — is the file in your GitHub repo?');
+
   // ── THEME DEFINITIONS ──
   const THEMES = {
     classic: { bg:'#faf7f2', card:'#f4efe6', msg:'#1a1410', accent:'#c9973a' },
@@ -374,21 +382,24 @@
     } catch(e) {}
 
     // 2. Read from Base blockchain via EternalWishes contract
-    // Wait up to 3 seconds for external scripts to finish loading
+    // Wait up to 5 seconds for external scripts to finish loading
     try {
       let attempts = 0;
-      while (typeof EternalWishes === 'undefined' && attempts < 30) {
+      while (typeof EternalWishes === 'undefined' && attempts < 50) {
         await new Promise(r => setTimeout(r, 100));
         attempts++;
       }
       if (typeof EternalWishes !== 'undefined') {
+        console.log('Loading wish #' + tokenId + ' from blockchain...');
         const wish = await EternalWishes.getWish(tokenId);
+        console.log('Wish loaded:', wish);
         if (wish) return wish;
       } else {
-        console.warn('EternalWishes script did not load in time');
+        console.error('EternalWishes script did not load after 5 seconds');
+        console.error('Check: contract-integration.js loaded? ethers.js loaded?');
       }
     } catch(e) {
-      console.log('Blockchain read failed, wish may not exist:', e.message);
+      console.error('Blockchain read failed:', e.message, e);
     }
 
     return null;
@@ -520,14 +531,14 @@
     document.getElementById('proofTokenId').textContent = `#${data.tokenId}`;
     document.getElementById('proofTimestamp').textContent = fmt(data.timestamp);
     document.getElementById('proofTier').textContent = data.tier.charAt(0).toUpperCase() + data.tier.slice(1);
-    document.getElementById('proofContract').textContent = '0x0000…0000'; // PLACEHOLDER
+    document.getElementById('proofContract').textContent = '0xdaB6…1175'; // PLACEHOLDER
     if (data.txHash) {
       document.getElementById('proofTxHash').textContent = data.txHash.slice(0,10) + '…' + data.txHash.slice(-8);
       document.getElementById('basescanLink').href = `https://basescan.org/tx/${data.txHash}`;
     } else {
       document.getElementById('proofTxHash').textContent = 'View on Basescan ↗';
       document.getElementById('basescanLink').href =
-        `https://basescan.org/token/0xCCc9B111713D8CD98973ca744c7082003274C6da?a=${data.tokenId}`;
+        `https://basescan.org/token/0xdaB67208DFF64A428a60Db1BaF0A4091aAda1175?a=${data.tokenId}`;
     }
 
     // Share
