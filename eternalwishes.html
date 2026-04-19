@@ -1058,16 +1058,18 @@
       }
     }
 
-    // Fallback: also check localStorage for wishes not yet on chain or from UPI path
-    try{
-      for(let i=0;i<localStorage.length;i++){
-        const key=localStorage.key(i);
-        if(key && key.startsWith('ew_wish_')){
-          const w=JSON.parse(localStorage.getItem(key));
-          if(w && !wishes.find(x=>x.tokenId==w.tokenId)) wishes.push(w);
+    // Only use localStorage if NO wallet connected (e.g. UPI users without wallet)
+    if(!state.walletConnected){
+      try{
+        for(let i=0;i<localStorage.length;i++){
+          const key=localStorage.key(i);
+          if(key && key.startsWith('ew_wish_')){
+            const w=JSON.parse(localStorage.getItem(key));
+            if(w && !wishes.find(x=>x.tokenId==w.tokenId)) wishes.push(w);
+          }
         }
-      }
-    }catch(e){}
+      }catch(e){}
+    }
 
     // Sort newest first
     wishes.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
