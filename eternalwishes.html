@@ -1031,19 +1031,40 @@
 
   // ── MY WISHES ─────────────────────────────────────────────────────────
 
-  function openMyWishes(){
+  async function openMyWishes(){
     const list=document.getElementById('myWishesList');
     const empty=document.getElementById('myWishesEmpty');
     list.innerHTML='';
+    empty.style.display='none';
 
-    // Collect from localStorage — all keys starting with ew_wish_
-    const wishes=[];
+    // Show loading state
+    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;"><div style="display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;"></div>Loading your wishes from blockchain…</div>';
+    document.getElementById('myWishesModal').classList.add('visible');
+
+    let wishes=[];
+
+    // If wallet connected — query blockchain for wishes by this wallet
+    if(state.walletConnected && state.walletAddress && typeof EternalWishes!=='undefined'){
+      try{
+        const chainWishes=await EternalWishes.getWishesByWallet(state.walletAddress, 20);
+        for(const cw of chainWishes){
+          try{
+            const full=await EternalWishes.getWish(cw.tokenId);
+            wishes.push(full);
+          }catch(e){ wishes.push(cw); }
+        }
+      }catch(e){
+        console.log('Blockchain wish lookup failed:', e.message);
+      }
+    }
+
+    // Fallback: also check localStorage for wishes not yet on chain or from UPI path
     try{
       for(let i=0;i<localStorage.length;i++){
         const key=localStorage.key(i);
         if(key && key.startsWith('ew_wish_')){
           const w=JSON.parse(localStorage.getItem(key));
-          if(w) wishes.push(w);
+          if(w && !wishes.find(x=>x.tokenId==w.tokenId)) wishes.push(w);
         }
       }
     }catch(e){}
@@ -1051,6 +1072,7 @@
     // Sort newest first
     wishes.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
 
+    list.innerHTML='';
     if(wishes.length===0){
       empty.style.display='block';
     } else {
@@ -1065,17 +1087,15 @@
         card.onclick=()=>window.open(url,'_blank');
         card.innerHTML=`
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion} ${tierBadge}</span>
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion||''} ${tierBadge}</span>
             <span style="font-size:11px;color:var(--chain-light);">#${w.tokenId}</span>
           </div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${w.message.slice(0,80)}${w.message.length>80?'…':''}"</div>
-          <div style="font-size:11px;color:var(--muted);">To ${w.to} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${(w.message||'').slice(0,80)}${(w.message||'').length>80?'…':''}"</div>
+          <div style="font-size:11px;color:var(--muted);">To ${w.to||'—'} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
         `;
         list.appendChild(card);
       });
     }
-
-    document.getElementById('myWishesModal').classList.add('visible');
   }
   function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 
