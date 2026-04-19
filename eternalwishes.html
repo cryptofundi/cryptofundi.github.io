@@ -202,8 +202,21 @@
     <button class="modal-close" onclick="document.getElementById('myWishesModal').classList.remove('visible')">✕</button>
     <div class="modal-seal" style="font-size:20px;">✦</div>
     <h2 style="margin-bottom:6px;">My Wishes</h2>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Wishes minted from this wallet or this browser</p>
-    <div id="myWishesList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Wishes minted from this wallet</p>
+
+    <!-- Search bar -->
+    <div style="position:relative;margin-bottom:14px;">
+      <input type="text" id="wishSearchInput" placeholder="Search by name, occasion, or message…"
+             oninput="filterMyWishes()"
+             style="width:100%;padding:10px 14px 10px 34px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--cream);color:var(--ink);outline:none;transition:border-color 0.2s;"
+             onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none;">🔍</span>
+    </div>
+
+    <!-- Results count -->
+    <div id="wishSearchCount" style="display:none;font-size:11px;color:var(--muted);margin-bottom:10px;"></div>
+
+    <div id="myWishesList" style="display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;"></div>
     <p id="myWishesEmpty" style="display:none;font-size:13px;color:var(--muted);text-align:center;padding:20px 0;">No wishes found yet. Mint your first one!</p>
   </div>
 </div>
@@ -1031,6 +1044,8 @@
 
   // ── MY WISHES ─────────────────────────────────────────────────────────
 
+  let _allMyWishes = [];  // stored for search filtering
+
   async function openMyWishes(){
     const list=document.getElementById('myWishesList');
     const empty=document.getElementById('myWishesEmpty');
@@ -1069,74 +1084,110 @@
 
     // Sort newest first
     wishes.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+    _allMyWishes = wishes;  // store for search filtering
+    document.getElementById('wishSearchInput').value = '';  // clear search on open
+    document.getElementById('wishSearchCount').style.display = 'none';
 
-    list.innerHTML='';
+    // Render using shared function (also used by search filter)
+    renderMyWishList(wishes);
+  }
+  function filterMyWishes(){
+    const query = (document.getElementById('wishSearchInput').value || '').toLowerCase().trim();
+    const countEl = document.getElementById('wishSearchCount');
 
-    if(wishes.length===0){
-      empty.style.display='block';
-    } else {
-      empty.style.display='none';
+    if(!query){
+      // No search — show all with pagination
+      renderMyWishList(_allMyWishes);
+      countEl.style.display = 'none';
+      return;
+    }
 
-      // Show first 10, with "Show more" button if there are more
-      const PAGE_SIZE=10;
-      let shown=0;
+    // Filter across: to, occasion, tier, tokenId
+    const filtered = _allMyWishes.filter(w => {
+      const searchable = [
+        w.to || '',
+        w.occasion || '',
+        w.tier || '',
+        w.message || '',
+        '#' + w.tokenId,
+      ].join(' ').toLowerCase();
+      return searchable.includes(query);
+    });
 
-      function renderWishCards(startIdx, count){
-        const batch=wishes.slice(startIdx, startIdx+count);
-        batch.forEach(w=>{
-          const url=buildWishURL(w.tokenId);
-          const tierLabel=(w.tier||'basic').charAt(0).toUpperCase()+(w.tier||'basic').slice(1);
-          const tierBadge=(w.tier||'basic')!=='basic'?`<span style="font-size:10px;padding:1px 8px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">${w.tier==='eternal'?'✦✦':'✦'} ${tierLabel}</span>`:'';
-          const card=document.createElement('div');
-          card.style.cssText='background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s;';
-          card.onmouseover=()=>card.style.borderColor='var(--gold)';
-          card.onmouseout=()=>card.style.borderColor='var(--border)';
-          card.onclick=()=>window.open(url,'_blank');
-          card.innerHTML=`
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion||''} ${tierBadge}</span>
-              <span style="font-size:11px;color:var(--chain-light);">#${w.tokenId}</span>
-            </div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${(w.to||'—')}"</div>
-            <div style="font-size:11px;color:var(--muted);">To ${w.to||'—'} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
-          `;
-          list.appendChild(card);
-        });
-        shown+=batch.length;
-      }
+    countEl.textContent = `${filtered.length} wish${filtered.length !== 1 ? 'es' : ''} found`;
+    countEl.style.display = 'block';
+    renderMyWishList(filtered);
+  }
 
-      renderWishCards(0, PAGE_SIZE);
+  function renderMyWishList(wishes){
+    const list = document.getElementById('myWishesList');
+    const empty = document.getElementById('myWishesEmpty');
+    list.innerHTML = '';
 
-      // "Show more" button if there are more wishes
-      if(wishes.length>PAGE_SIZE){
-        const countInfo=document.createElement('div');
-        countInfo.style.cssText='text-align:center;font-size:12px;color:var(--muted);padding:8px 0 4px;';
-        countInfo.textContent=`Showing ${Math.min(PAGE_SIZE, wishes.length)} of ${wishes.length} wishes`;
-        list.appendChild(countInfo);
+    if(wishes.length === 0){
+      empty.style.display = 'block';
+      empty.textContent = document.getElementById('wishSearchInput').value
+        ? 'No wishes match your search'
+        : 'No wishes found yet. Mint your first one!';
+      return;
+    }
 
-        const moreBtn=document.createElement('button');
-        moreBtn.style.cssText='width:100%;padding:12px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--ink);cursor:pointer;transition:border-color 0.2s;';
-        moreBtn.textContent='Show more wishes ↓';
-        moreBtn.onmouseover=()=>moreBtn.style.borderColor='var(--gold)';
-        moreBtn.onmouseout=()=>moreBtn.style.borderColor='var(--border)';
-        moreBtn.onclick=()=>{
-          moreBtn.remove();
-          countInfo.remove();
-          renderWishCards(shown, PAGE_SIZE);
-          if(shown<wishes.length){
-            const newInfo=document.createElement('div');
-            newInfo.style.cssText='text-align:center;font-size:12px;color:var(--muted);padding:8px 0 4px;';
-            newInfo.textContent=`Showing ${shown} of ${wishes.length} wishes`;
-            list.appendChild(newInfo);
-            const newBtn=moreBtn.cloneNode(true);
-            newBtn.onclick=moreBtn.onclick;
-            list.appendChild(newBtn);
-          }
-        };
-        list.appendChild(moreBtn);
-      }
+    empty.style.display = 'none';
+    const PAGE_SIZE = 10;
+    let shown = 0;
+
+    function renderBatch(startIdx, count){
+      const batch = wishes.slice(startIdx, startIdx + count);
+      batch.forEach(w => {
+        const url = buildWishURL(w.tokenId);
+        const tierLabel = (w.tier||'basic').charAt(0).toUpperCase() + (w.tier||'basic').slice(1);
+        const tierBadge = (w.tier||'basic') !== 'basic'
+          ? `<span style="font-size:10px;padding:1px 8px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:20px;color:var(--gold);">${w.tier==='eternal'?'✦✦':'✦'} ${tierLabel}</span>`
+          : '';
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s;';
+        card.onmouseover = () => card.style.borderColor = 'var(--gold)';
+        card.onmouseout = () => card.style.borderColor = 'var(--border)';
+        card.onclick = () => window.open(url, '_blank');
+        card.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">${w.occasion||''} ${tierBadge}</span>
+            <span style="font-size:11px;color:var(--chain-light);">#${w.tokenId}</span>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--ink);margin-bottom:6px;">"${(w.to||'—')}"</div>
+          <div style="font-size:11px;color:var(--muted);">To ${w.to||'—'} · ${new Date(w.timestamp).toLocaleDateString('en-IN')}</div>
+        `;
+        list.appendChild(card);
+      });
+      shown += batch.length;
+    }
+
+    renderBatch(0, PAGE_SIZE);
+
+    if(wishes.length > PAGE_SIZE){
+      const info = document.createElement('div');
+      info.style.cssText = 'text-align:center;font-size:12px;color:var(--muted);padding:8px 0 4px;';
+      info.textContent = `Showing ${Math.min(PAGE_SIZE, wishes.length)} of ${wishes.length} wishes`;
+      list.appendChild(info);
+
+      const btn = document.createElement('button');
+      btn.style.cssText = 'width:100%;padding:12px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--ink);cursor:pointer;';
+      btn.textContent = 'Show more wishes ↓';
+      btn.onclick = () => {
+        btn.remove(); info.remove();
+        renderBatch(shown, PAGE_SIZE);
+        if(shown < wishes.length){
+          info.textContent = `Showing ${shown} of ${wishes.length} wishes`;
+          list.appendChild(info);
+          const newBtn = btn.cloneNode(true);
+          newBtn.onclick = btn.onclick;
+          list.appendChild(newBtn);
+        }
+      };
+      list.appendChild(btn);
     }
   }
+
   function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 
   function copyLink(){navigator.clipboard.writeText(document.getElementById('wishLink').value).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);});}
