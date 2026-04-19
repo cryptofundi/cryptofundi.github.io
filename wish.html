@@ -505,18 +505,29 @@
     // 1. imageData (full base64 in localStorage — same device, instant)
     // 2. imageURL as ipfs:// URI → resolve via Pinata gateway (any device)
     // 3. imageURL as ew_img_ localStorage key → resolve to base64 (legacy)
+    console.log('Image debug:', {tier: data.tier, imageURL: data.imageURL, imageData: data.imageData ? 'present' : 'null'});
     if (data.tier !== 'basic') {
       let imgSrc = null;
       if (data.imageData) {
         imgSrc = data.imageData;
+        console.log('Image source: imageData (base64)');
       } else if (data.imageURL) {
-        if (PINATA.isIPFS(data.imageURL)) {
+        if (typeof PINATA !== 'undefined' && PINATA.isIPFS(data.imageURL)) {
           imgSrc = PINATA.toGatewayURL(data.imageURL);
+          console.log('Image source: IPFS gateway →', imgSrc);
         } else if (data.imageURL.startsWith('ew_img_')) {
           try { imgSrc = localStorage.getItem(data.imageURL); } catch(e) {}
+          console.log('Image source: localStorage key →', imgSrc ? 'found' : 'not found');
+        } else if (data.imageURL.startsWith('ipfs://')) {
+          // Fallback: PINATA not loaded, manually construct gateway URL
+          imgSrc = 'https://gateway.pinata.cloud/ipfs/' + data.imageURL.slice(7);
+          console.log('Image source: manual IPFS gateway →', imgSrc);
         } else {
           imgSrc = data.imageURL;
+          console.log('Image source: direct URL →', imgSrc);
         }
+      } else {
+        console.log('No imageURL found in wish data');
       }
       if (imgSrc) {
         const imgEl = document.getElementById('wishImage');
@@ -524,7 +535,12 @@
         imgEl.style.objectFit = 'cover';
         imgEl.style.objectPosition = `${data.imagePosX || 50}% ${data.imagePosY || 50}%`;
         document.getElementById('wishImageContainer').classList.add('visible');
+        console.log('Image element set, container visible');
+      } else {
+        console.log('No image source resolved — image will not display');
       }
+    } else {
+      console.log('Basic tier — image section skipped');
     }
 
     // Proof panel
