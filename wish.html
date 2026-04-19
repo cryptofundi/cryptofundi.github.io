@@ -87,7 +87,7 @@
   /* WISH IMAGE */
   .wish-image-container { border-radius: 12px; overflow: hidden; margin-bottom: 24px; display: none; }
   .wish-image-container.visible { display: block; }
-  .wish-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .wish-image { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: block; }
 
   .message-divider { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
   .message-divider::before,.message-divider::after { content:''; flex:1; height:1px; background:var(--border); }
@@ -205,9 +205,9 @@
 
           <!-- Wish image (premium only) -->
           <div class="wish-image-container" id="wishImageContainer"
-               style="border-radius:12px;overflow:hidden;margin-bottom:24px;max-height:320px;">
+               style="border-radius:12px;overflow:hidden;margin-bottom:24px;">
             <img id="wishImage" class="wish-image" src="" alt="Wish photo"
-                 style="width:100%;height:100%;max-height:320px;object-fit:cover;display:block;">
+                 style="width:100%;height:auto;max-height:500px;object-fit:contain;display:block;">
           </div>
 
           <div class="message-divider"><span class="divider-ornament">✦</span></div>
@@ -532,7 +532,7 @@
       if (imgSrc) {
         const imgEl = document.getElementById('wishImage');
         imgEl.src = imgSrc;
-        imgEl.style.objectFit = 'cover';
+        imgEl.style.objectFit = 'contain';
         imgEl.style.objectPosition = `${data.imagePosX || 50}% ${data.imagePosY || 50}%`;
         document.getElementById('wishImageContainer').classList.add('visible');
         console.log('Image element set, container visible');
