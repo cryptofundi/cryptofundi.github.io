@@ -126,27 +126,37 @@ const EternalWishes = {
     this.signer   = this.provider.getSigner();
     this.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, this.signer);
 
-    // Listen for account changes (user switches wallet in MetaMask)
-    window.ethereum.on('accountsChanged', (accounts) => {
-      if (accounts.length === 0) {
-        // Disconnected
-        document.getElementById('walletDot').classList.remove('connected');
-        document.getElementById('walletLabel').textContent = 'Connect Wallet';
-        document.getElementById('myWishesBtn').style.display = 'none';
-      } else {
-        // Switched account — update display
-        const addr = accounts[0];
-        document.getElementById('walletDot').classList.add('connected');
-        document.getElementById('walletLabel').textContent = addr.slice(0,6) + '…' + addr.slice(-4);
-        // Re-init signer and contract for new account
-        EternalWishes.provider = new ethers.providers.Web3Provider(window.ethereum);
-        EternalWishes.signer = EternalWishes.provider.getSigner();
-        EternalWishes.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, EternalWishes.signer);
-      }
-    });
+    // Listen for account/chain changes — only register once
+    if (!this._listenersRegistered) {
+      this._listenersRegistered = true;
+
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          // User disconnected all accounts
+          this.signer = null;
+          this.contract = null;
+          this._onDisconnect();
+        } else {
+          // User switched account — re-init everything
+          this.provider = new ethers.providers.Web3Provider(window.ethereum);
+          this.signer   = this.provider.getSigner();
+          this.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, this.signer);
+          this._onAccountChange(accounts[0]);
+        }
+      });
+
+      window.ethereum.on('chainChanged', () => {
+        // Chain changed — reload to reset state cleanly
+        window.location.reload();
+      });
+    }
 
     return await this.signer.getAddress();
   },
+
+  // Callbacks for UI updates — overridden by eternal-wishes.html
+  _onDisconnect() {},
+  _onAccountChange(addr) {},
 
   // ── MINT — CRYPTO PATH ────────────────────────────────────────────────
 
