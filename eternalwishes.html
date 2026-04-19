@@ -275,9 +275,9 @@
     <div class="tiers">
 
       <!-- BASIC -->
-      <div class="tier-card active" data-tier="basic" data-price="19" onclick="selectTier(this)">
+      <div class="tier-card active" data-tier="basic" data-price="0.15" onclick="selectTier(this)">
         <div class="tier-name">Basic</div>
-        <div class="tier-price">₹19 <span>/ wish</span></div>
+        <div class="tier-price">~$0.15 <span>/ wish</span></div>
         <div class="tier-tagline">Simple & permanent</div>
         <ul class="tier-features">
           <li>Beautiful text wish card</li>
@@ -288,10 +288,10 @@
       </div>
 
       <!-- PREMIUM -->
-      <div class="tier-card" data-tier="premium" data-price="49" onclick="selectTier(this)">
+      <div class="tier-card" data-tier="premium" data-price="0.39" onclick="selectTier(this)">
         <div class="tier-popular">Most popular</div>
         <div class="tier-name">Premium</div>
-        <div class="tier-price">₹49 <span>/ wish</span></div>
+        <div class="tier-price">~$0.39 <span>/ wish</span></div>
         <div class="tier-tagline">Make it unforgettable</div>
         <ul class="tier-features">
           <li>Add a photo</li>
@@ -303,9 +303,9 @@
       </div>
 
       <!-- ETERNAL -->
-      <div class="tier-card" data-tier="eternal" data-price="99" onclick="selectTier(this)">
+      <div class="tier-card" data-tier="eternal" data-price="0.79" onclick="selectTier(this)">
         <div class="tier-name">Eternal</div>
-        <div class="tier-price">₹99 <span>/ wish</span></div>
+        <div class="tier-price">~$0.79 <span>/ wish</span></div>
         <div class="tier-tagline">The ultimate wish</div>
         <ul class="tier-features">
           <li>Everything in Premium</li>
@@ -465,7 +465,7 @@
     </div>
 
     <div class="payment-info" id="upiInfo">
-      <strong>UPI / Card:</strong> Pay ₹<span id="upiPrice">19</span> — converted to ETH and your wish is minted on Base automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
+      <strong>UPI / Card:</strong> Pay ~$<span id="upiPrice">0.15</span> — converted to ETH and your wish is minted on Base automatically. No wallet needed. Temporary session (~2 min) deleted after minting.
     </div>
     <div class="payment-info visible" id="cryptoInfo">
       <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved. Wish mints the moment the transaction confirms on-chain.
@@ -474,7 +474,7 @@
     <button class="mint-btn" id="mintBtn" onclick="handleMint()">
       Seal this wish forever →
     </button>
-    <p class="mint-note">Gas ~₹0.50 · Base blockchain · Cannot be deleted · Ever</p>
+    <p class="mint-note">Paid in ETH · Gas < $0.01 · Base blockchain · Cannot be deleted · Ever</p>
   </div>
 
   <!-- FEED -->
@@ -536,7 +536,7 @@
     <h2 style="margin-bottom:10px;">UPI / Card — Coming Soon</h2>
     <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;">
       We're integrating UPI, GPay, PhonePe and Credit Card payments via Onramp.money.<br><br>
-      <strong style="color:var(--ink);">For now, use Crypto Wallet payment</strong> — it takes just 2 seconds on Base and costs less than ₹1 in gas.
+      <strong style="color:var(--ink);">For now, use Crypto Wallet payment</strong> — it takes just 2 seconds on Base and costs less than $0.01 in gas.
     </p>
     <button onclick="switchToCrypto()" style="width:100%;padding:14px;background:var(--ink);color:var(--parchment);border:none;border-radius:var(--radius-sm);font-family:'Cormorant Garamond',serif;font-size:18px;cursor:pointer;">
       Switch to Crypto Wallet →
@@ -562,7 +562,7 @@
 
 <script>
   const state = {
-    occasion:'birthday', tier:'basic', tierPrice:19,
+    occasion:'birthday', tier:'basic', tierPrice:0.15,
     paymentMethod:'crypto', walletConnected:false, walletAddress:null,
     theme:'classic', imageData:null, croppedImageData:null,
     audioBlob:null, audioHash:null, audioURL:null, audioBase64:null,  // audioHash = SHA-256 = audioProof field
