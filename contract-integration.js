@@ -125,6 +125,26 @@ const EternalWishes = {
 
     this.signer   = this.provider.getSigner();
     this.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, this.signer);
+
+    // Listen for account changes (user switches wallet in MetaMask)
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        // Disconnected
+        document.getElementById('walletDot').classList.remove('connected');
+        document.getElementById('walletLabel').textContent = 'Connect Wallet';
+        document.getElementById('myWishesBtn').style.display = 'none';
+      } else {
+        // Switched account — update display
+        const addr = accounts[0];
+        document.getElementById('walletDot').classList.add('connected');
+        document.getElementById('walletLabel').textContent = addr.slice(0,6) + '…' + addr.slice(-4);
+        // Re-init signer and contract for new account
+        EternalWishes.provider = new ethers.providers.Web3Provider(window.ethereum);
+        EternalWishes.signer = EternalWishes.provider.getSigner();
+        EternalWishes.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, EternalWishes.signer);
+      }
+    });
+
     return await this.signer.getAddress();
   },
 
