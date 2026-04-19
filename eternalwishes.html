@@ -295,8 +295,7 @@
         <div class="tier-tagline">Make it unforgettable</div>
         <ul class="tier-features">
           <li>Add a photo</li>
-          <li>Choose a design theme</li>
-          <li>Animated card reveal</li>
+                    <li>Animated card reveal</li>
           <li>✦ Premium badge on wish</li>
           <li>Permanent on-chain</li>
           <li>Shareable link</li>
@@ -380,8 +379,9 @@
         </div>
       </div>
 
-<!-- Theme selector -->
+<!-- Theme selector — hidden for now (always defaults to classic) -->
       <div class="field" style="margin-bottom:20px;">
+        <div style="display:none;">
         <label>Choose a design theme</label>
         <div class="themes" id="themeSelector">
           <button class="theme-btn active" data-theme="classic" onclick="selectTheme(this)">
@@ -400,6 +400,7 @@
             <div class="theme-swatch" style="background:linear-gradient(135deg,#e8f5e9,#2e7d32);"></div>
             <div class="theme-label">Nature</div>
           </button>
+        </div>
         </div>
       </div>
 
