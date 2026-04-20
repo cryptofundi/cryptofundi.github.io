@@ -587,7 +587,7 @@
 <!-- External scripts loaded FIRST so PINATA and EternalWishes are available -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js"></script>
+<script src="storage.js"></script>
 <script src="contract-integration.js"></script>
 
 <script>
@@ -929,10 +929,10 @@
 
     // ── Step 2: Upload image to IPFS (Premium + Eternal) ───────────────
     if (wish.imageData && ['premium','eternal'].includes(wish.tier)) {
-      showProcessing('Uploading photo to IPFS…', 'Pinning to decentralised storage');
+      showProcessing('Uploading photo to IPFS…', 'Storing permanently on IPFS + Filecoin');
       try {
-        wish.imageURL = await PINATA.uploadImage(wish.imageData, 'wish-image.jpg');
-        // imageURL is now an ipfs:// hash — stored on-chain, works cross-device
+        wish.imageURL = await STORAGE.uploadImage(wish.imageData, 'wish-image.jpg');
+        // imageURL is now an HTTPS gateway URL — works on Basescan, OpenSea, all browsers
       } catch(e) {
         hideProcessing();
         alert('Image upload failed: ' + e.message + '\n\nCheck your internet connection and try again.');
@@ -942,9 +942,9 @@
 
     // ── Step 3: Upload audio to IPFS (Eternal only) ────────────────────
     if (wish.tier === 'eternal' && state.audioBlob) {
-      showProcessing('Uploading voice note to IPFS…', 'Sealing audio to decentralised storage');
+      showProcessing('Uploading voice note to IPFS…', 'Storing audio permanently on IPFS + Filecoin');
       try {
-        const audioIPFS = await PINATA.uploadAudio(state.audioBlob, 'wish-voice.webm');
+        const audioIPFS = await STORAGE.uploadAudio(state.audioBlob, 'wish-voice.webm');
         wish.audioCID = audioIPFS;      // IPFS CID → goes on-chain for cross-device playback
         wish.audioIPFSURL = audioIPFS;  // also kept for localStorage
         // audioProof (SHA-256) is state.audioHash — also goes on-chain as verification
@@ -1003,7 +1003,7 @@
       tokenId,occasion:wish.occasion,to:wish.recipient,
       from:wish.sender||'Anonymous',message:wish.message,
       tier:wish.tier,theme:wish.theme,
-      imageURL:wish.imageURL||null,     // ipfs:// hash after PINATA upload
+      imageURL:wish.imageURL||null,     // HTTPS gateway URL after Lighthouse upload
       imageData:null,                   // DON'T store base64 — too big for localStorage (2-3MB)
       imagePosX:wish.imagePosX||50,
       imagePosY:wish.imagePosY||50,
