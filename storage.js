@@ -1,113 +1,92 @@
 /**
- * storage.js — Permanent IPFS storage via Lighthouse
+ * storage.js — IPFS storage via Pinata (hot) + Lighthouse (archival)
  *
- * Pay once, stored forever on IPFS + Filecoin.
- * Replaces pinata.js — same interface, permanent storage.
+ * Strategy:
+ *   Pinata  = hot storage (instant IPFS access, free 1GB tier)
+ *   Lighthouse Beacon = permanent Filecoin archival (future backup layer)
  *
- * Gateway: https://gateway.lighthouse.storage/ipfs/{CID}
- * Docs: https://docs.lighthouse.storage
+ * For now, all uploads go through Pinata for instant availability.
+ * Images load immediately on Basescan, OpenSea, wish.html, any browser.
+ *
+ * Gateway: https://gateway.pinata.cloud/ipfs/{CID}
  */
 
 const STORAGE = {
 
-  API_KEY: 'aa55319f.ab15cf3b98f74943b2cf787b97350776',
+  JWT: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2ZGE4ZjBmZC0yOWNlLTRmMTMtOTQ3OS00NWFlMDFiMTBiOWQiLCJlbWFpbCI6InRoZWFpd29ybGRuZXRAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6IjZkMjJhMDIxODRjMWU1ZTQ5MjdjIiwic2NvcGVkS2V5U2VjcmV0IjoiMGQ3NWMzNjNmZWU0OWM3Njg4OTU1ODI5NzU0M2U2NjRjYmY3Mjc4OWFhY2VjNWNlMzNiMjMxMmJlMzVmYTZhZCIsImV4cCI6MTgwNzg1NzQ0MX0.ZNTBmoGRrPCbzI1eCeD-bRlnHmWS7trXmd2PkPMqb14',
 
-  UPLOAD_URL: 'https://node.lighthouse.storage/api/v0/add',
-
-  GATEWAY: 'https://gateway.lighthouse.storage/ipfs/',
+  GATEWAY: 'https://gateway.pinata.cloud/ipfs/',
 
   /**
-   * Upload a base64 data URI (image) to IPFS via Lighthouse.
-   * Returns an HTTPS gateway URL for universal compatibility.
-   *
-   * @param {string} base64DataURI  - e.g. "data:image/jpeg;base64,/9j/4AAQ..."
-   * @param {string} filename       - e.g. "wish-image.jpg"
-   * @returns {string}              - "https://gateway.lighthouse.storage/ipfs/QmHash..."
+   * Upload a base64 data URI (image) to IPFS.
+   * Returns HTTPS gateway URL for universal compatibility.
    */
   async uploadImage(base64DataURI, filename = 'wish-image.jpg') {
     const res  = await fetch(base64DataURI);
     const blob = await res.blob();
-    return await this._uploadBlob(blob, filename);
+    return await this._uploadBlob(blob, filename, 'image');
   },
 
   /**
-   * Upload an audio Blob (voice note) to IPFS via Lighthouse.
-   *
-   * @param {Blob}   audioBlob  - recorded audio blob (audio/webm)
-   * @param {string} filename
-   * @returns {string}          - "https://gateway.lighthouse.storage/ipfs/QmHash..."
+   * Upload an audio Blob (voice note) to IPFS.
    */
   async uploadAudio(audioBlob, filename = 'wish-voice.webm') {
-    return await this._uploadBlob(audioBlob, filename);
+    return await this._uploadBlob(audioBlob, filename, 'audio');
   },
 
   /**
-   * Core upload — sends file to Lighthouse node API.
-   * Lighthouse stores on IPFS immediately + Filecoin for permanence.
+   * Core upload — Pinata pinFileToIPFS endpoint.
    */
-  async _uploadBlob(blob, filename) {
+  async _uploadBlob(blob, filename, type) {
     const formData = new FormData();
     formData.append('file', blob, filename);
+    formData.append('pinataMetadata', JSON.stringify({
+      name: filename,
+      keyvalues: { app: 'EternalWishes', type }
+    }));
+    formData.append('pinataOptions', JSON.stringify({ cidVersion: 1 }));
 
-    const response = await fetch(this.UPLOAD_URL, {
+    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.API_KEY}`,
-      },
+      headers: { 'Authorization': `Bearer ${this.JWT}` },
       body: formData,
     });
 
     if (!response.ok) {
       const err = await response.text();
-      throw new Error(`Lighthouse upload failed (${response.status}): ${err}`);
+      throw new Error(`Upload failed (${response.status}): ${err}`);
     }
 
     const data = await response.json();
-    const hash = data.Hash || data.cid;
-    if (!hash) throw new Error('Lighthouse returned no hash');
+    if (!data.IpfsHash) throw new Error('No hash returned');
 
-    // Return HTTPS gateway URL — works on Basescan, OpenSea, all browsers
-    return `${this.GATEWAY}${hash}`;
+    // HTTPS gateway URL — works on Basescan, OpenSea, all browsers
+    return `${this.GATEWAY}${data.IpfsHash}`;
   },
 
   /**
-   * Convert any supported URI to an HTTPS gateway URL for display.
-   * Handles: ipfs:// URIs, gateway URLs, base64, direct URLs.
-   *
-   * @param {string} uri  - "ipfs://QmHash..." or "https://gateway..." or base64
-   * @returns {string}    - HTTPS URL ready for <img> or <audio> src
+   * Convert any URI to displayable HTTPS URL.
    */
   toGatewayURL(uri) {
     if (!uri) return null;
-    if (uri.startsWith('ipfs://')) {
-      return this.GATEWAY + uri.slice(7);
-    }
-    // Already an HTTPS URL, base64, or other — return as-is
+    if (uri.startsWith('ipfs://')) return this.GATEWAY + uri.slice(7);
     return uri;
   },
 
-  /**
-   * Check if a string is an IPFS URI (ipfs:// protocol)
-   */
   isIPFS(str) {
     return str && str.startsWith('ipfs://');
   },
 
-  /**
-   * Check if a string is a gateway URL (from Lighthouse or Pinata)
-   */
   isGatewayURL(str) {
     return str && (
-      str.includes('gateway.lighthouse.storage/ipfs/') ||
       str.includes('gateway.pinata.cloud/ipfs/') ||
-      str.includes('ipfs.io/ipfs/') ||
-      str.includes('nftstorage.link/ipfs/')
+      str.includes('gateway.lighthouse.storage/ipfs/') ||
+      str.includes('ipfs.io/ipfs/')
     );
   },
 };
 
-// Backward compatibility — code that references PINATA will still work
+// Backward compatibility
 const PINATA = STORAGE;
 
-// Export for Node.js if needed
 if (typeof module !== 'undefined') module.exports = { STORAGE, PINATA };
