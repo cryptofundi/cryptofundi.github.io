@@ -249,7 +249,7 @@
       <button class="occasion-btn" data-occasion="promotion" onclick="selectOccasion(this)"><span class="occasion-icon">🚀</span><span class="occasion-name">Promotion</span></button>
       <button class="occasion-btn" data-occasion="newyear" onclick="selectOccasion(this)"><span class="occasion-icon">✨</span><span class="occasion-name">New Year</span></button>
       <button class="occasion-btn" data-occasion="memorial" onclick="selectOccasion(this)"><span class="occasion-icon">🕯️</span><span class="occasion-name">In Memory</span></button>
-      <button class="occasion-btn" data-occasion="custom" onclick="selectOccasion(this)"><span class="occasion-icon">💫</span><span class="occasion-name">Custom</span></button>
+      <button class="occasion-btn" data-occasion="custom" onclick="selectOccasion(this)"><span class="occasion-icon">📌</span><span class="occasion-name">Preserve</span></button>
     </div>
   </div>
 
@@ -614,6 +614,22 @@
   function selectOccasion(el) {
     document.querySelectorAll('.occasion-btn').forEach(b=>b.classList.remove('active'));
     el.classList.add('active'); state.occasion=el.dataset.occasion;
+
+    // Update placeholder and labels based on occasion type
+    const msgEl = document.getElementById('wishMessage');
+    const recipEl = document.getElementById('recipientName');
+    const msgLabel = document.querySelector('label[for="wishMessage"]');
+    const recipLabel = recipEl?.previousElementSibling || recipEl?.parentElement?.querySelector('label');
+
+    if (state.occasion === 'custom') {
+      msgEl.placeholder = 'Paste a tweet, message, or moment you want to preserve forever…';
+      msgLabel.textContent = 'What do you want to preserve?';
+      recipEl.placeholder = 'Person, project, or @handle';
+    } else {
+      msgEl.placeholder = 'Write something they will read forever…';
+      msgLabel.textContent = 'Your eternal message';
+      recipEl.placeholder = 'Ravi Kumar';
+    }
   }
 
   // TIER — shows/hides premium and eternal exclusive sections
@@ -1194,7 +1210,7 @@
   function shareWhatsApp(){const u=encodeURIComponent(document.getElementById('wishLink').value);window.open(`https://wa.me/?text=${encodeURIComponent('✨ I just sealed an eternal wish on the blockchain — ')}${u}`,'_blank');}
   function shareTwitter(){const u=encodeURIComponent(document.getElementById('wishLink').value);window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Just minted an eternal wish on the blockchain ✨')}&url=${u}`,'_blank');}
 
-  const OCCASION_MAP={birthday:{i:'🎂',l:'Birthday'},anniversary:{i:'💍',l:'Anniversary'},wedding:{i:'💐',l:'Wedding'},newbaby:{i:'👶',l:'New Baby'},graduation:{i:'🎓',l:'Graduation'},promotion:{i:'🚀',l:'Promotion'},newyear:{i:'✨',l:'New Year'},memorial:{i:'🕯️',l:'In Memory'},custom:{i:'💫',l:'Wish'}};
+  const OCCASION_MAP={birthday:{i:'🎂',l:'Birthday'},anniversary:{i:'💍',l:'Anniversary'},wedding:{i:'💐',l:'Wedding'},newbaby:{i:'👶',l:'New Baby'},graduation:{i:'🎓',l:'Graduation'},promotion:{i:'🚀',l:'Promotion'},newyear:{i:'✨',l:'New Year'},memorial:{i:'🕯️',l:'In Memory'},custom:{i:'📌',l:'Preserve'}};
   const THEME_COLORS={classic:'var(--cream)',romantic:'#fce4ec',dark:'#2d2520',nature:'#e8f5e9'};
 
   let feedWishes = [];
