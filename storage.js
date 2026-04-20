@@ -8,14 +8,14 @@
  * For now, all uploads go through Pinata for instant availability.
  * Images load immediately on Basescan, OpenSea, wish.html, any browser.
  *
- * Gateway: https://gateway.pinata.cloud/ipfs/{CID}
+ * Gateway: https://ipfs.io/ipfs/{CID}
  */
 
 const STORAGE = {
 
   JWT: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2ZGE4ZjBmZC0yOWNlLTRmMTMtOTQ3OS00NWFlMDFiMTBiOWQiLCJlbWFpbCI6InRoZWFpd29ybGRuZXRAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6IjZkMjJhMDIxODRjMWU1ZTQ5MjdjIiwic2NvcGVkS2V5U2VjcmV0IjoiMGQ3NWMzNjNmZWU0OWM3Njg4OTU1ODI5NzU0M2U2NjRjYmY3Mjc4OWFhY2VjNWNlMzNiMjMxMmJlMzVmYTZhZCIsImV4cCI6MTgwNzg1NzQ0MX0.ZNTBmoGRrPCbzI1eCeD-bRlnHmWS7trXmd2PkPMqb14',
 
-  GATEWAY: 'https://gateway.pinata.cloud/ipfs/',
+  GATEWAY: 'https://ipfs.io/ipfs/',
 
   /**
    * Upload a base64 data URI (image) to IPFS.
@@ -79,7 +79,7 @@ const STORAGE = {
 
   isGatewayURL(str) {
     return str && (
-      str.includes('gateway.pinata.cloud/ipfs/') ||
+      str.includes('ipfs.io/ipfs/') ||
       str.includes('gateway.lighthouse.storage/ipfs/') ||
       str.includes('ipfs.io/ipfs/')
     );
