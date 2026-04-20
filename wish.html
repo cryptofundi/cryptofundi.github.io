@@ -328,16 +328,16 @@
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="pinata.js"></script>
+<script src="storage.js"></script>
 <script src="contract-integration.js"></script>
 
 <script>
   // ── DIAGNOSTIC: Check if external scripts loaded ──
   console.log('ethers loaded:', typeof ethers !== 'undefined');
-  console.log('PINATA loaded:', typeof PINATA !== 'undefined');
+  console.log('STORAGE loaded:', typeof PINATA !== 'undefined');
   console.log('EternalWishes loaded:', typeof EternalWishes !== 'undefined');
   if (typeof ethers === 'undefined') console.error('❌ ethers.js FAILED to load — check CDN URL');
-  if (typeof PINATA === 'undefined') console.error('❌ pinata.js FAILED to load — is the file in your GitHub repo?');
+  if (typeof PINATA === 'undefined') console.error('❌ storage.js FAILED to load — is the file in your GitHub repo?');
   if (typeof EternalWishes === 'undefined') console.error('❌ contract-integration.js FAILED to load — is the file in your GitHub repo?');
 
   // ── THEME DEFINITIONS ──
@@ -478,8 +478,9 @@
       // Audio resolution: IPFS first (any device), then base64 (same device), then blob (same tab)
       let audioSrc = null;
       // audioCID from contract = IPFS CID → works on any device
-      if (data.audioCID && PINATA.isIPFS(data.audioCID)) {
-        audioSrc = PINATA.toGatewayURL(data.audioCID);
+      if (data.audioCID) {
+        // audioCID could be ipfs:// (old mints) or https://gateway... (new mints)
+        audioSrc = PINATA.isIPFS(data.audioCID) ? PINATA.toGatewayURL(data.audioCID) : data.audioCID;
       } else if (data.audioIPFSURL && PINATA.isIPFS(data.audioIPFSURL)) {
         audioSrc = PINATA.toGatewayURL(data.audioIPFSURL);
       } else if (data.audioBase64) {
