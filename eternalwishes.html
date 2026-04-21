@@ -136,7 +136,12 @@
   .feed-avatar { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--gold); font-weight: 500; border: 1px solid var(--border); }
 
   /* WALLET */
-  .wallet-bar { position: fixed; top: 16px; right: 16px; z-index: 50; }
+  .top-nav { position: sticky; top: 0; z-index: 50; background: var(--ink); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .top-nav-brand { color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; text-decoration: none; }
+  .top-nav-links { display: flex; gap: 14px; align-items: center; }
+  .top-nav-links a { color: var(--chain-light); font-size: 12px; text-decoration: none; transition: color 0.2s; }
+  .top-nav-links a:hover { color: var(--gold-light); }
+  .wallet-bar { display: flex; align-items: center; gap: 8px; }
   .wallet-connect-btn { background: var(--ink); color: var(--parchment); border: none; border-radius: 20px; padding: 8px 16px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 7px; transition: all 0.2s; }
   .wallet-connect-btn:hover { background: #2d2520; }
   .wallet-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
@@ -183,17 +188,23 @@
 </head>
 <body>
 
-<div class="wallet-bar">
-  <button class="wallet-connect-btn" id="walletBtn" onclick="toggleWallet()">
-    <span class="wallet-dot" id="walletDot"></span>
-    <span id="walletLabel">Connect Wallet</span>
-  </button>
-  <button class="wallet-connect-btn" id="myWishesBtn" onclick="openMyWishes()" style="display:none;margin-top:6px;background:var(--cream);color:var(--ink);border:1px solid var(--border);">
-    ✦ My Wishes
-  </button>
-  <button class="wallet-connect-btn" id="disconnectBtn" onclick="toggleWallet()" style="display:none;margin-top:4px;background:none;color:var(--muted);border:1px solid var(--border);font-size:11px;padding:6px 12px;">
-    Disconnect
-  </button>
+<nav class="top-nav">
+  <a href="eternalwishes.html" class="top-nav-brand">Eternal Wishes</a>
+  <div class="top-nav-links">
+    <a href="moments.html">Moments</a>
+    <div class="wallet-bar">
+      <button class="wallet-connect-btn" id="myWishesBtn" onclick="openMyWishes()" style="display:none;background:var(--cream);color:var(--ink);border:1px solid rgba(255,255,255,0.15);">
+        ✦ My Wishes
+      </button>
+      <button class="wallet-connect-btn" id="walletBtn" onclick="toggleWallet()">
+        <span class="wallet-dot" id="walletDot"></span>
+        <span id="walletLabel">Connect Wallet</span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div style="display:none;">
+  <button id="disconnectBtn" onclick="toggleWallet()"></button>
 </div>
 
 <!-- My Wishes Modal -->
@@ -288,6 +299,22 @@
   <!-- STEP 3: TIER -->
   <div style="animation: fadeUp 0.5s 0.3s both;">
     <p class="section-label">Step 3 — Choose your tier</p>
+
+    <!-- Compact tier selector (default: Basic) -->
+    <div id="compactTier" style="background:var(--cream);border:1.5px solid var(--gold);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:all 0.2s;" onclick="toggleTierExpand()">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:18px;" id="compactTierName">Basic</span>
+          <span style="font-size:14px;color:var(--gold);margin-left:8px;" id="compactTierPrice">~$0.15</span>
+          <span style="font-size:12px;color:var(--muted);margin-left:4px;">/ wish</span>
+        </div>
+        <span style="font-size:12px;color:var(--gold);font-weight:500;" id="tierExpandLabel">Change ▾</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="compactTierDesc">Simple & permanent · Text wish card</div>
+    </div>
+
+    <!-- Expandable tier cards (hidden by default on mobile) -->
+    <div id="tierExpand" style="display:none;margin-top:12px;">
     <div class="tiers">
 
       <!-- BASIC -->
@@ -311,7 +338,7 @@
         <div class="tier-tagline">Make it unforgettable</div>
         <ul class="tier-features">
           <li>Add a photo</li>
-                    <li>Animated card reveal</li>
+          <li>Animated card reveal</li>
           <li>✦ Premium badge on wish</li>
           <li>Permanent on-chain</li>
           <li>Shareable link</li>
@@ -330,138 +357,13 @@
           <li>✦✦ Eternal badge</li>
           <li>Priority minting</li>
           <li>Permanent on-chain</li>
+          <li>Shareable link</li>
         </ul>
       </div>
 
     </div>
-
-    <!-- PREMIUM FIELDS (shown for premium + eternal) -->
-    <div class="premium-fields" id="premiumFields">
-      <div class="premium-label" id="premiumLabelText">✦ Premium features — make your wish unforgettable</div>
-
-      <!-- Photo upload — QRNFT-inspired: object-fit cover + position slider -->
-      <div class="field" style="margin-bottom:20px;">
-        <label>Add a photo <span id="cropHint" style="color:var(--chain-light);font-size:10px;font-style:italic;display:none;">(Eternal — drag slider to reposition)</span></label>
-
-        <!-- Upload trigger area -->
-        <div class="image-upload-area" id="uploadArea" onclick="triggerImageUpload()"
-             style="position:relative;overflow:hidden;min-height:56px;">
-          <!-- Preview — uses object-fit:cover so image always fills correctly -->
-          <img id="uploadPreview" class="upload-preview" src="" alt="Preview"
-               style="width:100%;height:180px;object-fit:cover;object-position:50% 50%;border-radius:8px;display:none;">
-          <div class="upload-placeholder" id="uploadPlaceholder">
-            <span>📷</span>
-            Tap to upload a photo
-            <div style="font-size:11px;color:var(--chain-light);margin-top:4px;">JPG, PNG · max 5MB</div>
-          </div>
-        </div>
-        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
-
-        <!-- Position controls (shown after upload) -->
-        <div id="imageControls" style="display:none;margin-top:10px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-          <div style="font-size:11px;color:var(--chain);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">Adjust photo position</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:11px;color:var(--muted);width:40px;font-weight:500;">Top↕Bot</span>
-              <input type="range" id="imgPosY" min="0" max="100" value="50"
-                     oninput="updateImagePosition()"
-                     style="flex:1;accent-color:var(--gold);">
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:11px;color:var(--muted);width:40px;font-weight:500;">Left↔Right</span>
-              <input type="range" id="imgPosX" min="0" max="100" value="50"
-                     oninput="updateImagePosition()"
-                     style="flex:1;accent-color:var(--gold);">
-            </div>
-          </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-            <button onclick="resetImagePosition()"
-                    style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px;">
-              ↺ Reset position
-            </button>
-          </div>
-        </div>
-
-        <!-- Crop tool (Eternal only — canvas based for precise crop) -->
-        <div id="cropTool" style="display:none;margin-top:12px;">
-          <div style="font-size:11px;color:var(--chain);margin-bottom:8px;letter-spacing:0.05em;">DRAG TO CROP · <span style="color:var(--gold);">Eternal exclusive</span></div>
-          <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);border:1.5px solid var(--gold);background:#000;user-select:none;" id="cropContainer">
-            <canvas id="cropCanvas" style="display:block;max-width:100%;cursor:crosshair;"></canvas>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <button onclick="applyCrop()" style="flex:1;padding:10px;background:var(--ink);color:var(--parchment);border:none;border-radius:var(--radius-sm);font-family:'Cormorant Garamond',serif;font-size:16px;cursor:pointer;">Apply crop ✓</button>
-            <button onclick="resetCrop()" style="padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;color:var(--muted);">Reset</button>
-          </div>
-        </div>
-      </div>
-
-<!-- Theme selector — hidden for now (always defaults to classic) -->
-      <div class="field" style="margin-bottom:20px;">
-        <div style="display:none;">
-        <label>Choose a design theme</label>
-        <div class="themes" id="themeSelector">
-          <button class="theme-btn active" data-theme="classic" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background:linear-gradient(135deg,#f4efe6,#c9973a);"></div>
-            <div class="theme-label">Classic Gold</div>
-          </button>
-          <button class="theme-btn" data-theme="romantic" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background:linear-gradient(135deg,#fce4ec,#c2185b);"></div>
-            <div class="theme-label">Romantic</div>
-          </button>
-          <button class="theme-btn" data-theme="dark" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background:linear-gradient(135deg,#1a1410,#c9973a);"></div>
-            <div class="theme-label">Dark Luxury</div>
-          </button>
-          <button class="theme-btn" data-theme="nature" onclick="selectTheme(this)">
-            <div class="theme-swatch" style="background:linear-gradient(135deg,#e8f5e9,#2e7d32);"></div>
-            <div class="theme-label">Nature</div>
-          </button>
-        </div>
-        </div>
-      </div>
-
-      <!-- VOICE NOTE (Eternal only) -->
-      <div id="voiceNoteSection" style="display:none;">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--chain);font-weight:500;margin-bottom:10px;">
-          Voice note <span style="color:var(--gold);font-style:italic;text-transform:none;letter-spacing:0;font-size:11px;">— sealed on-chain · Eternal exclusive</span>
-        </div>
-        <div style="background:var(--parchment);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;">
-
-          <!-- Recorder UI -->
-          <div id="recorderUI" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button id="recordBtn" onclick="toggleRecording()" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--ink);color:var(--parchment);border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;">
-              <span id="recordIcon" style="width:10px;height:10px;background:#ef4444;border-radius:50%;display:inline-block;"></span>
-              <span id="recordLabel">Record voice note</span>
-            </button>
-            <span id="recordTimer" style="font-size:13px;color:var(--chain);font-family:monospace;min-width:40px;">0:00</span>
-            <span id="recordStatus" style="font-size:11px;color:var(--chain-light);">Max 30 seconds</span>
-          </div>
-
-          <!-- Waveform visualiser -->
-          <canvas id="waveformCanvas" width="400" height="48" style="display:none;width:100%;margin-top:12px;border-radius:6px;background:var(--cream);"></canvas>
-
-          <!-- Playback (shown after recording) -->
-          <div id="playbackUI" style="display:none;margin-top:12px;">
-            <audio id="audioPlayback" controls style="width:100%;height:36px;"></audio>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-              <div style="font-size:11px;color:var(--chain-light);">
-                🔒 Voice proof (SHA-256): <span id="audioHashDisplay" style="font-family:monospace;font-size:10px;color:var(--muted);">computing…</span>
-              </div>
-              <button onclick="clearRecording()" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px;">✕ Redo</button>
-            </div>
-            <div style="font-size:11px;color:var(--chain-light);margin-top:4px;">The hash of your voice note will be sealed on-chain. Audio stored on IPFS.</div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
-  </div>
 
-  <div class="section-divider" style="animation: fadeUp 0.5s 0.35s both;"><span class="divider-ornament">✦</span></div>
-
-  <!-- STEP 4: PAYMENT -->
-  <div style="animation: fadeUp 0.5s 0.4s both;">
     <p class="section-label">Step 4 — Pay & mint forever</p>
     <div class="payment-options">
       <button class="pay-btn active" data-method="crypto" onclick="selectPayment(this)">
@@ -485,14 +387,9 @@
     </div>
     <div class="payment-info visible" id="cryptoInfo">
       <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved.<br><br>
-      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;">
-        <div style="font-weight:600;color:var(--ink);margin-bottom:6px;">🔒 Safety note</div>
-        <div style="color:var(--muted);">
-          • You only pay the exact wish price — no approvals, no token access<br>
-          • Contract is <a href="https://basescan.org/address/0xdaB67208DFF64A428a60Db1BaF0A4091aAda1175#code" target="_blank" style="color:var(--gold);text-decoration:underline;">verified on Basescan</a> — read the code yourself<br>
-          • No wallet permissions requested — just a simple ETH transfer<br>
-          • Tip: use a fresh wallet if you prefer extra caution
-        </div>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.6;">
+        <span style="font-weight:600;color:var(--ink);">🔒 Safe & simple</span>
+        <span style="color:var(--muted);"> · No approvals · Pay once · <a href="https://basescan.org/address/0xC51b7B6B4af1B62dc604324c89b386b10F67716D#code" target="_blank" style="color:var(--gold);">Verified contract</a></span>
       </div>
     </div>
 
@@ -644,11 +541,37 @@
   }
 
   // TIER — shows/hides premium and eternal exclusive sections
+  function toggleTierExpand() {
+    const expand = document.getElementById('tierExpand');
+    const label = document.getElementById('tierExpandLabel');
+    if (expand.style.display === 'none') {
+      expand.style.display = 'block';
+      label.textContent = 'Collapse ▴';
+    } else {
+      expand.style.display = 'none';
+      label.textContent = 'Change ▾';
+    }
+  }
+
+  function updateCompactTier(tierName, price, desc) {
+    document.getElementById('compactTierName').textContent = tierName;
+    document.getElementById('compactTierPrice').textContent = price;
+    document.getElementById('compactTierDesc').textContent = desc;
+    // Collapse the expanded view
+    document.getElementById('tierExpand').style.display = 'none';
+    document.getElementById('tierExpandLabel').textContent = 'Change ▾';
+  }
+
   function selectTier(el) {
     document.querySelectorAll('.tier-card').forEach(c=>c.classList.remove('active'));
     el.classList.add('active');
-    state.tier=el.dataset.tier; state.tierPrice=parseInt(el.dataset.price);
+    state.tier=el.dataset.tier; state.tierPrice=parseFloat(el.dataset.price);
     document.getElementById('upiPrice').textContent=state.tierPrice;
+    // Update compact tier display
+    const tierNames = {basic:'Basic', premium:'Premium', eternal:'Eternal'};
+    const tierDescs = {basic:'Simple & permanent · Text wish card', premium:'Photo + premium badge · Make it unforgettable', eternal:'Photo + voice + eternal badge · The ultimate wish'};
+    const tierPrices = {basic:'~$0.15', premium:'~$0.39', eternal:'~$0.79'};
+    updateCompactTier(tierNames[state.tier], tierPrices[state.tier], tierDescs[state.tier]);
     const isPrem=['premium','eternal'].includes(state.tier);
     const isEternal=state.tier==='eternal';
     document.getElementById('premiumFields').classList.toggle('visible', isPrem);
