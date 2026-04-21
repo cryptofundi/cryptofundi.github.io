@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore Moments · Eternal Wishes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
+    --gold: #c9973a; --gold-light: #e8c97a; --gold-pale: #f7edcd;
+    --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
+    --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Nav */
+  .nav { background: var(--ink); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-brand { color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a { color: var(--chain-light); font-size: 13px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold-light); text-decoration: none; }
+  .nav-links a.active { color: var(--gold-light); }
+
+  /* Hero */
+  .hero { text-align: center; padding: 50px 24px 20px; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 6vw, 52px); font-weight: 300; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .hero p { font-size: 15px; color: var(--muted); max-width: 500px; margin: 0 auto; line-height: 1.6; }
+  .hero .divider { margin: 20px auto; color: var(--gold); font-size: 14px; }
+
+  /* Search */
+  .search-wrap { max-width: 560px; margin: 0 auto 30px; padding: 0 24px; position: relative; }
+  .search-wrap input { width: 100%; padding: 14px 18px 14px 42px; border: 1.5px solid var(--border); border-radius: 30px; font-family: inherit; font-size: 14px; background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.2s; }
+  .search-wrap input:focus { border-color: var(--gold); }
+  .search-wrap .icon { position: absolute; left: 40px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--muted); pointer-events: none; }
+  .search-wrap input::placeholder { color: var(--chain-light); }
+
+  /* Tabs */
+  .tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; padding: 0 24px; }
+  .tab { padding: 8px 20px; font-size: 13px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; background: transparent; color: var(--muted); font-family: inherit; transition: all 0.2s; }
+  .tab.active { background: var(--gold-pale); color: var(--gold); border-color: rgba(201,151,58,0.4); }
+  .tab:hover { border-color: var(--gold); }
+
+  /* Container */
+  .container { max-width: 720px; margin: 0 auto; padding: 0 24px 40px; }
+
+  /* Moment card */
+  .moment-card { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 14px; transition: border-color 0.2s, box-shadow 0.2s; }
+  .moment-card:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(201,151,58,0.08); }
+  .moment-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px; line-height: 1.3; }
+  .moment-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .moment-meta .count { color: var(--gold); font-weight: 500; }
+  .moment-actions { display: flex; justify-content: flex-end; }
+  .btn-wish { background: var(--gold-pale); border: 1px solid rgba(201,151,58,0.4); border-radius: var(--radius-sm); padding: 8px 18px; font-family: inherit; font-size: 13px; color: var(--gold); cursor: pointer; transition: all 0.2s; }
+  .btn-wish:hover { background: var(--gold); color: white; border-color: var(--gold); }
+
+  /* Loading */
+  .loading { text-align: center; padding: 40px 0; color: var(--muted); font-size: 13px; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 50px 20px; }
+  .empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 10px; }
+  .empty p { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
+  /* Load more */
+  .load-more { display: block; margin: 20px auto; padding: 12px 30px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .load-more:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Bottom CTA */
+  .bottom-cta { text-align: center; padding: 40px 24px 20px; border-top: 1px solid var(--border); margin-top: 20px; }
+  .bottom-cta p { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; color: var(--ink); margin-bottom: 16px; }
+  .badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .badge { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; }
+  .btn-create { display: inline-block; padding: 14px 32px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; color: var(--ink); cursor: pointer; background: transparent; transition: all 0.2s; text-decoration: none; }
+  .btn-create:hover { border-color: var(--gold); background: var(--gold-pale); color: var(--gold); text-decoration: none; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 20px 24px 30px; font-size: 11px; color: var(--chain-light); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="eternalwishes.html" class="nav-brand">Eternal Wishes</a>
+  <div class="nav-links">
+    <a href="eternalwishes.html">Create Wish</a>
+    <a href="moments.html" class="active">Moments</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Explore Public Moments 🌍</h1>
+  <p>Join others in sending heartfelt, on-chain wishes for special occasions.</p>
+  <div class="divider">✦</div>
+</div>
+
+<div class="search-wrap">
+  <span class="icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="Search by occasion, keyword, or host…" oninput="filterMoments()">
+</div>
+
+<div class="container">
+  <div id="momentsList">
+    <div class="loading">
+      <span class="spinner"></span> Loading moments from Base blockchain…
+    </div>
+  </div>
+
+  <div class="bottom-cta">
+    <p>Create a shared space where others can add their wishes.</p>
+    <div class="badges">
+      <span class="badge">No login</span>
+      <span class="badge">No tracking</span>
+      <span class="badge">Forever on-chain</span>
+      <span class="badge">Base network</span>
+    </div>
+    <a href="create-moment.html" class="btn-create">Create a Moment</a>
+  </div>
+</div>
+
+<div class="footer">
+  Eternal Wishes · Base blockchain · This platform enables users to create and share messages. It is not an investment or earnings platform.
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="contract-integration.js"></script>
+<script>
+
+const OCCASION_ICONS = {
+  birthday:'🎂', anniversary:'💍', wedding:'💐', newbaby:'👶',
+  graduation:'🎓', promotion:'🚀', newyear:'✨', memorial:'🕯️',
+  custom:'📌', celebration:'🎉',
+};
+
+let allMoments = [];
+
+async function loadMoments() {
+  const listEl = document.getElementById('momentsList');
+  try {
+    // Load active moments from contract
+    const moments = await EternalWishes.getActiveMoments();
+
+    // For each moment, count wishes using event query
+    const c        = EternalWishes.contract || EternalWishes.initReadOnly();
+    const provider = EternalWishes.provider || EternalWishes.readOnly;
+    const latest   = await provider.getBlockNumber();
+
+    for (const m of moments) {
+      try {
+        const queryHash = await c.getQueryHash(m.occasion, m.momentHash);
+        const filter    = c.filters.WishMinted(null, null, queryHash);
+        const events    = await c.queryFilter(filter, 0, latest);
+        m.wishCount = events.length;
+      } catch(e) {
+        m.wishCount = 0;
+      }
+
+      // Get host address
+      try {
+        m.hostAddress = await c.momentHost(m.momentHash);
+      } catch(e) {
+        m.hostAddress = null;
+      }
+    }
+
+    allMoments = moments;
+    renderMoments(allMoments);
+
+  } catch(e) {
+    console.log('Moments load error:', e.message);
+    listEl.innerHTML = `
+      <div class="empty">
+        <h3>No moments yet</h3>
+        <p>Be the first to create a public moment!</p>
+        <a href="create-moment.html" class="btn-create">Create a Moment</a>
+      </div>`;
+  }
+}
+
+function renderMoments(moments) {
+  const listEl = document.getElementById('momentsList');
+
+  if (moments.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty">
+        <h3>No moments found</h3>
+        <p>${document.getElementById('searchInput').value ? 'Try a different search term' : 'Be the first to create a public moment!'}</p>
+        <a href="create-moment.html" class="btn-create">Create a Moment</a>
+      </div>`;
+    return;
+  }
+
+  // Sort by wish count (trending)
+  moments.sort((a, b) => (b.wishCount || 0) - (a.wishCount || 0));
+
+  listEl.innerHTML = moments.map(m => {
+    const icon = OCCASION_ICONS[m.occasion] || '🌍';
+    const hostShort = m.hostAddress
+      ? m.hostAddress.slice(0, 6) + '…' + m.hostAddress.slice(-4)
+      : '—';
+    const slug = m.id;
+
+    return `
+      <div class="moment-card" onclick="window.location.href='moment.html?slug=${encodeURIComponent(slug)}'">
+        <div class="moment-title">${icon} ${escapeHTML(m.recipientName ? 'Wish ' + m.recipientName : m.id)}</div>
+        <div class="moment-meta">
+          <span class="count">♥ ${m.wishCount || 0} wishes</span> · Host: ${hostShort} · ${m.occasion}
+        </div>
+        <div class="moment-actions">
+          <button class="btn-wish" onclick="event.stopPropagation(); window.location.href='moment.html?slug=${encodeURIComponent(slug)}'">👏 Add Your Wish</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterMoments() {
+  const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  if (!query) { renderMoments(allMoments); return; }
+
+  const filtered = allMoments.filter(m => {
+    const searchable = [
+      m.id || '', m.recipientName || '', m.occasion || '',
+      m.defaultMessage || '', m.hostAddress || '',
+    ].join(' ').toLowerCase();
+    return searchable.includes(query);
+  });
+  renderMoments(filtered);
+}
+
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Load on page ready
+loadMoments();
+</script>
+</body>
+</html>
