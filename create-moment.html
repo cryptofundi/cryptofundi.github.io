@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create a Moment · Eternal Wishes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
+    --gold: #c9973a; --gold-light: #e8c97a; --gold-pale: #f7edcd;
+    --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
+    --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
+  a { color: var(--gold); text-decoration: none; }
+
+  .nav { background: var(--ink); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-brand { color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a { color: var(--chain-light); font-size: 13px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold-light); text-decoration: none; }
+
+  .hero { text-align: center; padding: 50px 24px 30px; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 5vw, 42px); font-weight: 300; margin-bottom: 10px; }
+  .hero p { font-size: 14px; color: var(--muted); max-width: 440px; margin: 0 auto; line-height: 1.6; }
+
+  .form-card { max-width: 560px; margin: 0 auto 40px; padding: 30px; background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 6px; font-weight: 500; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 14px; background: var(--parchment); color: var(--ink); outline: none; transition: border-color 0.2s; resize: none;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--gold); }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--chain-light); }
+  .form-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .occasion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 480px) { .occasion-grid { grid-template-columns: repeat(2, 1fr); } }
+  .occ-btn { padding: 10px 8px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--parchment); cursor: pointer; text-align: center; font-family: inherit; font-size: 12px; color: var(--ink); transition: all 0.2s; }
+  .occ-btn:hover { border-color: var(--gold); }
+  .occ-btn.active { border-color: var(--gold); background: var(--gold-pale); }
+  .occ-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+
+  .fee-box { background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 18px; text-align: center; }
+  .fee-box .fee-amount { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold); }
+  .fee-box .fee-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .trust-box { background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 18px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .trust-box .trust-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+
+  .btn-submit { width: 100%; padding: 16px; background: var(--ink); color: var(--gold-light); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-sub-text { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+  /* Success modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
+  .modal-overlay.visible { display: flex; }
+  .modal { background: var(--parchment); border-radius: var(--radius); padding: 30px; max-width: 460px; width: 100%; text-align: center; position: relative; }
+  .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; margin-bottom: 10px; }
+  .modal p { font-size: 14px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .modal-link { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--ink); word-break: break-all; margin-bottom: 16px; display: block; }
+  .modal-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .modal-btn { padding: 10px 20px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--ink); }
+  .modal-btn:hover { border-color: var(--gold); }
+  .modal-btn.primary { background: var(--ink); color: var(--gold-light); border-color: var(--ink); }
+
+  /* Processing overlay */
+  .processing { position: fixed; inset: 0; background: rgba(26,20,16,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; flex-direction: column; gap: 12px; }
+  .processing.visible { display: flex; }
+  .processing-text { color: var(--gold-light); font-size: 16px; }
+  .processing-sub { color: var(--chain-light); font-size: 12px; }
+  .spinner-lg { width: 30px; height: 30px; border: 3px solid rgba(201,151,58,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer { text-align: center; padding: 20px 24px 30px; font-size: 11px; color: var(--chain-light); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="eternalwishes.html" class="nav-brand">Eternal Wishes</a>
+  <div class="nav-links">
+    <a href="eternalwishes.html">Create Wish</a>
+    <a href="moments.html">Moments</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Create a Public Moment</h1>
+  <p>Invite others to share wishes for a special occasion. Anyone with the link can add their wish.</p>
+</div>
+
+<div class="form-card">
+
+  <div class="form-group">
+    <label>Moment Title</label>
+    <input type="text" id="momentTitle" placeholder="Wish Narendra Modi a Happy Birthday" maxlength="100">
+    <div class="form-hint">This becomes the headline of your moment page</div>
+  </div>
+
+  <div class="form-group">
+    <label>Who is this for?</label>
+    <input type="text" id="momentRecipient" placeholder="Narendra Modi / Elon Musk / Rahul & Priya" maxlength="80">
+  </div>
+
+  <div class="form-group">
+    <label>Occasion</label>
+    <div class="occasion-grid" id="occasionGrid">
+      <button class="occ-btn active" data-occ="birthday" onclick="selectOcc(this)"><span class="occ-icon">🎂</span>Birthday</button>
+      <button class="occ-btn" data-occ="anniversary" onclick="selectOcc(this)"><span class="occ-icon">💍</span>Anniversary</button>
+      <button class="occ-btn" data-occ="wedding" onclick="selectOcc(this)"><span class="occ-icon">💐</span>Wedding</button>
+      <button class="occ-btn" data-occ="memorial" onclick="selectOcc(this)"><span class="occ-icon">🕯️</span>In Memory</button>
+      <button class="occ-btn" data-occ="celebration" onclick="selectOcc(this)"><span class="occ-icon">🎉</span>Celebration</button>
+      <button class="occ-btn" data-occ="custom" onclick="selectOcc(this)"><span class="occ-icon">📌</span>Other</button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Suggested Message (optional)</label>
+    <textarea id="momentMessage" rows="3" placeholder="Wishing you happiness and success always!" maxlength="200"></textarea>
+    <div class="form-hint">Pre-fills for users — they can edit it</div>
+  </div>
+
+  <div class="fee-box" id="feeBox">
+    <div class="fee-amount" id="feeDisplay">Free</div>
+    <div class="fee-label">One-time fee to create a public moment</div>
+  </div>
+
+  <div class="trust-box">
+    <div class="trust-title">🔒 Safety note</div>
+    You approve the transaction in your wallet. No permissions, no token access.
+    Your wallet becomes the host of this moment.
+  </div>
+
+  <button class="btn-submit" id="createBtn" onclick="handleCreate()">Create Moment</button>
+  <div class="btn-sub-text">Your moment will be live instantly after confirmation</div>
+</div>
+
+<!-- Success modal -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <h2>Your moment is live! 🎉</h2>
+    <p>Share it with others so they can add their wishes.</p>
+    <div class="modal-link" id="momentLink"></div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="copyLink()">🔗 Copy Link</button>
+      <button class="modal-btn" onclick="shareWhatsApp()">💬 WhatsApp</button>
+      <button class="modal-btn" onclick="shareX()">𝕏 Share</button>
+      <button class="modal-btn primary" onclick="viewMoment()">View Moment →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Processing overlay -->
+<div class="processing" id="processing">
+  <div class="spinner-lg"></div>
+  <div class="processing-text" id="processingText">Creating moment…</div>
+  <div class="processing-sub" id="processingSub">Please confirm in MetaMask</div>
+</div>
+
+<div class="footer">
+  Eternal Wishes · Base blockchain · This platform enables users to create and share messages. It is not an investment or earnings platform.
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="contract-integration.js"></script>
+<script>
+
+let selectedOccasion = 'birthday';
+let createdSlug = '';
+
+function selectOcc(el) {
+  document.querySelectorAll('.occ-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedOccasion = el.dataset.occ;
+}
+
+// Load and display the creation fee
+async function loadFee() {
+  try {
+    const c = EternalWishes.contract || EternalWishes.initReadOnly();
+    const fee = await c.momentCreationFee();
+    const feeEth = ethers.utils.formatEther(fee);
+    if (fee.isZero()) {
+      document.getElementById('feeDisplay').textContent = 'Free';
+    } else {
+      document.getElementById('feeDisplay').textContent = `~$${(parseFloat(feeEth) * 2500).toFixed(2)} (${feeEth} ETH)`;
+    }
+  } catch(e) {
+    console.log('Fee load skipped:', e.message);
+  }
+}
+
+function generateSlug(title) {
+  const base = title
+    .toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  return base + '-' + new Date().getFullYear();
+}
+
+async function handleCreate() {
+  const title     = document.getElementById('momentTitle').value.trim();
+  const recipient = document.getElementById('momentRecipient').value.trim();
+  const message   = document.getElementById('momentMessage').value.trim();
+
+  if (!title) { alert('Please enter a moment title'); return; }
+  if (!recipient) { alert('Please enter who this is for'); return; }
+
+  const slug = generateSlug(title);
+  const btn = document.getElementById('createBtn');
+  btn.disabled = true;
+
+  // Connect wallet
+  showProcessing('Connecting wallet…', 'Please approve in MetaMask');
+  try {
+    await EternalWishes.connectWallet();
+  } catch(e) {
+    hideProcessing(); btn.disabled = false;
+    alert('Wallet connection failed: ' + e.message);
+    return;
+  }
+
+  // Create moment on-chain
+  showProcessing('Creating moment…', 'Confirm the transaction in MetaMask');
+  try {
+    const result = await EternalWishes.createMomentOnChain(slug, {
+      recipientName:  recipient,
+      occasion:       selectedOccasion,
+      defaultMessage: message,
+      imageURL:       '',
+      eventDate:      0,
+    });
+
+    createdSlug = slug;
+    hideProcessing();
+
+    // Show success
+    const url = `${window.location.origin}${window.location.pathname.replace('create-moment.html', '')}moment.html?slug=${encodeURIComponent(slug)}`;
+    document.getElementById('momentLink').textContent = url;
+    document.getElementById('successModal').classList.add('visible');
+
+  } catch(e) {
+    hideProcessing(); btn.disabled = false;
+    alert('Moment creation failed: ' + e.message);
+  }
+}
+
+function showProcessing(text, sub) {
+  document.getElementById('processingText').textContent = text;
+  document.getElementById('processingSub').textContent = sub;
+  document.getElementById('processing').classList.add('visible');
+}
+
+function hideProcessing() {
+  document.getElementById('processing').classList.remove('visible');
+}
+
+function copyLink() {
+  const link = document.getElementById('momentLink').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = '🔗 Copy Link', 1500);
+  });
+}
+
+function shareWhatsApp() {
+  const link = document.getElementById('momentLink').textContent;
+  const text = `Add your wish to this moment! ${link}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareX() {
+  const link = document.getElementById('momentLink').textContent;
+  const text = `Add your wish to this moment on @EternalWishes! ${link}`;
+  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function viewMoment() {
+  window.location.href = `moment.html?slug=${encodeURIComponent(createdSlug)}`;
+}
+
+loadFee();
+</script>
+</body>
+</html>
