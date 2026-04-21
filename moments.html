@@ -49,7 +49,7 @@
   .container { max-width: 720px; margin: 0 auto; padding: 0 24px 40px; }
 
   /* Moment card */
-  .moment-card { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 14px; transition: border-color 0.2s, box-shadow 0.2s; }
+  .moment-card { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 14px; transition: border-color 0.2s, box-shadow 0.2s; }
   .moment-card:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(201,151,58,0.08); }
   .moment-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px; line-height: 1.3; }
   .moment-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
@@ -95,14 +95,15 @@
 </nav>
 
 <div class="hero">
-  <h1>Explore Public Moments 🌍</h1>
-  <p>Join others in sending heartfelt, on-chain wishes for special occasions.</p>
+  <h1>Join a Public Moment 🌍</h1>
+  <p>Be part of something special — add your wish to a shared moment, sealed on-chain forever.</p>
+    <p style="font-size:13px;color:var(--gold);margin-top:8px;" id="globalStats"></p>
   <div class="divider">✦</div>
 </div>
 
 <div class="search-wrap">
   <span class="icon">🔍</span>
-  <input type="text" id="searchInput" placeholder="Search by occasion, keyword, or host…" oninput="filterMoments()">
+  <input type="text" id="searchInput" placeholder="Search moments (birthday, wedding, name…)" oninput="filterMoments()">
 </div>
 
 <div class="container">
@@ -120,7 +121,7 @@
       <span class="badge">Forever on-chain</span>
       <span class="badge">Base network</span>
     </div>
-    <a href="create-moment.html" class="btn-create">Create a Moment</a>
+    <a href="create-moment.html" class="btn-create">Create Your Moment ✨</a>
   </div>
 </div>
 
@@ -172,13 +173,22 @@ async function loadMoments() {
     allMoments = moments;
     renderMoments(allMoments);
 
+    // Global stats
+    const totalWishes = allMoments.reduce((sum, m) => sum + (m.wishCount || 0), 0);
+    const statsEl = document.getElementById('globalStats');
+    if (totalWishes > 0) {
+      statsEl.textContent = '✨ ' + totalWishes + ' wishes shared across ' + allMoments.length + ' moments';
+    } else if (allMoments.length > 0) {
+      statsEl.textContent = '✨ ' + allMoments.length + ' moment' + (allMoments.length > 1 ? 's' : '') + ' created';
+    }
+
   } catch(e) {
     console.log('Moments load error:', e.message);
     listEl.innerHTML = `
       <div class="empty">
         <h3>No moments yet</h3>
         <p>Be the first to create a public moment!</p>
-        <a href="create-moment.html" class="btn-create">Create a Moment</a>
+        <a href="create-moment.html" class="btn-create">Create Your Moment ✨</a>
       </div>`;
   }
 }
@@ -191,7 +201,7 @@ function renderMoments(moments) {
       <div class="empty">
         <h3>No moments found</h3>
         <p>${document.getElementById('searchInput').value ? 'Try a different search term' : 'Be the first to create a public moment!'}</p>
-        <a href="create-moment.html" class="btn-create">Create a Moment</a>
+        <a href="create-moment.html" class="btn-create">Create Your Moment ✨</a>
       </div>`;
     return;
   }
@@ -206,14 +216,32 @@ function renderMoments(moments) {
       : '—';
     const slug = m.id;
 
+    // Display title: use recipientName if available, otherwise clean up slug
+    const displayTitle = m.recipientName
+      ? 'Wish ' + escapeHTML(m.recipientName)
+      : escapeHTML(m.id).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    // Wish count display
+    const wishText = (m.wishCount || 0) === 0
+      ? 'Be the first to wish ❤️'
+      : `❤️ ${m.wishCount} wish${m.wishCount !== 1 ? 'es' : ''}`;
+
+    // Trending badge
+    const trending = (m.wishCount || 0) >= 5
+      ? '<span style="font-size:10px;background:var(--gold-pale);border:1px solid rgba(201,151,58,0.4);border-radius:12px;padding:2px 8px;color:var(--gold);margin-left:8px;">🔥 Trending</span>'
+      : '';
+
+    // Host — friendly text instead of wallet
+    const hostText = 'Created by a community member';
+
     return `
       <div class="moment-card" onclick="window.location.href='moment.html?slug=${encodeURIComponent(slug)}'">
-        <div class="moment-title">${icon} ${escapeHTML(m.recipientName ? 'Wish ' + m.recipientName : m.id)}</div>
+        <div class="moment-title">${icon} ${displayTitle}${trending}</div>
         <div class="moment-meta">
-          <span class="count">♥ ${m.wishCount || 0} wishes</span> · Host: ${hostShort} · ${m.occasion}
+          <span class="count">${wishText}</span> · ${hostText} · ${m.occasion}
         </div>
         <div class="moment-actions">
-          <button class="btn-wish" onclick="event.stopPropagation(); window.location.href='moment.html?slug=${encodeURIComponent(slug)}'">👏 Add Your Wish</button>
+          <button class="btn-wish" onclick="event.stopPropagation(); window.location.href='moment.html?slug=${encodeURIComponent(slug)}'">✨ Add Your Wish</button>
         </div>
       </div>`;
   }).join('');
