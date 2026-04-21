@@ -87,12 +87,14 @@
   <div class="nav-links">
     <a href="eternalwishes.html">Create Wish</a>
     <a href="moments.html">Moments</a>
+    <span id="walletState" style="font-size:11px;color:var(--chain-light);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:4px 10px;">● Not connected</span>
   </div>
 </nav>
 
 <div class="hero">
-  <h1>Create a Public Moment</h1>
-  <p>Invite others to share wishes for a special occasion. Anyone with the link can add their wish.</p>
+  <h1>Create a Moment That Lives Forever</h1>
+  <p>Invite others to share wishes for someone special — sealed on the blockchain forever.</p>
+    <p style="font-size:12px;color:var(--gold);margin-top:6px;">🌍 Anyone with the link can join and add their wish</p>
 </div>
 
 <div class="form-card">
@@ -100,12 +102,12 @@
   <div class="form-group">
     <label>Moment Title</label>
     <input type="text" id="momentTitle" placeholder="Wish Narendra Modi a Happy Birthday" maxlength="100">
-    <div class="form-hint">This becomes the headline of your moment page</div>
+    <div class="form-hint">Example: "Wish Rahul a Happy Birthday" or "Celebrate Priya & Arjun's Wedding"</div>
   </div>
 
   <div class="form-group">
     <label>Who is this for?</label>
-    <input type="text" id="momentRecipient" placeholder="Narendra Modi / Elon Musk / Rahul & Priya" maxlength="80">
+    <input type="text" id="momentRecipient" placeholder="Name of person or couple (e.g. Rahul, Elon Musk)" maxlength="80">
   </div>
 
   <div class="form-group">
@@ -121,23 +123,21 @@
   </div>
 
   <div class="form-group">
-    <label>Suggested Message (optional)</label>
+    <label>Suggested message for others (optional)</label>
     <textarea id="momentMessage" rows="3" placeholder="Wishing you happiness and success always!" maxlength="200"></textarea>
-    <div class="form-hint">Pre-fills for users — they can edit it</div>
+    <div class="form-hint">This will pre-fill for everyone who adds a wish — they can edit it</div>
   </div>
 
   <div class="fee-box" id="feeBox">
-    <div class="fee-amount" id="feeDisplay">Free</div>
-    <div class="fee-label">One-time fee to create a public moment</div>
+    <div class="fee-amount" id="feeDisplay">Free to create</div>
+    <div class="fee-label">No cost — anyone can start a moment</div>
   </div>
 
   <div class="trust-box">
-    <div class="trust-title">🔒 Safety note</div>
-    You approve the transaction in your wallet. No permissions, no token access.
-    Your wallet becomes the host of this moment.
+    <span style="font-weight:600;color:var(--ink);">🔒 Safe & simple</span> · No approvals · No token access · Just a single transaction
   </div>
 
-  <button class="btn-submit" id="createBtn" onclick="handleCreate()">Create Moment</button>
+  <button class="btn-submit" id="createBtn" onclick="handleCreate()">✨ Create This Moment</button>
   <div class="btn-sub-text">Your moment will be live instantly after confirmation</div>
 </div>
 
