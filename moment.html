@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moment · Eternal Wishes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
+    --gold: #c9973a; --gold-light: #e8c97a; --gold-pale: #f7edcd;
+    --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
+    --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; }
+  a { color: var(--gold); text-decoration: none; }
+
+  .nav { background: var(--ink); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-brand { color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a { color: var(--chain-light); font-size: 13px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold-light); text-decoration: none; }
+
+  /* Hero */
+  .moment-hero { text-align: center; padding: 50px 24px 30px; }
+  .moment-hero .occasion-icon { font-size: 36px; margin-bottom: 10px; display: block; }
+  .moment-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 5vw, 44px); font-weight: 300; margin-bottom: 10px; line-height: 1.2; }
+  .moment-hero .subtitle { font-size: 15px; color: var(--muted); max-width: 480px; margin: 0 auto 16px; line-height: 1.5; }
+  .stats { display: flex; justify-content: center; gap: 20px; font-size: 13px; color: var(--muted); }
+  .stats .count { color: var(--gold); font-weight: 500; font-size: 15px; }
+
+  /* Container */
+  .container { max-width: 660px; margin: 0 auto; padding: 0 24px 40px; }
+  .divider { text-align: center; color: var(--gold); font-size: 14px; margin: 20px 0; }
+
+  /* Add Wish Form */
+  .wish-form { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 30px; }
+  .wish-form h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; margin-bottom: 16px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 6px; font-weight: 500; }
+  .form-group input, .form-group textarea {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 14px; background: var(--parchment); color: var(--ink); outline: none; transition: border-color 0.2s; resize: none;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--chain-light); }
+  .char-count { text-align: right; font-size: 11px; color: var(--chain-light); margin-top: 2px; }
+
+  .form-price { display: flex; align-items: center; justify-content: space-between; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-size: 13px; }
+  .form-price .label { color: var(--muted); }
+  .form-price .amount { color: var(--gold); font-weight: 500; }
+
+  .btn-seal { width: 100%; padding: 16px; background: var(--ink); color: var(--gold-light); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+  .btn-seal:hover { opacity: 0.9; }
+  .btn-seal:disabled { opacity: 0.5; cursor: not-allowed; }
+  .seal-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+  /* Wish feed */
+  .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .feed-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; }
+  .feed-count { font-size: 12px; color: var(--muted); }
+
+  .wish-card { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 10px; transition: border-color 0.2s; cursor: pointer; }
+  .wish-card:hover { border-color: var(--gold); }
+  .wish-message { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; color: var(--ink); margin-bottom: 8px; line-height: 1.5; }
+  .wish-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  .wish-token { color: var(--chain-light); }
+
+  /* Share */
+  .share-section { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 30px; text-align: center; }
+  .share-section h4 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; margin-bottom: 12px; }
+  .share-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .share-btn { padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 12px; cursor: pointer; background: transparent; color: var(--ink); transition: all 0.2s; }
+  .share-btn:hover { border-color: var(--gold); }
+
+  /* Loading */
+  .loading { text-align: center; padding: 40px 0; color: var(--muted); font-size: 13px; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-feed { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
+
+  /* Processing overlay */
+  .processing { position: fixed; inset: 0; background: rgba(26,20,16,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; flex-direction: column; gap: 12px; }
+  .processing.visible { display: flex; }
+  .processing-text { color: var(--gold-light); font-size: 16px; }
+  .processing-sub { color: var(--chain-light); font-size: 12px; }
+  .spinner-lg { width: 30px; height: 30px; border: 3px solid rgba(201,151,58,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+  /* Success */
+  .success-box { background: var(--gold-pale); border: 1px solid rgba(201,151,58,0.4); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; text-align: center; display: none; }
+  .success-box.visible { display: block; }
+  .success-box h4 { font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-bottom: 6px; color: var(--gold); }
+  .success-box p { font-size: 13px; color: var(--muted); }
+  .success-box a { color: var(--gold); text-decoration: underline; }
+
+  /* Sticky mobile CTA */
+  .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: var(--ink); padding: 12px 24px; display: none; z-index: 100; }
+  .sticky-cta button { width: 100%; padding: 14px; background: var(--gold); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; cursor: pointer; }
+  @media (max-width: 640px) { .sticky-cta { display: block; } body { padding-bottom: 70px; } }
+
+  .footer { text-align: center; padding: 20px 24px 30px; font-size: 11px; color: var(--chain-light); }
+  .seal-badge { background: var(--ink); color: var(--gold-light); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 20px; font-size: 11px; text-align: center; letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="eternalwishes.html" class="nav-brand">Eternal Wishes</a>
+  <div class="nav-links">
+    <a href="eternalwishes.html">Create Wish</a>
+    <a href="moments.html">Moments</a>
+  </div>
+</nav>
+
+<div class="moment-hero" id="heroSection">
+  <span class="occasion-icon" id="occasionIcon">🎂</span>
+  <h1 id="momentTitle">Loading moment…</h1>
+  <p class="subtitle" id="momentSubtitle">Join others in sending a message that will be remembered forever</p>
+  <div class="stats">
+    <span><span class="count" id="wishCount">0</span> wishes</span>
+    <span>·</span>
+    <span>Host: <span id="hostAddress">—</span></span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="divider">✦</div>
+
+  <!-- Success message (shown after minting) -->
+  <div class="success-box" id="successBox">
+    <h4>Your wish is now part of this moment! 💫</h4>
+    <p>It's sealed on the blockchain forever. <a id="successWishLink" href="#" target="_blank">View your wish →</a></p>
+  </div>
+
+  <!-- Add Wish Form -->
+  <div class="wish-form" id="wishForm">
+    <h3>Add Your Wish</h3>
+
+    <div class="form-group">
+      <label>Your message</label>
+      <textarea id="wishMessage" rows="3" maxlength="280" placeholder="Write something they will read forever…" oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="charCount">0</span>/280</div>
+    </div>
+
+    <div class="form-group">
+      <label>Your name (optional)</label>
+      <input type="text" id="senderName" placeholder="Anonymous or your name" maxlength="80">
+    </div>
+
+    <div class="form-price">
+      <span class="label">Basic wish</span>
+      <span class="amount" id="priceDisplay">~$0.15</span>
+    </div>
+
+    <button class="btn-seal" id="sealBtn" onclick="handleMintWish()">Seal this wish forever →</button>
+    <div class="seal-note">Paid in ETH · Gas < $0.01 · Base blockchain</div>
+  </div>
+
+  <div class="divider">✦</div>
+
+  <!-- Wishes Feed -->
+  <div class="feed-header">
+    <h3>Messages</h3>
+    <span class="feed-count" id="feedCount"></span>
+  </div>
+
+  <div id="wishFeed">
+    <div class="loading">
+      <span class="spinner"></span> Loading wishes…
+    </div>
+  </div>
+
+  <!-- Share -->
+  <div class="share-section">
+    <h4>Invite others to join this moment</h4>
+    <div class="share-btns">
+      <button class="share-btn" onclick="copyMomentLink()">🔗 Copy Link</button>
+      <button class="share-btn" onclick="shareWA()">💬 WhatsApp</button>
+      <button class="share-btn" onclick="shareXPost()">𝕏 Share</button>
+    </div>
+  </div>
+
+  <div class="seal-badge">Sealed on-chain forever · Media stored on decentralized networks</div>
+</div>
+
+<!-- Sticky mobile CTA -->
+<div class="sticky-cta">
+  <button onclick="document.getElementById('wishForm').scrollIntoView({behavior:'smooth'})">👏 Add Your Wish</button>
+</div>
+
+<!-- Processing overlay -->
+<div class="processing" id="processing">
+  <div class="spinner-lg"></div>
+  <div class="processing-text" id="processingText">Connecting wallet…</div>
+  <div class="processing-sub" id="processingSub">Please confirm in MetaMask</div>
+</div>
+
+<div class="footer">
+  Eternal Wishes · Base blockchain · This platform enables users to create and share messages.
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="contract-integration.js"></script>
+<script>
+
+const OCCASION_ICONS = {
+  birthday:'🎂', anniversary:'💍', wedding:'💐', newbaby:'👶',
+  graduation:'🎓', promotion:'🚀', newyear:'✨', memorial:'🕯️',
+  custom:'📌', celebration:'🎉',
+};
+
+let momentData = null;
+let momentHash = null;
+let momentSlug = '';
+
+// ── Load Moment ──────────────────────────────────────────────────────────
+
+async function loadMoment() {
+  const params = new URLSearchParams(window.location.search);
+  momentSlug = params.get('slug');
+
+  if (!momentSlug) {
+    document.getElementById('momentTitle').textContent = 'Moment not found';
+    document.getElementById('momentSubtitle').textContent = 'No slug provided in URL.';
+    return;
+  }
+
+  momentHash = EternalWishes.toMomentHash(momentSlug);
+
+  try {
+    const c = EternalWishes.contract || EternalWishes.initReadOnly();
+
+    // Get moment metadata
+    momentData = await c.getMoment(momentHash);
+    if (!momentData || !momentData.id) throw new Error('Moment not found');
+
+    // Update hero
+    const icon = OCCASION_ICONS[momentData.occasion] || '🌍';
+    document.getElementById('occasionIcon').textContent = icon;
+    document.getElementById('momentTitle').textContent = momentData.recipientName
+      ? `Wish ${momentData.recipientName}`
+      : momentData.id;
+    document.title = `${momentData.recipientName || momentData.id} · Eternal Wishes`;
+
+    // Pre-fill default message
+    if (momentData.defaultMessage) {
+      document.getElementById('wishMessage').placeholder = momentData.defaultMessage;
+    }
+
+    // Get host
+    const host = await c.momentHost(momentHash);
+    document.getElementById('hostAddress').textContent = host
+      ? host.slice(0, 6) + '…' + host.slice(-4)
+      : '—';
+
+    // Load wishes for this moment
+    await loadWishes();
+
+    // Load price
+    try {
+      const price = await c.getPrice(0); // Basic only
+      const ethPrice = parseFloat(ethers.utils.formatEther(price));
+      document.getElementById('priceDisplay').textContent = `~$${(ethPrice * 2500).toFixed(2)}`;
+    } catch(e) {}
+
+  } catch(e) {
+    console.log('Moment load error:', e.message);
+    document.getElementById('momentTitle').textContent = 'Moment not found';
+    document.getElementById('momentSubtitle').textContent = 'This moment may not exist or the slug is incorrect.';
+    document.getElementById('wishForm').style.display = 'none';
+  }
+}
+
+async function loadWishes() {
+  const feedEl = document.getElementById('wishFeed');
+
+  try {
+    const c        = EternalWishes.contract || EternalWishes.initReadOnly();
+    const provider = EternalWishes.provider || EternalWishes.readOnly;
+    const latest   = await provider.getBlockNumber();
+
+    // Get queryHash for this moment + occasion
+    const queryHash = await c.getQueryHash(momentData.occasion, momentHash);
+    const filter    = c.filters.WishMinted(null, null, queryHash);
+    const events    = await c.queryFilter(filter, 0, latest);
+
+    document.getElementById('wishCount').textContent = events.length;
+    document.getElementById('feedCount').textContent = `${events.length} wishes`;
+
+    if (events.length === 0) {
+      feedEl.innerHTML = '<div class="empty-feed">No wishes yet. Be the first to add yours!</div>';
+      return;
+    }
+
+    // Load full wish data for recent wishes (last 20)
+    const recentEvents = events.slice(-20).reverse();
+    let html = '';
+
+    for (const ev of recentEvents) {
+      const tokenId = Number(ev.args.tokenId);
+      try {
+        const wish = await c.getWish(tokenId);
+        const date = new Date(Number(wish.timestamp) * 1000);
+        const dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        html += `
+          <div class="wish-card" onclick="window.open('wish.html?id=${tokenId}','_blank')">
+            <div class="wish-message">"${escapeHTML(wish.message)}"</div>
+            <div class="wish-meta">
+              <span>— ${escapeHTML(wish.from || 'Anonymous')} · ${dateStr}</span>
+              <span class="wish-token">#${tokenId}</span>
+            </div>
+          </div>`;
+      } catch(e) {
+        // Fallback — show minimal data from event
+        html += `
+          <div class="wish-card" onclick="window.open('wish.html?id=${tokenId}','_blank')">
+            <div class="wish-message">Wish to ${escapeHTML(ev.args.to)}</div>
+            <div class="wish-meta">
+              <span>#${tokenId}</span>
+            </div>
+          </div>`;
+      }
+    }
+
+    if (events.length > 20) {
+      html += `<div style="text-align:center;font-size:12px;color:var(--muted);padding:10px;">Showing 20 of ${events.length} wishes</div>`;
+    }
+
+    feedEl.innerHTML = html;
+
+  } catch(e) {
+    console.log('Wishes load error:', e.message);
+    feedEl.innerHTML = '<div class="empty-feed">Could not load wishes. Try refreshing.</div>';
+  }
+}
+
+// ── Mint Wish ────────────────────────────────────────────────────────────
+
+async function handleMintWish() {
+  const message = document.getElementById('wishMessage').value.trim();
+  const sender  = document.getElementById('senderName').value.trim() || 'Anonymous';
+
+  if (!message) { alert('Please write a message'); return; }
+  if (!momentData) { alert('Moment data not loaded'); return; }
+
+  const btn = document.getElementById('sealBtn');
+  btn.disabled = true;
+
+  // Connect wallet
+  showProcessing('Connecting wallet…', 'Please approve in MetaMask');
+  try {
+    await EternalWishes.connectWallet();
+  } catch(e) {
+    hideProcessing(); btn.disabled = false;
+    alert('Wallet connection failed: ' + e.message);
+    return;
+  }
+
+  // Mint — Basic tier only for moments
+  showProcessing('Sealing your wish…', 'Confirm the transaction in MetaMask');
+  try {
+    const result = await EternalWishes.mintCrypto({
+      recipient:  momentData.recipientName || '',
+      message:    message,
+      sender:     sender,
+      occasion:   momentData.occasion,
+      imageURL:   '',
+      audioCID:   '',
+      audioProof: '',
+      theme:      'classic',
+      tier:       'basic',
+      momentHash: momentHash,
+    });
+
+    hideProcessing();
+
+    // Show success
+    const successBox = document.getElementById('successBox');
+    const wishLink   = document.getElementById('successWishLink');
+    wishLink.href    = `wish.html?id=${result.tokenId}`;
+    successBox.classList.add('visible');
+
+    // Refresh feed
+    await loadWishes();
+
+    // Clear form
+    document.getElementById('wishMessage').value = '';
+    document.getElementById('senderName').value = '';
+    document.getElementById('charCount').textContent = '0';
+    btn.disabled = false;
+
+  } catch(e) {
+    hideProcessing(); btn.disabled = false;
+    alert('Minting failed: ' + e.message);
+  }
+}
+
+function updateCharCount() {
+  const len = document.getElementById('wishMessage').value.length;
+  document.getElementById('charCount').textContent = len;
+}
+
+// ── Processing ───────────────────────────────────────────────────────────
+
+function showProcessing(text, sub) {
+  document.getElementById('processingText').textContent = text;
+  document.getElementById('processingSub').textContent = sub;
+  document.getElementById('processing').classList.add('visible');
+}
+
+function hideProcessing() {
+  document.getElementById('processing').classList.remove('visible');
+}
+
+// ── Share ─────────────────────────────────────────────────────────────────
+
+function getMomentURL() {
+  return window.location.href;
+}
+
+function copyMomentLink() {
+  navigator.clipboard.writeText(getMomentURL()).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = '🔗 Copy Link', 1500);
+  });
+}
+
+function shareWA() {
+  const title = document.getElementById('momentTitle').textContent;
+  const text = `${title} — Add your wish!\n${getMomentURL()}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareXPost() {
+  const title = document.getElementById('momentTitle').textContent;
+  const text = `${title} — sealed on the blockchain forever.\nAdd your wish: ${getMomentURL()}`;
+  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────
+
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+loadMoment();
+</script>
+</body>
+</html>
