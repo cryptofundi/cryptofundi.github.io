@@ -97,9 +97,9 @@
   .success-box a { color: var(--gold); text-decoration: underline; }
 
   /* Sticky mobile CTA */
-  .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: var(--ink); padding: 12px 24px; display: none; z-index: 100; }
-  .sticky-cta button { width: 100%; padding: 14px; background: var(--gold); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; cursor: pointer; }
-  @media (max-width: 640px) { .sticky-cta { display: block; } body { padding-bottom: 70px; } }
+  
+  
+  
 
   .footer { text-align: center; padding: 20px 24px 30px; font-size: 11px; color: var(--chain-light); }
   .seal-badge { background: var(--ink); color: var(--gold-light); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 20px; font-size: 11px; text-align: center; letter-spacing: 0.06em; }
@@ -122,7 +122,7 @@
   <div class="stats">
     <span><span class="count" id="wishCount">0</span> wishes</span>
     <span>·</span>
-    <span>Host: <span id="hostAddress">—</span></span>
+    <span>Created by <span id="hostAddress">—</span></span>
   </div>
 </div>
 
@@ -138,10 +138,11 @@
 
   <!-- Add Wish Form -->
   <div class="wish-form" id="wishForm">
-    <h3>Add Your Wish</h3>
+    <h3>Leave your wish ✨</h3>
 
     <div class="form-group">
       <label>Your message</label>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Write something they will remember forever</div>
       <textarea id="wishMessage" rows="3" maxlength="280" placeholder="Write something they will read forever…" oninput="updateCharCount()"></textarea>
       <div class="char-count"><span id="charCount">0</span>/280</div>
     </div>
@@ -151,12 +152,13 @@
       <input type="text" id="senderName" placeholder="Anonymous or your name" maxlength="80">
     </div>
 
+    <div id="socialProof" style="display:none;font-size:12px;color:var(--gold);text-align:center;margin-bottom:10px;"></div>
     <div class="form-price">
       <span class="label">Basic wish</span>
       <span class="amount" id="priceDisplay">~$0.15</span>
     </div>
 
-    <button class="btn-seal" id="sealBtn" onclick="handleMintWish()">Seal this wish forever →</button>
+    <button class="btn-seal" id="sealBtn" onclick="handleMintWish()">✨ Seal this wish forever</button>
     <div class="seal-note">Paid in ETH · Gas < $0.01 · Base blockchain</div>
   </div>
 
@@ -187,10 +189,7 @@
   <div class="seal-badge">Sealed on-chain forever · Media stored on decentralized networks</div>
 </div>
 
-<!-- Sticky mobile CTA -->
-<div class="sticky-cta">
-  <button onclick="document.getElementById('wishForm').scrollIntoView({behavior:'smooth'})">👏 Add Your Wish</button>
-</div>
+<!-- Sticky CTA removed — single CTA in form -->
 
 <!-- Processing overlay -->
 <div class="processing" id="processing">
@@ -241,10 +240,13 @@ async function loadMoment() {
     // Update hero
     const icon = OCCASION_ICONS[momentData.occasion] || '🌍';
     document.getElementById('occasionIcon').textContent = icon;
-    document.getElementById('momentTitle').textContent = momentData.recipientName
-      ? `Wish ${momentData.recipientName}`
-      : momentData.id;
-    document.title = `${momentData.recipientName || momentData.id} · Eternal Wishes`;
+    // Build a human-readable title from moment data
+    const displayName = momentData.recipientName || momentData.id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const occasionNames = {birthday:'a Happy Birthday',anniversary:'a Happy Anniversary',wedding:'on Their Wedding',memorial:'in Loving Memory',celebration:'on This Celebration',custom:'',newbaby:'on the New Baby'};
+    const occSuffix = occasionNames[momentData.occasion] || '';
+    const fullTitle = occSuffix ? `Wish ${displayName} ${occSuffix}` : `Wish ${displayName}`;
+    document.getElementById('momentTitle').textContent = fullTitle;
+    document.title = `${fullTitle} · Eternal Wishes`;
 
     // Pre-fill default message
     if (momentData.defaultMessage) {
@@ -253,9 +255,7 @@ async function loadMoment() {
 
     // Get host
     const host = await c.momentHost(momentHash);
-    document.getElementById('hostAddress').textContent = host
-      ? host.slice(0, 6) + '…' + host.slice(-4)
-      : '—';
+    document.getElementById('hostAddress').textContent = 'a community member';
 
     // Load wishes for this moment
     await loadWishes();
@@ -288,11 +288,14 @@ async function loadWishes() {
     const filter    = c.filters.WishMinted(null, null, queryHash);
     const events    = await c.queryFilter(filter, 0, latest);
 
-    document.getElementById('wishCount').textContent = events.length;
-    document.getElementById('feedCount').textContent = `${events.length} wishes`;
+    document.getElementById('wishCount').textContent = events.length || '';
+    if (events.length === 0) {
+      document.querySelector('.stats').innerHTML = '<span>Be the first to wish ❤️</span> · <span>Created by <span id="hostAddress">a community member</span></span>';
+    }
+    document.getElementById('feedCount').textContent = events.length > 0 ? `${events.length} wishes` : '';
 
     if (events.length === 0) {
-      feedEl.innerHTML = '<div class="empty-feed">No wishes yet. Be the first to add yours!</div>';
+      feedEl.innerHTML = '<div class="empty-feed">No wishes yet — be the first to add yours!</div>';
       return;
     }
 
@@ -332,6 +335,15 @@ async function loadWishes() {
     }
 
     feedEl.innerHTML = html;
+
+    // Social proof
+    if (events.length > 0) {
+      const proofEl = document.getElementById('socialProof');
+      proofEl.textContent = events.length === 1
+        ? '1 person has already wished ❤️'
+        : `Join ${events.length} others who already wished ❤️`;
+      proofEl.style.display = 'block';
+    }
 
   } catch(e) {
     console.log('Wishes load error:', e.message);
