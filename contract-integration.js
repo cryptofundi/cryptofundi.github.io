@@ -1,80 +1,72 @@
 /**
  * contract-integration.js
  *
- * Drop this file into your frontend project.
- * Usage in eternal-wishes.html:
- *   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
- *   <script src="pinata.js"></script>
- *   <script src="contract-integration.js"></script>
+ * Production contract v5: EternalWishes / WISH
+ * Deployed: Base Mainnet — 0xC51b7B6B4af1B62dc604324c89b386b10F67716D
  *
- * Production contract: EternalWishes / WISH
- * Deployed: Base Mainnet — 0xdaB67208DFF64A428a60Db1BaF0A4091aAda1175
+ * v5 changes: Campaign → Moment, host fee split, PaymentSplit event
  *
  * WishParams tuple (9 fields):
- *   (to, message, from, occasion, imageURL, audioCID, audioProof, theme, campaignHash)
- *   campaignHash = bytes32(0) for personal wishes
- *   audioCID     = IPFS CID for voice note (cross-device playback)
- *   audioProof   = SHA-256 hex (on-chain verification)
+ *   (to, message, from, occasion, imageURL, audioCID, audioProof, theme, momentHash)
+ *   momentHash = bytes32(0) for personal wishes
  */
 
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const CONFIG = {
-  CONTRACT_ADDRESS: "0xdaB67208DFF64A428a60Db1BaF0A4091aAda1175",
+  CONTRACT_ADDRESS: "0xC51b7B6B4af1B62dc604324c89b386b10F67716D",
 
-  // Base Mainnet
   CHAIN_ID:        8453,
   RPC_URL:         "https://mainnet.base.org",
   CHAIN_NAME:      "Base",
   NATIVE_CURRENCY: { name: "Ether", symbol: "ETH", decimals: 18 },
   EXPLORER:        "https://basescan.org",
-
-  // Base Sepolia — uncomment for development
-  // CHAIN_ID:        84532,
-  // RPC_URL:         "https://sepolia.base.org",
-  // CHAIN_NAME:      "Base Sepolia",
-  // NATIVE_CURRENCY: { name: "Ether", symbol: "ETH", decimals: 18 },
-  // EXPLORER:        "https://sepolia.basescan.org",
 };
 
 // ── ABI ───────────────────────────────────────────────────────────────────
-// WishParams tuple: (to, message, from, occasion, imageURL, audioCID, audioProof, theme, campaignHash)
-// campaignHash is bytes32 — use ethers.constants.HashZero for personal wishes
 const ABI = [
   // ── Write ──
   "function mintWish(uint8,(string,string,string,string,string,string,string,string,bytes32)) external payable returns (uint256)",
   "function mintWishRelayer(address,uint8,(string,string,string,string,string,string,string,string,bytes32)) external returns (uint256)",
+  "function createMoment(bytes32,(string,string,string,string,string,uint64,bool)) external payable",
 
   // ── Read ──
-  "function getWish(uint256) external view returns (tuple(address minter,address payer,string to,string message,string from,string occasion,string imageURL,string audioCID,string audioProof,string theme,bytes32 campaignHash,uint8 tier,uint64 timestamp,bool upiPayment))",
+  "function getWish(uint256) external view returns (tuple(address minter,address payer,string to,string message,string from,string occasion,string imageURL,string audioCID,string audioProof,string theme,bytes32 momentHash,uint8 tier,uint64 timestamp,bool upiPayment))",
   "function getWishes(uint256[]) external view returns (tuple(address,address,string,string,string,string,string,string,string,string,bytes32,uint8,uint64,bool)[])",
   "function allPrices() external view returns (uint256,uint256,uint256)",
   "function getPrice(uint8) external view returns (uint256)",
   "function tokenURI(uint256) external view returns (string)",
   "function totalSupply() external view returns (uint256)",
   "function contractBalance() external view returns (uint256)",
-  "function getActiveCampaigns() external view returns (tuple(string id,string recipientName,string occasion,string defaultMessage,string imageURL,uint64 eventDate,bool active)[])",
-  "function getCampaign(string) external view returns (tuple(string id,string recipientName,string occasion,string defaultMessage,string imageURL,uint64 eventDate,bool active))",
+  "function getMoment(bytes32) external view returns (tuple(string id,string recipientName,string occasion,string defaultMessage,string imageURL,uint64 eventDate,bool active))",
+  "function getMomentHost(bytes32) external view returns (address)",
+  "function getActiveMoments() external view returns (tuple(string id,string recipientName,string occasion,string defaultMessage,string imageURL,uint64 eventDate,bool active)[])",
   "function getQueryHash(string,bytes32) external pure returns (bytes32)",
+  "function momentHost(bytes32) external view returns (address)",
+  "function hostFeePercent() external view returns (uint256)",
+  "function momentCreationFee() external view returns (uint256)",
+  "function pending(address) external view returns (uint256)",
 
   // ── Admin ──
   "function setPrices(uint256,uint256,uint256) external",
   "function setRelayer(address,bool) external",
   "function setFeeCollector(address) external",
+  "function setHostFeePercent(uint256) external",
+  "function setMomentCreationFee(uint256) external",
   "function setPaused(bool) external",
   "function withdraw() external",
-  "function createCampaign(tuple(string,string,string,string,string,uint64,bool)) external",
+  "function withdrawPending() external",
+  "function setMomentActive(bytes32,bool) external",
+  "function updateMoment(bytes32,string,string) external",
 
   // ── Events ──
-  // WishMinted: queryHash = keccak256(occasion + campaignHash) for filtering
-  "event WishMinted(uint256 indexed tokenId, address indexed minter, bytes32 indexed queryHash, uint8 tier, string to, string occasion, bytes32 campaignHash, bool upiPayment, uint64 timestamp)",
-  "event WishMintedFull(uint256 indexed tokenId, address indexed minter, address payer, string to, string message, string from, string occasion, string imageURL, string audioCID, string audioProof, string theme, bytes32 campaignHash, uint8 tier, bool upiPayment, uint64 timestamp)",
-  "event CampaignCreated(bytes32 indexed campaignHash, string id, string recipientName, string occasion)",
+  "event WishMinted(uint256 indexed tokenId, address indexed minter, bytes32 indexed queryHash, uint8 tier, string to, string occasion, bytes32 momentHash, bool upiPayment, uint64 timestamp)",
+  "event WishMintedFull(uint256 indexed tokenId, address indexed minter, address payer, string to, string message, string from, string occasion, string imageURL, string audioCID, string audioProof, string theme, bytes32 momentHash, uint8 tier, bool upiPayment, uint64 timestamp)",
+  "event PaymentSplit(uint256 indexed tokenId, bytes32 indexed momentHash, address host, uint256 hostShare, uint256 platformShare)",
+  "event MomentCreated(bytes32 indexed momentHash, address indexed host, string id, string recipientName, string occasion)",
 ];
 
 const TIER_MAP = { basic: 0, premium: 1, eternal: 2 };
-
-// bytes32(0) — used as campaignHash for all personal (non-campaign) wishes
-const NO_CAMPAIGN = ethers.constants.HashZero;  // "0x0000...0000"
+const NO_CAMPAIGN = ethers.constants.HashZero;  // bytes32(0) for personal wishes
 
 // ── Main integration object ───────────────────────────────────────────────
 const EternalWishes = {
@@ -83,6 +75,7 @@ const EternalWishes = {
   signer:   null,
   contract: null,
   readOnly: null,
+  _listenersRegistered: false,
 
   // ── INIT ──────────────────────────────────────────────────────────────
 
@@ -94,7 +87,6 @@ const EternalWishes = {
   async connectWallet() {
     if (!window.ethereum) throw new Error("No wallet detected. Please install MetaMask.");
 
-    // Force MetaMask to show account picker (not just auto-connect the last account)
     if (this._wasDisconnected) {
       await window.ethereum.request({
         method: "wallet_requestPermissions",
@@ -135,18 +127,15 @@ const EternalWishes = {
     this.signer   = this.provider.getSigner();
     this.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, this.signer);
 
-    // Listen for account/chain changes — only register once
     if (!this._listenersRegistered) {
       this._listenersRegistered = true;
 
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length === 0) {
-          // User disconnected all accounts
           this.signer = null;
           this.contract = null;
           this._onDisconnect();
         } else {
-          // User switched account — re-init everything
           this.provider = new ethers.providers.Web3Provider(window.ethereum);
           this.signer   = this.provider.getSigner();
           this.contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, this.signer);
@@ -155,7 +144,6 @@ const EternalWishes = {
       });
 
       window.ethereum.on('chainChanged', () => {
-        // Chain changed — reload to reset state cleanly
         window.location.reload();
       });
     }
@@ -163,27 +151,17 @@ const EternalWishes = {
     return await this.signer.getAddress();
   },
 
-  // Callbacks for UI updates — overridden by eternal-wishes.html
   _onDisconnect() {},
   _onAccountChange(addr) {},
 
   // ── MINT — CRYPTO PATH ────────────────────────────────────────────────
 
-  /**
-   * Mint a wish by paying ETH directly.
-   * WishParams now has 9 fields — audioCID, audioProof, campaignHash are new.
-   *
-   * @param {object} wish  from collectWishData()
-   * @returns {{ tokenId, txHash, explorerURL }}
-   */
   async mintCrypto(wish) {
     if (!this.contract) throw new Error("Wallet not connected. Call connectWallet() first.");
 
     const tierNum  = TIER_MAP[wish.tier] ?? 0;
     const price    = await this.contract.getPrice(tierNum);
-
-    // campaignHash: bytes32(0) for personal wishes, or keccak256 of campaign id
-    const campaignHash = wish.campaignHash || NO_CAMPAIGN;
+    const momentHash = wish.momentHash || NO_CAMPAIGN;
 
     const tx = await this.contract.mintWish(
       tierNum,
@@ -192,11 +170,11 @@ const EternalWishes = {
         wish.message     || "",
         wish.sender      || "",
         wish.occasion    || "birthday",
-        wish.imageURL    || "",     // ipfs:// URI (Premium+)
-        wish.audioCID    || "",     // ipfs:// CID of voice note (Eternal)
-        wish.audioProof  || "",     // SHA-256 hex of voice note (Eternal)
+        wish.imageURL    || "",
+        wish.audioCID    || "",
+        wish.audioProof  || "",
         wish.theme       || "classic",
-        campaignHash,               // bytes32 — NO_CAMPAIGN for personal wishes
+        momentHash,
       ],
       { value: price }
     );
@@ -222,17 +200,13 @@ const EternalWishes = {
 
   // ── MINT — UPI/CARD PATH (RELAYER BACKEND) ────────────────────────────
 
-  /**
-   * Called by Node.js backend after Onramp.money confirms payment.
-   * NEVER call this from frontend — relayerPrivateKey must stay server-side.
-   */
   async mintRelayerBackend(recipientAddress, wish, relayerPrivateKey) {
     const provider = new ethers.providers.JsonRpcProvider(CONFIG.RPC_URL);
     const relayer  = new ethers.Wallet(relayerPrivateKey, provider);
     const contract = new ethers.Contract(CONFIG.CONTRACT_ADDRESS, ABI, relayer);
 
     const tierNum      = TIER_MAP[wish.tier] ?? 0;
-    const campaignHash = wish.campaignHash || NO_CAMPAIGN;
+    const momentHash = wish.momentHash || NO_CAMPAIGN;
 
     const tx = await contract.mintWishRelayer(
       recipientAddress,
@@ -246,7 +220,7 @@ const EternalWishes = {
         wish.audioCID    || "",
         wish.audioProof  || "",
         wish.theme       || "classic",
-        campaignHash,
+        momentHash,
       ],
       { gasLimit: 400_000 }
     );
@@ -264,6 +238,44 @@ const EternalWishes = {
     };
   },
 
+  // ── CREATE MOMENT ─────────────────────────────────────────────────────
+
+  /**
+   * Create a public moment. Anyone can call.
+   * @param {string} slug       - e.g. "modi-birthday-2026"
+   * @param {object} moment     - { recipientName, occasion, defaultMessage, imageURL, eventDate }
+   * @returns {{ momentHash, txHash }}
+   */
+  async createMomentOnChain(slug, moment) {
+    if (!this.contract) throw new Error("Wallet not connected.");
+
+    const momentHash = this.toMomentHash(slug);
+    const creationFee = await this.contract.momentCreationFee();
+
+    const tx = await this.contract.createMoment(
+      momentHash,
+      [
+        slug,                          // id
+        moment.recipientName || "",
+        moment.occasion      || "custom",
+        moment.defaultMessage || "",
+        moment.imageURL       || "",
+        moment.eventDate      || 0,    // Unix timestamp
+        true,                          // active
+      ],
+      { value: creationFee }
+    );
+
+    const receipt = await tx.wait();
+
+    return {
+      momentHash,
+      slug,
+      txHash:      receipt.transactionHash,
+      explorerURL: `${CONFIG.EXPLORER}/tx/${receipt.transactionHash}`,
+    };
+  },
+
   // ── READ WISH ─────────────────────────────────────────────────────────
 
   async getWish(tokenId) {
@@ -272,7 +284,6 @@ const EternalWishes = {
 
     const tierName = ["basic", "premium", "eternal"][Number(raw.tier)] || "basic";
 
-    // Look up txHash from events so Basescan link works on any device
     let txHash = null;
     try {
       const provider = this.provider || this.readOnly || c.provider;
@@ -293,16 +304,15 @@ const EternalWishes = {
       from:          raw.from,
       occasion:      raw.occasion,
       imageURL:      raw.imageURL    || null,
-      audioCID:      raw.audioCID    || null,  // IPFS CID — use for cross-device playback
-      audioProof:    raw.audioProof  || null,  // SHA-256 — display as verification proof
+      audioCID:      raw.audioCID    || null,
+      audioProof:    raw.audioProof  || null,
       theme:         raw.theme       || "classic",
-      campaignHash:  raw.campaignHash,
+      momentHash:    raw.momentHash,
       tier:          tierName,
       timestamp:     new Date(Number(raw.timestamp) * 1000).toISOString(),
       upiPayment:    raw.upiPayment,
       isFirstOfDay:  false,
       txHash:        txHash,
-      // Device-local — not available from chain read on other devices
       imageData:     null,
       audioBase64:   null,
       audioURL:      null,
@@ -325,62 +335,49 @@ const EternalWishes = {
     };
   },
 
-  // ── CAMPAIGNS ─────────────────────────────────────────────────────────
+  // ── MOMENTS ───────────────────────────────────────────────────────────
 
-  /**
-   * Get all active campaigns for the homepage campaign cards.
-   */
-  async getActiveCampaigns() {
+  async getActiveMoments() {
     const c = this.contract || this.initReadOnly();
-    const campaigns = await c.getActiveCampaigns();
-    return campaigns.map(camp => ({
-      id:             camp.id,
-      recipientName:  camp.recipientName,
-      occasion:       camp.occasion,
-      defaultMessage: camp.defaultMessage,
-      imageURL:       camp.imageURL,
-      eventDate:      new Date(Number(camp.eventDate) * 1000).toISOString(),
-      active:         camp.active,
-      // Compute campaignHash for use in mintWish
-      campaignHash:   ethers.utils.keccak256(ethers.utils.toUtf8Bytes(camp.id)),
+    const moments = await c.getActiveMoments();
+    return moments.map(m => ({
+      id:             m.id,
+      recipientName:  m.recipientName,
+      occasion:       m.occasion,
+      defaultMessage: m.defaultMessage,
+      imageURL:       m.imageURL,
+      eventDate:      new Date(Number(m.eventDate) * 1000).toISOString(),
+      active:         m.active,
+      momentHash:     ethers.utils.keccak256(ethers.utils.toUtf8Bytes(m.id)),
     }));
   },
 
-  /**
-   * Get all wishes for a campaign (by campaign id string).
-   * Queries WishMinted events filtered by queryHash.
-   */
-  async getCampaignWishes(occasionSlug, campaignId, count = 50) {
+  async getMomentWishes(occasionSlug, momentSlug, count = 50) {
     const c        = this.contract || this.initReadOnly();
     const provider = this.provider || this.readOnly;
     const latest   = await provider.getBlockNumber();
 
-    // Compute the same queryHash the contract used when minting
-    const campaignHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(campaignId));
-    const queryHash    = await c.getQueryHash(occasionSlug, campaignHash);
+    const momentHash = this.toMomentHash(momentSlug);
+    const queryHash  = await c.getQueryHash(occasionSlug, momentHash);
 
     const filter = c.filters.WishMinted(null, null, queryHash);
     const events = await c.queryFilter(filter, 0, latest);
 
     return events.slice(-count).reverse().map(e => ({
-      tokenId:   Number(e.args.tokenId),
-      minter:    e.args.minter,
-      to:        e.args.to,
-      occasion:  e.args.occasion,
-      timestamp: new Date(Number(e.args.timestamp) * 1000).toISOString(),
+      tokenId:     Number(e.args.tokenId),
+      minter:      e.args.minter,
+      to:          e.args.to,
+      occasion:    e.args.occasion,
+      momentHash:  e.args.momentHash,
+      timestamp:   new Date(Number(e.args.timestamp) * 1000).toISOString(),
     }));
   },
 
-  /**
-   * Get all wishes minted by a specific wallet address.
-   * Used for "My Wishes" when wallet is connected.
-   */
-  async getWishesByWallet(walletAddress, count = 50) {
+  async getWishesByWallet(walletAddress, count = 100) {
     const c        = this.contract || this.initReadOnly();
     const provider = this.provider || this.readOnly;
     const latest   = await provider.getBlockNumber();
 
-    // Filter WishMinted by indexed minter field
     const filter = c.filters.WishMinted(null, walletAddress);
     const events = await c.queryFilter(filter, 0, latest);
 
@@ -390,7 +387,7 @@ const EternalWishes = {
       to:           e.args.to,
       occasion:     e.args.occasion,
       tier:         ["basic","premium","eternal"][Number(e.args.tier)] || "basic",
-      campaignHash: e.args.campaignHash,
+      momentHash:   e.args.momentHash,
       timestamp:    new Date(Number(e.args.timestamp) * 1000).toISOString(),
     }));
   },
@@ -410,17 +407,18 @@ const EternalWishes = {
       .slice(-count)
       .reverse()
       .map(e => ({
-        tokenId:   Number(e.args.tokenId),
-        minter:    e.args.minter,
-        to:        e.args.to,
-        message:   e.args.message,
-        from:      e.args.from,
-        occasion:  e.args.occasion,
-        imageURL:  e.args.imageURL,
-        audioCID:  e.args.audioCID,
-        theme:     e.args.theme,
-        tier:      ["basic","premium","eternal"][Number(e.args.tier)] || "basic",
-        timestamp: new Date(Number(e.args.timestamp) * 1000).toISOString(),
+        tokenId:     Number(e.args.tokenId),
+        minter:      e.args.minter,
+        to:          e.args.to,
+        message:     e.args.message,
+        from:        e.args.from,
+        occasion:    e.args.occasion,
+        imageURL:    e.args.imageURL,
+        audioCID:    e.args.audioCID,
+        theme:       e.args.theme,
+        momentHash:  e.args.momentHash,
+        tier:        ["basic","premium","eternal"][Number(e.args.tier)] || "basic",
+        timestamp:   new Date(Number(e.args.timestamp) * 1000).toISOString(),
       }));
   },
 
@@ -437,16 +435,11 @@ const EternalWishes = {
     return `${CONFIG.EXPLORER}/tx/${txHash}`;
   },
 
-  /**
-   * Compute campaignHash from a campaign id string.
-   * Use this in the frontend when building WishParams for a campaign wish.
-   * e.g. EternalWishes.toCampaignHash("modi-birthday-2025")
-   */
-  toCampaignHash(campaignId) {
-    if (!campaignId) return NO_CAMPAIGN;
-    return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(campaignId));
+  toMomentHash(slug) {
+    if (!slug) return NO_CAMPAIGN;
+    return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(slug));
   },
 };
 
-// Export for Node.js backend (relayer script)
+// Export for Node.js backend
 if (typeof module !== "undefined") module.exports = { EternalWishes, CONFIG, ABI, NO_CAMPAIGN };
