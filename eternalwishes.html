@@ -292,6 +292,57 @@
         <input type="date" id="wishDate">
       </div>
     </div>
+
+    <!-- Image upload (Premium + Eternal) — appears after tier selection -->
+    <div id="premiumFields" class="premium-fields">
+      <p class="section-label" style="margin-bottom:10px;">
+        <span id="premiumLabelText">✦ Premium features — make your wish unforgettable</span>
+      </p>
+
+      <label style="font-size:12px;color:var(--gold);margin-bottom:6px;display:block;">Add a photo</label>
+      <div class="image-upload-area" id="uploadArea" onclick="triggerImageUpload()">
+        <img id="uploadPreview" class="upload-preview" src="" alt="Preview">
+        <div class="upload-placeholder" id="uploadPlaceholder">
+          <span>📷</span>
+          Tap to add a photo to your wish
+        </div>
+        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+      </div>
+
+      <!-- Position sliders -->
+      <div id="positionSliders" style="display:none;margin-top:12px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+        <label style="font-size:11px;color:var(--chain);text-transform:uppercase;letter-spacing:0.1em;">Adjust photo position</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <span style="font-size:11px;color:var(--muted);min-width:50px;">Top↕Bot</span>
+          <input type="range" id="posY" min="0" max="100" value="50" style="flex:1;" oninput="updateImagePosition()">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <span style="font-size:11px;color:var(--muted);min-width:50px;">Left↔Right</span>
+          <input type="range" id="posX" min="0" max="100" value="50" style="flex:1;" oninput="updateImagePosition()">
+        </div>
+        <div style="text-align:right;margin-top:6px;">
+          <button onclick="document.getElementById('posY').value=50;document.getElementById('posX').value=50;updateImagePosition();" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;">↻ Reset position</button>
+        </div>
+      </div>
+
+      <!-- Voice note (Eternal only) -->
+      <div id="voiceNoteSection" style="display:none;margin-top:16px;">
+        <label style="font-size:12px;color:var(--gold);margin-bottom:6px;display:block;">Record a voice note</label>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="recordBtn" onclick="toggleRecording()" style="width:44px;height:44px;border-radius:50%;background:var(--ink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+            <span style="color:var(--gold-light);font-size:18px;">🎙️</span>
+          </button>
+          <div>
+            <div id="recordStatus" style="font-size:13px;color:var(--ink);">Tap to record</div>
+            <div id="recordTimer" style="font-size:11px;color:var(--muted);">Max 30 seconds</div>
+          </div>
+        </div>
+        <audio id="audioPlayback" controls style="display:none;width:100%;margin-top:10px;"></audio>
+      </div>
+
+      <span id="cropHint" style="display:none;"></span>
+    </div>
+
   </div>
 
   <div class="section-divider" style="animation: fadeUp 0.5s 0.25s both;"><span class="divider-ornament">✦</span></div>
@@ -580,8 +631,8 @@
     document.getElementById('premiumLabelText').textContent=isEternal
       ?'✦✦ Eternal features — the ultimate wish':'✦ Premium features — make your wish unforgettable';
     // Show crop tool for Eternal if image already uploaded
-    if(state.cropImg&&isEternal){ initCropTool(state.cropImg); document.getElementById('cropTool').style.display='block'; }
-    if(!isEternal) document.getElementById('cropTool').style.display='none';
+    if(state.cropImg&&isEternal){ initCropTool(state.cropImg); try { document.getElementById('positionSliders').style.display='block'; } catch(e) {} }
+    if(!isEternal) try { document.getElementById('positionSliders').style.display='none'; } catch(e) {}
   }
 
   function selectTheme(el) {
@@ -620,7 +671,7 @@
         document.getElementById('uploadArea').classList.add('has-image');
         document.getElementById('uploadArea').onclick=null;
 
-        document.getElementById('imageControls').style.display='block';
+        document.getElementById('positionSliders').style.display='block';
         document.getElementById('imgPosX').value=50;
         document.getElementById('imgPosY').value=defaultY;
 
@@ -628,7 +679,7 @@
         if(state.tier==='eternal'){
           state.cropImg=tempImg;
           initCropTool(tempImg);
-          document.getElementById('cropTool').style.display='block';
+          try { document.getElementById('positionSliders').style.display='block'; } catch(e) {}
           document.getElementById('cropHint').style.display='inline';
         }
       };
@@ -695,8 +746,8 @@
     out.getContext('2d').drawImage(state.cropImg,rx/state.cropScale,ry/state.cropScale,rw/state.cropScale,rh/state.cropScale,0,0,rw,rh);
     state.croppedImageData=out.toDataURL('image/jpeg',0.88);
     document.getElementById('uploadPreview').src=state.croppedImageData;
-    document.getElementById('cropTool').style.display='none';
-    document.getElementById('uploadArea').onclick=()=>{initCropTool(state.cropImg);document.getElementById('cropTool').style.display='block';};
+    try { document.getElementById('positionSliders').style.display='none'; } catch(e) {}
+    document.getElementById('uploadArea').onclick=()=>{initCropTool(state.cropImg);try { document.getElementById('positionSliders').style.display='block'; } catch(e) {}};
   }
 
   function resetCrop(){
@@ -796,7 +847,7 @@
       document.getElementById('walletDot').classList.remove('connected');
       document.getElementById('walletLabel').textContent='Connect Wallet';
       document.getElementById('myWishesBtn').style.display='none';
-      document.getElementById('disconnectBtn').style.display='none';
+      try{document.getElementById('disconnectBtn').style.display='none';}catch(e){}
       if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Connect wallet to mint →';
     }else{
       connectWallet();
@@ -828,7 +879,7 @@
         document.getElementById('walletDot').classList.remove('connected');
         document.getElementById('walletLabel').textContent='Connect Wallet';
         document.getElementById('myWishesBtn').style.display='none';
-        document.getElementById('disconnectBtn').style.display='none';
+        try{document.getElementById('disconnectBtn').style.display='none';}catch(e){}
         if(state.paymentMethod==='crypto')document.getElementById('mintBtn').textContent='Connect wallet to mint →';
       };
     } catch(e) {
@@ -837,7 +888,7 @@
   }
 
   function updateWalletUI(address){
-    document.getElementById('disconnectBtn').style.display='block';
+    try{document.getElementById('disconnectBtn').style.display='block';}catch(e){}
     state.walletConnected=true;
     state.walletAddress=address;
     document.getElementById('walletDot').classList.add('connected');
