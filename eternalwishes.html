@@ -337,6 +337,7 @@
             <div id="recordTimer" style="font-size:11px;color:var(--muted);">Max 30 seconds</div>
           </div>
         </div>
+        <canvas id="waveformCanvas" width="300" height="50" style="display:none;width:100%;height:50px;margin-top:10px;border-radius:6px;background:var(--cream);"></canvas>
         <audio id="audioPlayback" controls style="display:none;width:100%;margin-top:10px;"></audio>
       </div>
 
@@ -623,6 +624,13 @@
     const tierDescs = {basic:'Simple & permanent · Text wish card', premium:'Photo + premium badge · Make it unforgettable', eternal:'Photo + voice + eternal badge · The ultimate wish'};
     const tierPrices = {basic:'~$0.15', premium:'~$0.39', eternal:'~$0.79'};
     updateCompactTier(tierNames[state.tier], tierPrices[state.tier], tierDescs[state.tier]);
+
+    // Auto-scroll to premium features on mobile when Premium/Eternal selected
+    if (['premium','eternal'].includes(state.tier)) {
+      setTimeout(() => {
+        document.getElementById('premiumFields').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 350);  // small delay for expand animation to finish
+    }
     const isPrem=['premium','eternal'].includes(state.tier);
     const isEternal=state.tier==='eternal';
     document.getElementById('premiumFields').classList.toggle('visible', isPrem);
