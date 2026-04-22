@@ -16,6 +16,8 @@
     --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
   }
   html { scroll-behavior: smooth; }
+  html { overflow-x: hidden; }
+  *, *::before, *::after { box-sizing: border-box; }
   body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
   body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
 
@@ -53,7 +55,7 @@
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field.full { grid-column: 1 / -1; }
   label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--chain); font-weight: 500; }
-  input, textarea, select { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); transition: border-color 0.2s; outline: none; resize: none; width: 100%; }
+  input, textarea, select { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--ink); transition: border-color 0.2s; outline: none; resize: none; width: 100%; max-width: 100%; box-sizing: border-box; }
   input:focus, textarea:focus, select:focus { border-color: var(--gold); background: var(--gold-pale); }
   input::placeholder, textarea::placeholder { color: var(--chain-light); }
   .char-count { text-align: right; font-size: 11px; color: var(--chain-light); margin-top: -4px; }
@@ -136,7 +138,7 @@
   .feed-avatar { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--gold); font-weight: 500; border: 1px solid var(--border); }
 
   /* WALLET */
-  .top-nav { position: sticky; top: 0; z-index: 50; background: var(--ink); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .top-nav { position: sticky; top: 0; z-index: 50; background: var(--ink); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
   .top-nav-brand { color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; text-decoration: none; }
   .top-nav-links { display: flex; gap: 14px; align-items: center; }
   .top-nav-links a { color: var(--chain-light); font-size: 12px; text-decoration: none; transition: color 0.2s; }
@@ -771,7 +773,17 @@
     try{
       const stream=await navigator.mediaDevices.getUserMedia({audio:true});
       state.recordChunks=[];state.recordSeconds=0;
-      const mr=new MediaRecorder(stream);state.mediaRecorder=mr;
+      // Use mp4 on Safari (iOS), webm on Chrome/Firefox
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/mp4')
+          ? 'audio/mp4'
+          : '';
+      const mr = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
+      state.mediaRecorder = mr;
+      state.audioMimeType = mr.mimeType || 'audio/webm';
       const actx=new AudioContext(),analyser=actx.createAnalyser();
       actx.createMediaStreamSource(stream).connect(analyser);
       analyser.fftSize=256;const buf=new Uint8Array(analyser.frequencyBinCount);
@@ -790,7 +802,7 @@
       mr.ondataavailable=e=>{if(e.data.size>0)state.recordChunks.push(e.data);};
       mr.onstop=async()=>{
         cancelAnimationFrame(animId);actx.close();stream.getTracks().forEach(t=>t.stop());
-        const blob=new Blob(state.recordChunks,{type:'audio/webm'});
+        const blob=new Blob(state.recordChunks,{type:state.audioMimeType||'audio/webm'});
         state.audioBlob=blob;
         state.audioURL=URL.createObjectURL(blob);  // for playback in current tab
         const ap=document.getElementById('audioPlayback');ap.src=state.audioURL;ap.style.display='block';
