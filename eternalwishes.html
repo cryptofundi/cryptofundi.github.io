@@ -11,14 +11,14 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
-    --gold: #c9973a; --gold-light: #e8c97a; --gold-pale: #f7edcd;
+    --gold: #b8862b; --gold-light: #d4a84f; --gold-pale: #f7edcd;
     --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
     --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
   }
   html { scroll-behavior: smooth; }
   html { overflow-x: hidden; }
   *, *::before, *::after { box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; overflow-x: hidden; font-size: 15px; }
   body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
 
   /* HEADER */
@@ -36,7 +36,7 @@
   /* MAIN */
   main { max-width: 900px; margin: 0 auto; padding: 48px 20px 80px; position: relative; z-index: 1; }
 
-  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--chain); margin-bottom: 14px; font-weight: 500; }
+  .section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--chain); margin-bottom: 14px; font-weight: 500; }
 
   /* OCCASIONS */
   .occasions { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 40px; }
@@ -44,18 +44,19 @@
   .occasion-btn::before { content: ''; position: absolute; inset: 0; background: var(--gold-pale); opacity: 0; transition: opacity 0.2s; }
   .occasion-btn:hover::before { opacity: 1; }
   .occasion-btn:hover { border-color: var(--gold); transform: translateY(-2px); }
-  .occasion-btn.active { border-color: var(--gold); background: var(--gold-pale); }
+  .occasion-btn.active { border-color: var(--gold); background: var(--gold-pale); box-shadow: 0 4px 12px rgba(184,134,43,0.15); border-width: 2px; }
   .occasion-btn.active::after { content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
   .occasion-icon { font-size: 22px; display: block; margin-bottom: 6px; position: relative; z-index: 1; }
   .occasion-name { font-size: 12px; color: var(--ink); font-weight: 400; position: relative; z-index: 1; }
 
   /* FORM */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field.full { grid-column: 1 / -1; }
   label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--chain); font-weight: 500; }
-  input, textarea, select { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--ink); transition: border-color 0.2s; outline: none; resize: none; width: 100%; max-width: 100%; box-sizing: border-box; }
+  input, textarea, select { background: #fffdf8; border: 1.5px solid rgba(184,134,43,0.25); border-radius: var(--radius-sm); padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--ink); transition: border-color 0.2s; outline: none; resize: none; width: 100%; max-width: 100%; box-sizing: border-box; }
+  input[type='date'] { max-width: 100% !important; min-width: 0 !important; width: 100% !important; -webkit-appearance: none; }
   input:focus, textarea:focus, select:focus { border-color: var(--gold); background: var(--gold-pale); }
   input::placeholder, textarea::placeholder { color: var(--chain-light); }
   .char-count { text-align: right; font-size: 11px; color: var(--chain-light); margin-top: -4px; }
@@ -95,7 +96,7 @@
   .tier-features li::before { content: '— '; color: var(--gold); }
 
   /* PREMIUM FIELDS */
-  .premium-fields { display: none; border: 1px solid rgba(201,151,58,0.3); border-radius: var(--radius); padding: 20px; background: linear-gradient(135deg, var(--gold-pale) 0%, var(--cream) 100%); margin-bottom: 20px; }
+  .premium-fields { display: none; border: 1px solid rgba(201,151,58,0.3); border-radius: var(--radius); padding: 20px; background: linear-gradient(135deg, #f7edcd 0%, #f4efe6 100%); margin-bottom: 20px; }
   .premium-fields.visible { display: block; animation: fadeIn 0.3s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
   .premium-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
@@ -247,6 +248,7 @@
     <span class="pill">No storage</span><span class="pill">Forever on-chain</span>
     <span class="pill">Base network</span>
   </div>
+  <a href="how-it-works.html" style="display:inline-block;margin-top:12px;color:var(--gold);font-size:14px;text-decoration:none;letter-spacing:0.02em;">How it works →</a>
 </header>
 
 <main>
@@ -442,16 +444,18 @@
     </div>
     <div class="payment-info visible" id="cryptoInfo">
       <strong>Crypto wallet:</strong> Connect MetaMask, sign the transaction. Fully trustless — no backend involved.<br><br>
-      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.6;">
-        <span style="font-weight:600;color:var(--ink);">🔒 Safe & simple</span>
-        <span style="color:var(--muted);"> · No approvals · Pay once · <a href="https://basescan.org/address/0xC51b7B6B4af1B62dc604324c89b386b10F67716D#code" target="_blank" style="color:var(--gold);">Verified contract</a></span>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;">
+        <div><span style="font-weight:600;color:var(--ink);">🔒 Safe & simple</span><span style="color:var(--muted);"> · No approvals · Pay once · <a href="https://basescan.org/address/0xC51b7B6B4af1B62dc604324c89b386b10F67716D#code" target="_blank" style="color:var(--gold);">Verified contract</a></span></div>
+        <div style="color:var(--muted);margin-top:4px;">• No wallet permissions requested — just a simple ETH transfer<br>• Tip: use a fresh wallet if you prefer extra caution</div>
       </div>
     </div>
 
     <button class="mint-btn" id="mintBtn" onclick="handleMint()">
       Seal this wish forever →
     </button>
-    <p class="mint-note">Paid in ETH · Gas < $0.01 · Base blockchain · Cannot be deleted · Ever</p>
+    <p class="mint-note">Paid in ETH · Gas < $0.01 · Base blockchain
+      · Cannot be deleted · Ever</p>
+    <p style="text-align:center;margin-top:6px;"><a href="how-it-works.html" style="color:var(--gold);font-size:12px;text-decoration:none;">How it works →</a></p>
   </div>
 
   <!-- PUBLIC MOMENTS SECTION -->
@@ -538,7 +542,14 @@
   </div>
 </div>
 
-<footer>Eternal Wishes · Base blockchain · No login · No tracking · No personal data stored</footer>
+<footer style="text-align:center;padding:32px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--chain-light);letter-spacing:0.05em;">
+  <div style="margin-bottom:8px;">No login · No tracking · No personal data stored</div>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="how-it-works.html" style="color:var(--muted);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">How it works</a>
+    <a href="privacy.html" style="color:var(--muted);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Privacy</a>
+    <a href="terms.html" style="color:var(--muted);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Terms</a>
+  </div>
+</footer>
 
 
 
