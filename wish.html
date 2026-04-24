@@ -14,13 +14,13 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
-    --gold: #c9973a; --gold-light: #e8c97a; --gold-pale: #f7edcd;
+    --gold: #b8862b; --gold-light: #d4a84f; --gold-pale: #f7edcd;
     --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
     --border: rgba(201,151,58,0.22); --radius: 20px; --radius-sm: 12px;
     --green: #22c55e;
     /* Theme vars — overridden by JS */
     --theme-bg: #f4efe6; --theme-card: #faf7f2;
-    --theme-msg: #1a1410; --theme-accent: #c9973a;
+    --theme-msg: #1a1410; --theme-accent: #b8862b;
   }
   html { scroll-behavior: smooth; }
   body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; transition: background 0.4s; }
@@ -76,7 +76,7 @@
   .premium-badge { margin-left: 8px; font-size: 10px; padding: 3px 10px; border-radius: 20px; display: none; font-weight: 500; }
   .premium-badge.visible { display: inline-block; }
   .premium-badge.premium { background: var(--gold-pale); border: 1px solid rgba(201,151,58,0.5); color: var(--gold); }
-  .premium-badge.eternal { background: var(--ink); color: var(--gold-light); border: 1px solid var(--gold); }
+  .premium-badge.eternal { background: linear-gradient(135deg, #1a1410, #2a1f16); color: #f7d98a; font-weight: 500; letter-spacing: 0.5px; border: 1px solid var(--gold); }
 
   /* CARD BODY */
   .card-body { padding: 36px 36px 28px; }
@@ -121,14 +121,15 @@
 
   .basescan-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 14px; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; color: var(--chain); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 10px; transition: all 0.2s; text-decoration: none; font-weight: 500; }
   .basescan-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
-  .immutable-badge { background: var(--ink); color: var(--gold-light); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 10px; font-size: 11px; text-align: center; letter-spacing: 0.06em; line-height: 1.6; }
+  .immutable-badge { background: linear-gradient(135deg, #1a1410, #2a1f16); color: #f7d98a; font-weight: 500; letter-spacing: 0.5px; border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 10px; font-size: 11px; text-align: center; letter-spacing: 0.06em; line-height: 1.6; }
 
   /* SHARE PANEL */
   .share-panel { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-top: 14px; animation: cardReveal 0.7s cubic-bezier(0.34,1.2,0.64,1) 0.25s both; }
   .share-header { background: var(--cream); padding: 13px 18px; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--chain); font-weight: 500; }
   .share-body { padding: 14px; }
-  .share-link-row { display: flex; gap: 8px; margin-bottom: 10px; }
-  .share-link-input { flex: 1; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 11px; font-size: 11px; font-family: monospace; color: var(--muted); outline: none; }
+  .share-link-row { display: flex; gap: 8px; margin-bottom: 10px; max-width: 100%; }
+  .share-link-input { flex: 1; min-width: 0; width: 100%; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; font-family: inherit; color: var(--muted); outline: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 480px) { .share-link-row { flex-direction: column; } .share-link-input { width: 100%; } }
   .copy-btn { padding: 9px 13px; background: var(--ink); color: var(--parchment); border: none; border-radius: var(--radius-sm); font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.2s; font-weight: 500; }
   .copy-btn:hover { background: #2d2520; }
   .copy-btn.copied { background: #15803d; }
@@ -153,6 +154,14 @@
 </style>
 </head>
 <body>
+
+<nav style="background:#1a1410;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;">
+  <a href="eternalwishes.html" style="color:#e8c97a;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;text-decoration:none;">Eternal Wishes</a>
+  <div style="display:flex;gap:18px;">
+    <a href="eternalwishes.html" style="color:#b5a48a;font-size:13px;text-decoration:none;">Create Wish</a>
+    <a href="moments.html" style="color:#b5a48a;font-size:13px;text-decoration:none;">Moments</a>
+  </div>
+</nav>
 
 <div id="loadingState">
   <div class="loading-spinner"></div>
@@ -300,7 +309,7 @@
         <div class="share-header">Share this wish</div>
         <div class="share-body">
           <div class="share-link-row">
-            <input type="text" class="share-link-input" id="shareLink" readonly>
+            <div class="share-link-input" id="shareLink" style="min-height:40px;word-break:break-all;white-space:normal;cursor:text;user-select:all;">Loading link…</div>
             <button class="copy-btn" id="copyBtn" onclick="copyWishLink()">Copy</button>
           </div>
           <div class="share-btns-grid">
@@ -315,16 +324,14 @@
       <!-- CTA -->
       <div class="cta-panel">
         <a href="eternalwishes.html" class="cta-btn">💖 Send your own eternal wish →</a>
-        <p class="cta-sub">From ₹19 · No login · Forever on-chain</p>
+        <p class="cta-sub">From ~$0.15 · No login · Forever on-chain</p>
       </div>
 
     </div>
   </div>
 </div>
 
-<footer>
-  <a href="eternalwishes.html">Eternal Wishes</a> · Base blockchain · No login · No tracking · No personal data stored
-</footer>
+
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
@@ -342,9 +349,9 @@
 
   // ── THEME DEFINITIONS ──
   const THEMES = {
-    classic: { bg:'#faf7f2', card:'#f4efe6', msg:'#1a1410', accent:'#c9973a' },
+    classic: { bg:'#faf7f2', card:'#f4efe6', msg:'#1a1410', accent:'#b8862b' },
     romantic: { bg:'#fff5f7', card:'#fce4ec', msg:'#880e4f', accent:'#e91e63' },
-    dark: { bg:'#1a1410', card:'#2d2520', msg:'#e8c97a', accent:'#c9973a' },
+    dark: { bg:'#1a1410', card:'#2d2520', msg:'#e8c97a', accent:'#b8862b' },
     nature: { bg:'#f1f8e9', card:'#e8f5e9', msg:'#1b5e20', accent:'#2e7d32' },
   };
 
@@ -555,11 +562,11 @@
     } else {
       document.getElementById('proofTxHash').textContent = 'View on Basescan ↗';
       document.getElementById('basescanLink').href =
-        `https://basescan.org/token/0xdaB67208DFF64A428a60Db1BaF0A4091aAda1175?a=${data.tokenId}`;
+        `https://basescan.org/token/0xC51b7B6B4af1B62dc604324c89b386b10F67716D?a=${data.tokenId}`;
     }
 
     // Share
-    document.getElementById('shareLink').value = url;
+    document.getElementById('shareLink').textContent = url;
 
     // Celebrations
     if (['birthday','wedding','newbaby','graduation'].includes(data.occasion)) {
@@ -595,7 +602,7 @@
 
   // SHARING
   function copyWishLink() {
-    navigator.clipboard.writeText(document.getElementById('shareLink').value).then(() => {
+    navigator.clipboard.writeText(document.getElementById('shareLink').textContent).then(() => {
       const b = document.getElementById('copyBtn');
       b.textContent = 'Copied!'; b.classList.add('copied');
       setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('copied'); }, 2500);
@@ -621,13 +628,13 @@
 
   function shareWhatsApp() {
     const to = document.getElementById('wishTo').textContent;
-    const url = document.getElementById('shareLink').value;
+    const url = document.getElementById('shareLink').textContent;
     window.open(`https://wa.me/?text=${encodeURIComponent(`✨ An eternal wish for ${to} — sealed forever on the blockchain\n${url}`)}`, '_blank');
   }
 
   function shareTwitter() {
     const to = document.getElementById('wishTo').textContent;
-    const url = document.getElementById('shareLink').value;
+    const url = document.getElementById('shareLink').textContent;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just sent an eternal wish to ${to} — sealed forever on the blockchain ✨`)}&url=${encodeURIComponent(url)}`, '_blank');
   }
 
@@ -635,13 +642,13 @@
 
   function shareGeneral() {
     const to = document.getElementById('wishTo').textContent;
-    const url = document.getElementById('shareLink').value;
+    const url = document.getElementById('shareLink').textContent;
     navigator.share ? navigator.share({ title:`Eternal Wish for ${to}`, url }) : copyWishLink();
   }
 
   // CONFETTI
   function launchConfetti() {
-    const colors = ['#c9973a','#e8c97a','#f7edcd','#1a1410','#b5a48a'];
+    const colors = ['#b8862b','#d4a84f','#f7edcd','#1a1410','#b5a48a'];
     for (let i = 0; i < 52; i++) {
       const el = document.createElement('div');
       el.className = 'confetti-piece';
@@ -665,5 +672,14 @@
 </script>
 
 
+
+<div style="text-align:center;padding:20px 24px 30px;font-size:12px;color:#b5a48a;border-top:1px solid rgba(201,151,58,0.2);margin-top:20px;">
+  <div style="margin-bottom:6px;">No login · No tracking · No personal data stored</div>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+    <a href="how-it-works.html" style="color:#7a6e62;text-decoration:none;">How it works</a>
+    <a href="privacy.html" style="color:#7a6e62;text-decoration:none;">Privacy</a>
+    <a href="terms.html" style="color:#7a6e62;text-decoration:none;">Terms</a>
+  </div>
+</div>
 </body>
 </html>
