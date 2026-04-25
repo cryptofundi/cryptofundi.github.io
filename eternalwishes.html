@@ -248,7 +248,7 @@
     <span class="pill">No storage</span><span class="pill">Forever on-chain</span>
     <span class="pill">Base network</span>
   </div>
-  <a href="how-it-works.html" style="display:inline-block;margin-top:12px;color:var(--gold);font-size:14px;text-decoration:none;letter-spacing:0.02em;">How it works →</a>
+  <a href="how-it-works.html" style="display:inline-block;margin-top:8px;margin-bottom:0;color:var(--gold);font-size:14px;text-decoration:none;letter-spacing:0.02em;border:1.5px solid var(--gold);border-radius:var(--radius-sm);padding:10px 24px;transition:all 0.2s;" onmouseover="this.style.background='var(--gold)';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">How it works →</a>
 </header>
 
 <main>
@@ -264,6 +264,7 @@
       <button class="occasion-btn" data-occasion="promotion" onclick="selectOccasion(this)"><span class="occasion-icon">🚀</span><span class="occasion-name">Promotion</span></button>
       <button class="occasion-btn" data-occasion="newyear" onclick="selectOccasion(this)"><span class="occasion-icon">✨</span><span class="occasion-name">New Year</span></button>
       <button class="occasion-btn" data-occasion="memorial" onclick="selectOccasion(this)"><span class="occasion-icon">🕯️</span><span class="occasion-name">In Memory</span></button>
+      <button class="occasion-btn" data-occasion="valentine" onclick="selectOccasion(this)"><span class="occasion-icon">💝</span><span class="occasion-name">Valentine</span></button>
       <button class="occasion-btn" data-occasion="custom" onclick="selectOccasion(this)"><span class="occasion-icon">📌</span><span class="occasion-name">Preserve</span></button>
     </div>
   </div>
@@ -421,7 +422,7 @@
     </div>
     </div>
 
-    <p class="section-label">Step 4 — Pay & mint forever</p>
+    <p class="section-label" style="margin-top:20px;">Step 4 — Pay & mint forever</p>
     <div class="payment-options">
       <button class="pay-btn active" data-method="crypto" onclick="selectPayment(this)">
         <div class="pay-icon">🦊</div>
@@ -463,8 +464,8 @@
     <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,36px);font-weight:300;margin-bottom:8px;">🌍 Public Moments</h2>
     <p style="font-size:14px;color:var(--muted);max-width:440px;margin:0 auto 18px;line-height:1.5;">Join others in sending wishes for special occasions</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a href="moments.html" style="display:inline-block;padding:12px 24px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--ink);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='';this.style.background=''">Explore Moments</a>
-      <a href="create-moment.html" style="display:inline-block;padding:12px 24px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--ink);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-pale)'" onmouseout="this.style.borderColor='';this.style.background=''">Create a Moment</a>
+      <a href="moments.html" style="display:inline-block;padding:10px 24px;border:1.5px solid var(--gold);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--gold);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--gold)';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">Explore Moments</a>
+      <a href="create-moment.html" style="display:inline-block;padding:10px 24px;border:1.5px solid var(--gold);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;color:var(--gold);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--gold)';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">Create a Moment</a>
     </div>
     <p style="font-size:11px;color:var(--chain-light);margin-top:10px;">Anyone can join a moment and add their wish</p>
   </div>
@@ -1227,7 +1228,7 @@
   function shareWhatsApp(){const u=encodeURIComponent(document.getElementById('wishLink').value);window.open(`https://wa.me/?text=${encodeURIComponent('✨ I just sealed an eternal wish on the blockchain — ')}${u}`,'_blank');}
   function shareTwitter(){const u=encodeURIComponent(document.getElementById('wishLink').value);window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Just minted an eternal wish on the blockchain ✨')}&url=${u}`,'_blank');}
 
-  const OCCASION_MAP={birthday:{i:'🎂',l:'Birthday'},anniversary:{i:'💍',l:'Anniversary'},wedding:{i:'💐',l:'Wedding'},newbaby:{i:'👶',l:'New Baby'},graduation:{i:'🎓',l:'Graduation'},promotion:{i:'🚀',l:'Promotion'},newyear:{i:'✨',l:'New Year'},memorial:{i:'🕯️',l:'In Memory'},custom:{i:'📌',l:'Preserve'}};
+  const OCCASION_MAP={birthday:{i:'🎂',l:'Birthday'},anniversary:{i:'💍',l:'Anniversary'},wedding:{i:'💐',l:'Wedding'},newbaby:{i:'👶',l:'New Baby'},graduation:{i:'🎓',l:'Graduation'},promotion:{i:'🚀',l:'Promotion'},newyear:{i:'✨',l:'New Year'},memorial:{i:'🕯️',l:'In Memory'},valentine:{i:'💝',l:'Valentine'},custom:{i:'📌',l:'Preserve'}};
   const THEME_COLORS={classic:'var(--cream)',romantic:'#fce4ec',dark:'#2d2520',nature:'#e8f5e9'};
 
   let feedWishes = [];
