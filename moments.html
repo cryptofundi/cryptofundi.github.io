@@ -33,7 +33,7 @@
   .hero .divider { margin: 20px auto; color: var(--gold); font-size: 14px; }
 
   /* Search */
-  .search-wrap { max-width: 560px; margin: 0 auto 30px; padding: 0 24px; position: relative; }
+  .search-wrap { max-width: 560px; margin: -4px auto 24px; padding: 0 24px; position: relative; }
   .search-wrap input { width: 100%; padding: 14px 18px 14px 42px; border: 1.5px solid var(--border); border-radius: 30px; font-family: inherit; font-size: 14px; background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.2s; }
   .search-wrap input:focus { border-color: var(--gold); }
   .search-wrap .icon { position: absolute; left: 40px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--muted); pointer-events: none; }
@@ -55,8 +55,8 @@
   .moment-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
   .moment-meta .count { color: var(--gold); font-weight: 500; }
   .moment-actions { display: flex; justify-content: flex-end; }
-  .btn-wish { background: var(--gold-pale); border: 1px solid rgba(201,151,58,0.4); border-radius: var(--radius-sm); padding: 8px 18px; font-family: inherit; font-size: 13px; color: var(--gold); cursor: pointer; transition: all 0.2s; }
-  .btn-wish:hover { background: var(--gold); color: white; border-color: var(--gold); }
+  .btn-wish { background: var(--gold); border: 1px solid var(--gold); border-radius: var(--radius-sm); padding: 8px 18px; font-family: inherit; font-size: 13px; color: white; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .btn-wish:hover { opacity: 0.9; }
 
   /* Loading */
   .loading { text-align: center; padding: 40px 0; color: var(--muted); font-size: 13px; }
@@ -77,8 +77,8 @@
   .bottom-cta p { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; color: var(--ink); margin-bottom: 16px; }
   .badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
   .badge { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; }
-  .btn-create { display: inline-block; padding: 14px 32px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; color: var(--ink); cursor: pointer; background: transparent; transition: all 0.2s; text-decoration: none; }
-  .btn-create:hover { border-color: var(--gold); background: var(--gold-pale); color: var(--gold); text-decoration: none; }
+  .btn-create { display: inline-block; padding: 12px 28px; border: 1.5px solid var(--gold); border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; color: var(--gold); cursor: pointer; background: transparent; transition: all 0.2s; text-decoration: none; }
+  .btn-create:hover { background: var(--gold); color: white; text-decoration: none; }
 
   /* Footer */
   .footer { text-align: center; padding: 20px 24px 30px; font-size: 11px; color: var(--chain-light); }
@@ -141,7 +141,7 @@
 const OCCASION_ICONS = {
   birthday:'🎂', anniversary:'💍', wedding:'💐', newbaby:'👶',
   graduation:'🎓', promotion:'🚀', newyear:'✨', memorial:'🕯️',
-  custom:'📌', celebration:'🎉',
+  valentine:'💝', custom:'📌', celebration:'🎉',
 };
 
 let allMoments = [];
