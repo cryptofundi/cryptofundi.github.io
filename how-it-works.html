@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It Works · Eternal Wishes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410; --parchment: #faf7f2; --cream: #f4efe6;
+    --gold: #b8862b; --gold-light: #d4a84f; --gold-pale: #f7edcd;
+    --chain: #8a7560; --chain-light: #b5a48a; --muted: #7a6e62;
+    --border: rgba(201,151,58,0.2); --radius: 16px; --radius-sm: 10px;
+  }
+  html { overflow-x: hidden; }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--parchment); color: var(--ink); min-height: 100vh; margin: 0; font-size: 15px; }
+  a { color: var(--gold); text-decoration: none; }
+
+  .nav { background: var(--ink); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .nav-brand { color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a { color: var(--chain-light); font-size: 13px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold-light); }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 0 24px 40px; }
+
+  .hero { text-align: center; padding: 36px 24px 6px; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(30px, 6vw, 48px); font-weight: 300; margin-bottom: 12px; letter-spacing: -0.02em; }
+  .hero p { font-size: 15px; color: var(--muted); max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+  .divider { text-align: center; color: var(--gold); font-size: 14px; margin: 16px 0; }
+
+  /* Step cards */
+  .step { background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+  .step-num { display: inline-block; width: 30px; height: 30px; line-height: 30px; text-align: center; background: var(--gold); color: white; border-radius: 50%; font-size: 14px; font-weight: 500; margin-right: 10px; }
+  .step h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; display: inline; vertical-align: middle; }
+  .step p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 10px; }
+
+  /* Feature cards */
+  .features { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 30px 0; }
+  @media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
+  .feature { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; box-shadow: 0 3px 12px rgba(0,0,0,0.03); }
+  .feature-icon { font-size: 24px; margin-bottom: 8px; }
+  .feature h4 { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 400; margin-bottom: 6px; }
+  .feature p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* Tiers */
+  .tier-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
+  @media (max-width: 540px) { .tier-row { grid-template-columns: 1fr; } }
+  .tier-mini { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
+  .tier-mini h4 { font-family: 'Cormorant Garamond', serif; font-size: 20px; margin-bottom: 4px; }
+  .tier-mini .price { color: var(--gold); font-size: 18px; font-weight: 500; }
+  .tier-mini p { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+  /* Section titles */
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; text-align: center; margin: 20px 0 14px; }
+
+  /* Trust */
+  .trust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+  @media (max-width: 480px) { .trust-grid { grid-template-columns: 1fr; } }
+  .trust-item { text-align: center; padding: 16px 12px; background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  .trust-item .icon { font-size: 22px; margin-bottom: 6px; }
+  .trust-item h5 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .trust-item p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* CTA */
+  .cta-box { text-align: center; padding: 30px; background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--radius); margin: 30px 0; }
+  .cta-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 10px; }
+  .cta-box p { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .cta-btn { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #1a1410, #2a1f16); color: #f7d98a; font-weight: 500; letter-spacing: 0.5px; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; text-decoration: none; transition: opacity 0.2s; }
+  .cta-btn:hover { opacity: 0.9; text-decoration: none; }
+
+  .faq { margin: 30px 0; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+  .faq-q { font-weight: 500; font-size: 15px; margin-bottom: 6px; cursor: pointer; }
+  .faq-a { font-size: 14px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="eternalwishes.html" class="nav-brand">Eternal Wishes</a>
+  <div class="nav-links">
+    <a href="eternalwishes.html">Create Wish</a>
+    <a href="moments.html">Moments</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>How Eternal Wishes Works</h1>
+  <p>Send a wish that lives forever on the blockchain. No accounts, no tracking, no middlemen — just your words, sealed permanently.</p>
+</div>
+
+<div class="container">
+
+  <div class="divider" style="display:flex;align-items:center;justify-content:center;gap:20px;">
+    <span>✦</span>
+    <a href="eternalwishes.html" style="font-size:14px;color:var(--gold);text-decoration:none;border:1.5px solid var(--gold);border-radius:var(--radius-sm);padding:10px 24px;transition:all 0.2s;" onmouseover="this.style.background='var(--gold)';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">Create a Wish →</a>
+  </div>
+
+  <!-- STEPS -->
+  <div class="step">
+    <span class="step-num">1</span>
+    <h3>Choose an occasion</h3>
+    <p>Pick from Birthday, Anniversary, Wedding, Graduation, New Baby, Promotion, New Year, In Memory, or Preserve (for tweets, moments, or anything worth keeping forever).</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">2</span>
+    <h3>Write your message</h3>
+    <p>Enter the recipient's name and write your message (up to 280 characters). Optionally add your name. For Premium and Eternal tiers, you can attach a photo or record a voice note.</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">3</span>
+    <h3>Choose your tier</h3>
+    <p>Select Basic (text only), Premium (add a photo), or Eternal (photo + voice note). Each tier creates a permanent NFT on the Base blockchain.</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">4</span>
+    <h3>Connect wallet & seal forever</h3>
+    <p>Connect MetaMask, confirm the transaction, and your wish is minted as an NFT. You get a shareable link that anyone can open — no wallet needed to view.</p>
+  </div>
+
+  <div class="divider">✦</div>
+
+  <!-- TIERS -->
+  <h2 class="section-title">Three Tiers</h2>
+
+  <div class="tier-row">
+    <div class="tier-mini">
+      <h4>Basic</h4>
+      <div class="price">~$0.15</div>
+      <p>Text wish card, permanent on-chain, timestamped, shareable link</p>
+    </div>
+    <div class="tier-mini">
+      <h4>Premium</h4>
+      <div class="price">~$0.39</div>
+      <p>Everything in Basic + photo attachment, premium badge</p>
+    </div>
+    <div class="tier-mini">
+      <h4>Eternal</h4>
+      <div class="price">~$0.79</div>
+      <p>Everything in Premium + voice note, eternal badge</p>
+    </div>
+  </div>
+
+  <div class="divider">✦</div>
+
+  <!-- FEATURES -->
+  <h2 class="section-title">Features</h2>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🔗</div>
+      <h4>Permanent on-chain</h4>
+      <p>Your message text is stored directly on the Base blockchain. It cannot be edited, deleted, or censored — by anyone, ever.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📷</div>
+      <h4>Photo & voice</h4>
+      <p>Premium and Eternal tiers let you attach a photo or record a 30-second voice note, stored on IPFS decentralized storage.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🌍</div>
+      <h4>Public Moments</h4>
+      <p>Create a shared moment (like "Wish Modi Happy Birthday") and invite anyone to add their wish. Great for communities and celebrations.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📌</div>
+      <h4>Preserve anything</h4>
+      <p>Not just wishes — preserve tweets, predictions, milestones, or any text you want to keep on-chain forever. Use the "Preserve" occasion.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔍</div>
+      <h4>Shareable & viewable</h4>
+      <p>Every wish gets a unique link. Anyone can view it — no wallet, no app, no login required. Share via WhatsApp, X, or any platform.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">💰</div>
+      <h4>Ultra low cost</h4>
+      <p>Starting at ~$0.15 on Base blockchain. Gas fees under $0.01. No subscriptions, no hidden charges. Pay once, stored forever.</p>
+    </div>
+  </div>
+
+  <div class="divider">✦</div>
+
+  <!-- TRUST -->
+  <h2 class="section-title">Trust & Safety</h2>
+
+  <div class="trust-grid">
+    <div class="trust-item">
+      <div class="icon">🔒</div>
+      <h5>No approvals</h5>
+      <p>We never ask for token approvals or wallet permissions. Just a simple ETH payment.</p>
+    </div>
+    <div class="trust-item">
+      <div class="icon">📋</div>
+      <h5>Verified contract</h5>
+      <p>Our smart contract is <a href="https://basescan.org/address/0xC51b7B6B4af1B62dc604324c89b386b10F67716D#code" target="_blank">verified on Basescan</a>. Read every line of code yourself.</p>
+    </div>
+    <div class="trust-item">
+      <div class="icon">🚫</div>
+      <h5>No tracking</h5>
+      <p>No cookies, no analytics, no personal data collection. We don't know who you are.</p>
+    </div>
+  </div>
+
+  <div class="divider">✦</div>
+
+  <!-- FAQ -->
+  <h2 class="section-title">Common Questions</h2>
+
+  <div class="faq">
+    <div class="faq-item">
+      <div class="faq-q">Do I need a crypto wallet?</div>
+      <div class="faq-a">Yes, currently you need MetaMask or a compatible wallet with a small amount of ETH on Base network. UPI/Card payment is coming soon.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I delete or edit my wish after minting?</div>
+      <div class="faq-a">No. Once sealed on the blockchain, your wish is permanent and immutable. No one can change or remove it — not even us. Please review carefully before confirming.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What happens to my photo or voice note?</div>
+      <div class="faq-a">Media files are stored on IPFS, a decentralized storage network. Your message text is stored directly on the blockchain. The text is permanent; media availability depends on the storage network.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How much does it cost?</div>
+      <div class="faq-a">Basic wishes start at ~$0.15 (paid in ETH). Gas fees on Base are under $0.01. No recurring charges.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can anyone see my wish?</div>
+      <div class="faq-a">Yes. All wishes are public and viewable by anyone with the link. Wallet addresses are visible on the blockchain. Don't include sensitive personal information.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is a Moment?</div>
+      <div class="faq-a">A Moment is a shared space where multiple people can add wishes for a common occasion — like wishing a public figure happy birthday. Anyone can create a Moment and share it.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Where can I view my wish after minting?</div>
+      <div class="faq-a">After minting, you get a unique link (e.g. wish.html?id=5) that you can open anytime. You can also find all your wishes by connecting your wallet and clicking "My Wishes" in the top menu. No account needed — your wallet is your identity.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I share my wish with someone who doesn't have a wallet?</div>
+      <div class="faq-a">Yes. Anyone can view a wish using the link — no wallet, no app, no login required. Just share the link via WhatsApp, X, Instagram, or any platform. The recipient sees the full wish card in their browser.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What happens if I lose the wish link?</div>
+      <div class="faq-a">Connect the same wallet you used to mint and click "My Wishes" — it queries the blockchain directly and shows all wishes you ever created. The wish lives on the blockchain forever, not on your device.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can someone else see my wish on the blockchain?</div>
+      <div class="faq-a">Yes. All wishes are public on the Base blockchain. Anyone can see the message, recipient name, and sender name. Your wallet address is also visible. Don't include sensitive personal information in your wish.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How do Moments work?</div>
+      <div class="faq-a">Anyone can create a public Moment (like "Wish Elon Musk a Happy Birthday") and share the link. Others can add their wishes to that Moment. All wishes are Basic tier (text only). It's a great way to collect wishes from a community for a shared celebration.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I create a Moment for free?</div>
+      <div class="faq-a">Yes. Creating a Moment is currently free. Your wallet address is recorded as the host of the Moment. You can share the link with anyone and they can add their wishes by paying the Basic wish fee (~$0.15).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What does "Preserve" mean?</div>
+      <div class="faq-a">Preserve is for anything beyond traditional wishes — save a tweet, a prediction, a milestone, or any text you want permanently recorded on-chain. Think of it as a digital time capsule.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is my photo or voice note stored permanently?</div>
+      <div class="faq-a">Your message text is stored directly on the blockchain and is permanent. Photos and voice notes are stored on IPFS (a decentralized network). They are designed for long-term availability, but their permanence depends on the storage network. Your text is guaranteed forever.</div>
+    </div>
+  </div>
+
+  <div class="divider">✦</div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h3>Ready to create your first wish?</h3>
+    <p>It takes less than 30 seconds. Your words will live on the blockchain forever.</p>
+    <a href="eternalwishes.html" class="cta-btn">Create a Wish →</a>
+  </div>
+
+</div>
+
+<footer style="text-align:center;padding:32px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--chain-light);">
+  <div style="margin-bottom:8px;">No login · No tracking · No personal data stored</div>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="how-it-works.html" style="color:var(--gold);text-decoration:none;">How it works</a>
+    <a href="privacy.html" style="color:var(--muted);text-decoration:none;">Privacy</a>
+    <a href="terms.html" style="color:var(--muted);text-decoration:none;">Terms</a>
+  </div>
+</footer>
+
+</body>
+</html>
